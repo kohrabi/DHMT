@@ -132,8 +132,8 @@ async function RapierPhysics() {
   // Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/
   await RAPIER.init();
 
-  const gravity = new THREE.Vector3(0.0, -9.81, 0.0);
-  const world = new RAPIER.World({ gravity });
+  const gravity = new RAPIER.Vector3(0.0, -9.81, 0.0);
+  const world = new RAPIER.World(gravity);
 
   const meshes: THREE.Mesh[] = [];
   const meshMap = new WeakMap();

@@ -1,15 +1,22 @@
 import * as THREE from "three";
 import { Component } from "@/engine/component";
+import { Scene } from "./scene";
 
 export class GameObject {
   readonly name: string;
   readonly transform: THREE.Object3D;
+  readonly scene: Scene;
 
   private components: Component[] = [];
   private started = false;
 
-  constructor(name: string, object3D: THREE.Object3D = new THREE.Object3D()) {
+  constructor(
+    name: string,
+    scene: Scene,
+    object3D: THREE.Object3D = new THREE.Object3D(),
+  ) {
     this.name = name;
+    this.scene = scene;
     this.transform = object3D;
     this.transform.name = name;
   }

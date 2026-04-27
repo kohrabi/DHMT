@@ -9,7 +9,7 @@ Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);
 document.getElementById("webgl")!.appendChild(Global.renderer.domElement);
 
-Global.sceneManager.setScene(new DemoScene());
+Global.sceneManager.setScene(new Scene2());
 
 Global.renderer.setAnimationLoop(animate);
 

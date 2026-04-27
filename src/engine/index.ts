@@ -1,4 +1,5 @@
 export * from "@/engine/component";
+export * from "@/engine/components/meshRenderer";
 
 export * from "@/engine/gameObject";
 export * from "@/engine/gameWorld";

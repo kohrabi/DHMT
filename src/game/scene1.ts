@@ -34,8 +34,6 @@ export class DemoScene extends Scene {
     this.scene.background = new THREE.Color(0xbfd1e5);
   }
 
-  protected initialize(): void {}
-
   protected async loadContent(): Promise<void> {
     this.physics = await RapierPhysics();
     const ambient = new THREE.HemisphereLight(0x555555, 0xffffff);

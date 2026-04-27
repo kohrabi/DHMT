@@ -2,15 +2,17 @@ import * as THREE from "three";
 import { ContentManager } from "@/engine/contentManager";
 import { GameObject } from "@/engine/gameObject";
 import { GameWorld } from "@/engine/gameWorld";
+import { PhysicsWorld } from "./physicsWorld";
 
 export abstract class Scene {
   readonly name: string;
 
-  protected readonly world = new GameWorld();
-  protected readonly scene = new THREE.Scene();
-  protected readonly content = new ContentManager();
-  protected readonly gameObjects = new Set<GameObject>();
-  protected readonly camera = new THREE.PerspectiveCamera(
+  public readonly world = new GameWorld();
+  public readonly physicsWorld = new PhysicsWorld();
+  public readonly scene = new THREE.Scene();
+  public readonly content = new ContentManager();
+  public readonly gameObjects = new Set<GameObject>();
+  public readonly camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
     1,
@@ -23,7 +25,9 @@ export abstract class Scene {
     this.name = name;
   }
 
-  protected initialize(): void {}
+  protected async initialize(): Promise<void> {
+    await this.physicsWorld.initialize();
+  }
 
   protected loadContent(): void {}
 

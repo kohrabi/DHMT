@@ -133,7 +133,7 @@ async function RapierPhysics() {
   await RAPIER.init();
 
   const gravity = new THREE.Vector3(0.0, -9.81, 0.0);
-  const world = new RAPIER.World(gravity);
+  const world = new RAPIER.World({ gravity });
 
   const meshes: THREE.Mesh[] = [];
   const meshMap = new WeakMap();

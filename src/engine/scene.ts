@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ContentManager } from "@/engine/contentManager";
 import { GameObject } from "@/engine/gameObject";
 import { GameWorld } from "@/engine/gameWorld";
 
@@ -7,6 +8,7 @@ export abstract class Scene {
 
   protected readonly world = new GameWorld();
   protected readonly scene = new THREE.Scene();
+  protected readonly content = new ContentManager();
   protected readonly gameObjects = new Set<GameObject>();
   protected readonly camera = new THREE.PerspectiveCamera(
     45,
@@ -27,6 +29,15 @@ export abstract class Scene {
 
   protected unloadContent(): void {
     this.clearGameObjects();
+    this.content.clear();
+  }
+
+  protected get contentManager(): ContentManager {
+    return this.content;
+  }
+
+  protected get globalContentManager(): ContentManager {
+    return ContentManager.global;
   }
 
   protected get scene3D(): THREE.Scene {
@@ -76,15 +87,15 @@ export abstract class Scene {
     this.contentLoaded = false;
   }
 
-  protected update(deltaTime: number): void {
+  public update(deltaTime: number): void {
     this.world.update(deltaTime);
   }
 
-  protected fixedUpdate(fixedDeltaTime: number): void {
+  public fixedUpdate(fixedDeltaTime: number): void {
     this.world.fixedUpdate(fixedDeltaTime);
   }
 
-  protected draw(renderer: THREE.WebGLRenderer): void {
+  public draw(renderer: THREE.WebGLRenderer): void {
     renderer.render(this.scene, this.camera);
   }
 }

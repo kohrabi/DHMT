@@ -1,0 +1,104 @@
+{
+  "objects": {
+    "Camera": {
+      "name": "Camera",
+      "position": [
+        0.0,
+        -12.0,
+        0.0
+      ],
+      "model_path": null,
+      "properties": {}
+    },
+    "block-grass.008": {
+      "name": "block-grass.008",
+      "position": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.001": {
+      "name": "block-grass.001",
+      "position": [
+        -1.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.002": {
+      "name": "block-grass.002",
+      "position": [
+        -2.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.003": {
+      "name": "block-grass.003",
+      "position": [
+        -3.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.004": {
+      "name": "block-grass.004",
+      "position": [
+        -4.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.005": {
+      "name": "block-grass.005",
+      "position": [
+        2.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.006": {
+      "name": "block-grass.006",
+      "position": [
+        3.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.007": {
+      "name": "block-grass.007",
+      "position": [
+        4.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    },
+    "block-grass.009": {
+      "name": "block-grass.009",
+      "position": [
+        5.0,
+        0.0,
+        -1.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "properties": {}
+    }
+  }
+}

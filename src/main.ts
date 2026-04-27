@@ -3,6 +3,7 @@ import { DemoScene } from "./game/scene1";
 import { SceneManager } from "./engine/sceneManager";
 import { RapierPhysics } from "./engine/physics";
 import * as Global from "./global";
+import { Scene2 } from "./game/scene2";
 
 Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);

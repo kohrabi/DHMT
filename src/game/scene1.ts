@@ -1,15 +1,21 @@
-import { GameObject } from "@/engine/gameObject";
-import { Scene } from "@/engine/scene";
 import * as THREE from "three";
 import {
   OrbitControls,
   RapierHelper,
   RoundedBoxGeometry,
 } from "three/examples/jsm/Addons.js";
-import * as Global from "@/global";
-import { RapierPhysics } from "@/engine/physics";
+import { RapierPhysics, Scene } from "@/engine";
 import Stats from "three/examples/jsm/libs/stats.module.js";
-import { renderer } from "../global";
+import * as Global from "@/global";
+
+type LevelObject = {
+  model_path?: string;
+  position?: [number, number, number];
+};
+
+type LevelData = {
+  objects: Record<string, LevelObject>;
+};
 
 export class DemoScene extends Scene {
   private physics: any;
@@ -28,14 +34,10 @@ export class DemoScene extends Scene {
     this.scene.background = new THREE.Color(0xbfd1e5);
   }
 
+  protected initialize(): void {}
+
   protected async loadContent(): Promise<void> {
     this.physics = await RapierPhysics();
-
-    this.camera.position.set(5, 5, 5);
-    this.camera.lookAt(0, 0, 0);
-    this.scene3D.add(new THREE.AxesHelper(1));
-    this.scene3D.add(new THREE.GridHelper(10, 10));
-
     const ambient = new THREE.HemisphereLight(0x555555, 0xffffff);
 
     this.scene.add(ambient);
@@ -64,21 +66,41 @@ export class DemoScene extends Scene {
     this.controls.target = new THREE.Vector3(0, 2, 0);
     this.controls.update();
 
-    const geometry = new THREE.BoxGeometry(10, 0.5, 10);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-    const floor = new THREE.Mesh(geometry, material);
-    floor.receiveShadow = true;
-
-    floor.position.y = -0.25;
-    floor.userData.physics = { mass: 0 };
-    this.scene.add(floor);
-
     this.physics.addScene(this.scene);
     this.physicsHelper = new RapierHelper(this.physics.world);
     this.scene.add(this.physicsHelper);
-    setInterval(() => {
-      this.addBody();
-    }, 1000);
+
+    this.camera.position.set(5, 5, 5);
+    this.camera.lookAt(0, 0, 0);
+    this.scene3D.add(new THREE.AxesHelper(1));
+    this.scene3D.add(new THREE.GridHelper(10, 10));
+
+    try {
+      const player = await this.contentManager.loadGLTF(
+        "/assets/platformer/character-oopi.glb",
+      );
+      player.scene.position.set(1, 0, 0);
+      this.scene.add(player.scene);
+
+      const levelData = await this.contentManager.loadJSON<LevelData>(
+        "/assets/scenes/level.json",
+      );
+      for (const objectData of Object.values(levelData.objects)) {
+        if (!objectData.model_path || !objectData.position) {
+          continue;
+        }
+        const model = await this.contentManager.loadGLTF(objectData.model_path);
+        const instance = model.scene.clone();
+        instance.position.set(
+          objectData.position[0],
+          objectData.position[1],
+          objectData.position[2],
+        );
+        this.scene.add(instance);
+      }
+    } catch (error) {
+      console.error("Error loading assets:", error);
+    }
   }
 
   private addBody() {
@@ -103,7 +125,7 @@ export class DemoScene extends Scene {
     this.physics.addMesh(mesh, 1, 0.5);
   }
 
-  protected update(deltaTime: number): void {
+  public update(deltaTime: number): void {
     super.update(deltaTime);
 
     for (const object of this.scene.children) {

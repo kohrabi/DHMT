@@ -108,6 +108,8 @@ export abstract class Scene {
     this.world.update(deltaTime);
   }
 
+  // Fixed Update will be called by PhysicsWorld.
+
   draw(renderer: THREE.WebGLRenderer): void {
     renderer.render(this.world.scene, this.camera);
   }

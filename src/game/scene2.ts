@@ -3,6 +3,15 @@ import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
 import * as Global from "@/global";
 
+type LevelObject = {
+  model_path?: string;
+  position?: [number, number, number];
+};
+
+type LevelData = {
+  objects: Record<string, LevelObject>;
+};
+
 export class Scene2 extends Scene {
   private controls!: OrbitControls;
   private physicsHelper!: RapierHelper;
@@ -11,7 +20,7 @@ export class Scene2 extends Scene {
     super("scene2");
   }
 
-  protected loadContent(): void {
+  protected async loadContent(): Promise<void> {
     Global.renderer.shadowMap.enabled = true;
 
     this.controls = new OrbitControls(this.camera, Global.renderer.domElement);
@@ -46,6 +55,7 @@ export class Scene2 extends Scene {
     this.world.scene.add(light);
     this.world.scene.add(new THREE.AmbientLight(0xffffff, 0.2));
 
+    // Ignore this warning.
     this.physicsHelper = new RapierHelper(this.world.physics.world);
     this.world.scene.add(this.physicsHelper);
 
@@ -54,6 +64,28 @@ export class Scene2 extends Scene {
 
     this.scene3D.add(new THREE.AxesHelper(1));
     this.scene3D.add(new THREE.GridHelper(10, 10));
+
+    try {
+      const player = await this.contentManager.loadGLTF(
+        "/assets/platformer/character-oopi.glb",
+      );
+      player.scene.position.set(1, 0, 0);
+      this.world.scene.add(player.scene);
+
+      const levelData = await this.contentManager.loadJSON<LevelData>(
+        "/assets/scenes/level.json",
+      );
+
+      for (const objectData of Object.values(levelData.objects)) {
+        if (!objectData.model_path || !objectData.position) continue;
+        const model = await this.contentManager.loadGLTF(objectData.model_path);
+        const instance = model.scene.clone();
+        instance.position.set(...objectData.position);
+        this.world.scene.add(instance);
+      }
+    } catch (error) {
+      console.error("Error loading assets:", error);
+    }
   }
 
   public update(deltaTime: number): void {

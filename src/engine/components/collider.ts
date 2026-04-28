@@ -20,6 +20,7 @@ import RAPIER from "@dimforge/rapier3d-compat";
  */
 export class Collider extends Component {
   private body?: RAPIER.RigidBody;
+  private collider?: RAPIER.Collider;
 
   constructor(
     private readonly mass: number = 0,
@@ -42,29 +43,40 @@ export class Collider extends Component {
       return;
     }
 
-    // Extract the collision shape from the mesh geometry.
-    const shape = this.gameObject.world.physics.getShape(renderer.instance.geometry);
-    if (!shape) return;
-
-    shape.setMass(this.mass);
-    shape.setRestitution(this.restitution);
-
-    // ── CRITICAL: use the gameObject transform's WORLD position/rotation,
-    //   not the child mesh's local (0,0,0).
     const worldPos = new THREE.Vector3();
     const worldQuat = new THREE.Quaternion();
     this.gameObject.transform.getWorldPosition(worldPos);
     this.gameObject.transform.getWorldQuaternion(worldQuat);
 
-    const desc =
-      this.mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+    const { body, collider } = this.gameObject.world.physics.addMesh(
+      renderer.instance,
+      this.mass,
+      this.restitution,
+      {
+        position: worldPos,
+        quaternion: worldQuat,
+      },
+    )!;
 
-    desc.setTranslation(worldPos.x, worldPos.y, worldPos.z);
-    desc.setRotation({ x: worldQuat.x, y: worldQuat.y, z: worldQuat.z, w: worldQuat.w });
+    if (body instanceof RAPIER.RigidBody) {
+      this.body = body;
+    } else {
+      this.body = body[0];
+      console.log(
+        `Collider on "${this.gameObject.name}": multiple bodies created for mesh. ` +
+          "Using the first body for syncing transforms.",
+      );
+    }
 
-    const rapierWorld = this.gameObject.world.physics.world;
-    this.body = rapierWorld.createRigidBody(desc);
-    rapierWorld.createCollider(shape, this.body);
+    if (collider instanceof RAPIER.Collider) {
+      this.collider = collider;
+    } else {
+      this.collider = collider[0];
+      console.log(
+        `Collider on "${this.gameObject.name}": multiple colliders created for mesh. ` +
+          "Using the first collider for reference.",
+      );
+    }
   }
 
   /**
@@ -83,9 +95,6 @@ export class Collider extends Component {
   }
 
   onDestroy(): void {
-    if (this.body) {
-      this.gameObject.world.physics.world.removeRigidBody(this.body);
-      this.body = undefined;
-    }
+    if (this.body) this.gameObject.world.physics.removeBody(this.body);
   }
 }

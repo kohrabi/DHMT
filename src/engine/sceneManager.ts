@@ -25,10 +25,6 @@ export class SceneManager {
     this.active?.update(deltaTime);
   }
 
-  fixedUpdate(fixedDeltaTime: number): void {
-    this.active?.fixedUpdate(fixedDeltaTime);
-  }
-
   draw(renderer: THREE.WebGLRenderer): void {
     this.active?.draw(renderer);
   }

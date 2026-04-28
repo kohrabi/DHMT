@@ -1,9 +1,8 @@
-import * as THREE from "three";
-import { DemoScene } from "./game/scene1";
-import { SceneManager } from "./engine/sceneManager";
-import { RapierPhysics } from "./engine/physics";
 import * as Global from "./global";
 import { Scene2 } from "./game/scene2";
+import RAPIER from "@dimforge/rapier3d-compat";
+
+await RAPIER.init();
 
 Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);
@@ -18,4 +17,5 @@ function animate() {
   const deltaTime = Global.timer.getDelta();
   Global.sceneManager.update(deltaTime);
   Global.sceneManager.draw(Global.renderer);
+  Global.input.update(); // clear per-frame input state last
 }

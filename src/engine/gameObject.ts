@@ -1,22 +1,29 @@
 import * as THREE from "three";
 import { Component } from "@/engine/component";
-import { Scene } from "./scene";
+import type { World } from "./world";
 
 export class GameObject {
   readonly name: string;
   readonly transform: THREE.Object3D;
-  readonly scene: Scene;
+
+  /**
+   * Reference to the unified World context.
+   * Components can reach the Three.js scene and physics world through here:
+   *   this.gameObject.world.scene    → THREE.Scene
+   *   this.gameObject.world.physics  → PhysicsWorld
+   */
+  readonly world: World;
 
   private components: Component[] = [];
   private started = false;
 
   constructor(
     name: string,
-    scene: Scene,
+    world: World,
     object3D: THREE.Object3D = new THREE.Object3D(),
   ) {
     this.name = name;
-    this.scene = scene;
+    this.world = world;
     this.transform = object3D;
     this.transform.name = name;
   }

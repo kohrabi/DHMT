@@ -20,9 +20,13 @@ export class PhysicsWorld {
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  async initialize() {
-    await RAPIER.init();
-    this.intervalId = setInterval(() => this.step(), 1000 / frameRate);
+  public onFixedStep?: (fdt: number) => void;
+
+  constructor() {
+    this.intervalId = setInterval(() => {
+      this.step();
+      this.onFixedStep?.(frameRate / 1000);
+    }, 1000 / frameRate);
   }
 
   public dispose() {
@@ -43,33 +47,33 @@ export class PhysicsWorld {
 
     this.world.timestep = this.timer.getDelta();
     this.world.step();
-    for (let i = 0, l = this.meshes.length; i < l; i++) {
-      const mesh = this.meshes[i];
+    // for (let i = 0, l = this.meshes.length; i < l; i++) {
+    //   const mesh = this.meshes[i];
 
-      if (mesh instanceof THREE.InstancedMesh) {
-        const array = mesh.instanceMatrix.array;
-        const { body: bodies } = this.meshMap.get(mesh);
+    //   if (mesh instanceof THREE.InstancedMesh) {
+    //     const array = mesh.instanceMatrix.array;
+    //     const { body: bodies } = this.meshMap.get(mesh);
 
-        for (let j = 0; j < bodies.length; j++) {
-          const body = bodies[j];
+    //     for (let j = 0; j < bodies.length; j++) {
+    //       const body = bodies[j];
 
-          const position = body.translation();
-          this._quaternion.copy(body.rotation());
+    //       const position = body.translation();
+    //       this._quaternion.copy(body.rotation());
 
-          this._matrix
-            .compose(position, this._quaternion, _scale)
-            .toArray(array, j * 16);
-        }
+    //       this._matrix
+    //         .compose(position, this._quaternion, _scale)
+    //         .toArray(array, j * 16);
+    //     }
 
-        mesh.instanceMatrix.needsUpdate = true;
-        mesh.computeBoundingSphere();
-      } else {
-        const { body } = this.meshMap.get(mesh);
+    //     mesh.instanceMatrix.needsUpdate = true;
+    //     mesh.computeBoundingSphere();
+    //   } else {
+    //     const { body } = this.meshMap.get(mesh);
 
-        mesh.position.copy(body.translation());
-        mesh.quaternion.copy(body.rotation());
-      }
-    }
+    //     mesh.position.copy(body.translation());
+    //     mesh.quaternion.copy(body.rotation());
+    //   }
+    // }
   }
 
   /**

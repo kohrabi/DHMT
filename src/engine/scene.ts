@@ -1,23 +1,33 @@
 import * as THREE from "three";
 import { ContentManager } from "@/engine/contentManager";
 import { GameObject } from "@/engine/gameObject";
-import { GameWorld } from "@/engine/gameWorld";
-import { PhysicsWorld } from "./physicsWorld";
+import { World } from "@/engine/world";
 
+/**
+ * Abstract base for all game scenes.
+ *
+ * Each Scene owns:
+ *   - world   → unified context (THREE.Scene + PhysicsWorld + GameObject lifecycle)
+ *   - camera  → perspective camera used for rendering
+ *   - content → scene-local asset cache
+ *
+ * Subclasses override loadContent() to populate the scene and
+ * unloadContent() to clean up (default disposes world + content cache).
+ *
+ * Access the Three.js scene graph via  this.world.scene
+ * Access the physics world via         this.world.physics
+ */
 export abstract class Scene {
   readonly name: string;
-
-  public readonly world = new GameWorld();
-  public readonly physicsWorld = new PhysicsWorld();
-  public readonly scene = new THREE.Scene();
-  public readonly content = new ContentManager();
-  public readonly gameObjects = new Set<GameObject>();
-  public readonly camera = new THREE.PerspectiveCamera(
+  readonly world = new World();
+  readonly content = new ContentManager();
+  readonly camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
     1,
     1000,
   );
+
   private initialized = false;
   private contentLoaded = false;
 
@@ -25,16 +35,18 @@ export abstract class Scene {
     this.name = name;
   }
 
-  protected async initialize(): Promise<void> {
-    await this.physicsWorld.initialize();
-  }
+  // ─── Overridable lifecycle hooks ──────────────────────────────────────────
+
+  protected initialize(): void {}
 
   protected loadContent(): void {}
 
   protected unloadContent(): void {
-    this.clearGameObjects();
+    this.world.dispose();
     this.content.clear();
   }
+
+  // ─── Helpers for subclasses ───────────────────────────────────────────────
 
   protected get contentManager(): ContentManager {
     return this.content;
@@ -44,31 +56,32 @@ export abstract class Scene {
     return ContentManager.global;
   }
 
+  /** The Three.js scene graph — shorthand for this.world.scene. */
   protected get scene3D(): THREE.Scene {
-    return this.scene;
+    return this.world.scene;
   }
 
+  /**
+   * Add a GameObject to the world.
+   * Its transform is automatically attached to the Three.js scene graph.
+   */
   protected addGameObject(gameObject: GameObject): GameObject {
-    this.gameObjects.add(gameObject);
-    this.world.add(gameObject);
-    this.scene.add(gameObject.transform);
-    return gameObject;
+    return this.world.add(gameObject);
   }
 
+  protected addNewGameObject(name: string): GameObject {
+    const gameObject = new GameObject(name, this.world);
+    return this.world.add(gameObject);
+  }
+  /**
+   * Remove a GameObject from the world.
+   * Its transform is detached and destroy() is called on it.
+   */
   protected removeGameObject(gameObject: GameObject): boolean {
-    this.scene.remove(gameObject.transform);
-    this.gameObjects.delete(gameObject);
     return this.world.remove(gameObject);
   }
 
-  protected clearGameObjects(): void {
-    for (const gameObject of this.gameObjects) {
-      this.scene.remove(gameObject.transform);
-      this.world.remove(gameObject);
-    }
-
-    this.gameObjects.clear();
-  }
+  // ─── SceneManager interface ───────────────────────────────────────────────
 
   activate(): void {
     if (!this.initialized) {
@@ -91,15 +104,11 @@ export abstract class Scene {
     this.contentLoaded = false;
   }
 
-  public update(deltaTime: number): void {
+  update(deltaTime: number): void {
     this.world.update(deltaTime);
   }
 
-  public fixedUpdate(fixedDeltaTime: number): void {
-    this.world.fixedUpdate(fixedDeltaTime);
-  }
-
-  public draw(renderer: THREE.WebGLRenderer): void {
-    renderer.render(this.scene, this.camera);
+  draw(renderer: THREE.WebGLRenderer): void {
+    renderer.render(this.world.scene, this.camera);
   }
 }

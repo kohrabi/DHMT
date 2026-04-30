@@ -3,8 +3,11 @@ import { GameObject } from "@/engine/gameObject";
 export abstract class Component {
   gameObject!: GameObject;
   enabled = true;
+  started = false;
 
-  start(): void {}
+  public start(): void {
+    this.started = true;
+  }
   update(_deltaTime: number): void {}
   fixedUpdate(_fixedDeltaTime: number): void {}
   onDestroy(): void {}

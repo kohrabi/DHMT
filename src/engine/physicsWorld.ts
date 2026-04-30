@@ -10,8 +10,9 @@ const _scale = new THREE.Vector3(1, 1, 1);
 export class PhysicsWorld {
   readonly world = new RAPIER.World(gravity);
 
-  readonly meshes: THREE.Mesh[] = [];
-  readonly meshMap = new WeakMap();
+  // Cannot use mesh
+  // readonly meshes: THREE.Mesh[] = [];
+  // readonly meshMap = new WeakMap();
 
   readonly _vector = new THREE.Vector3();
   readonly _quaternion = new THREE.Quaternion();
@@ -33,7 +34,7 @@ export class PhysicsWorld {
     }
 
     // clear tracked meshes
-    this.meshes.length = 0;
+    // this.meshes.length = 0;
 
     // free rapier world (if available in your build)
     this.world.free?.();
@@ -65,7 +66,7 @@ export class PhysicsWorld {
       quaternion?: THREE.Quaternion;
     } = {},
   ) {
-    const shape = this.getShape(mesh.geometry);
+    const shape = PhysicsWorld.getShape(mesh.geometry);
 
     if (shape === null) return;
 
@@ -82,40 +83,46 @@ export class PhysicsWorld {
             shape,
           );
 
-    if (!mesh.userData.physics) mesh.userData.physics = {};
-
-    mesh.userData.physics.body = body;
-    mesh.userData.physics.collider = collider;
-
-    if (mass > 0) {
-      this.meshes.push(mesh);
-      this.meshMap.set(mesh, { body, collider });
-    }
     return { body, collider };
   }
 
   /**
-   * Removes the given mesh from this physics simulation.
+   * Adds the given geometry to this physics simulation.
    *
    * @method
-   * @name RapierPhysics#removeMesh
-   * @param {Mesh} mesh The mesh to remove.
+   * @name RapierPhysics#addGeometry
+   * @param {Geometry} geometry The geometry to add.
+   * @param {number} [mass=0] The mass in kg of the geometry.
+   * @param {number} [restitution=0] The restitution of the geometry, usually from 0 to 1. Represents how "bouncy" objects are when they collide with each other.
    */
-  public removeMesh(mesh: THREE.Mesh) {
-    const index = this.meshes.indexOf(mesh);
+  public addGeometry(
+    mesh:
+      | THREE.BoxGeometry
+      | THREE.SphereGeometry
+      | THREE.CylinderGeometry
+      | THREE.CapsuleGeometry,
+    mass: number = 0,
+    restitution: number = 0,
+    initTransform: {
+      position: THREE.Vector3;
+      quaternion: THREE.Quaternion;
+    },
+  ) {
+    const shape = PhysicsWorld.getShape(mesh);
 
-    if (index !== -1) {
-      this.meshes.splice(index, 1);
-      this.meshMap.delete(mesh);
+    if (shape === null) return;
 
-      if (!mesh.userData.physics) return;
+    shape.setMass(mass);
+    shape.setRestitution(restitution);
 
-      const body = mesh.userData.physics.body;
-      const collider = mesh.userData.physics.collider;
+    const { body, collider } = this.createBody(
+      initTransform.position,
+      initTransform.quaternion,
+      mass,
+      shape,
+    );
 
-      if (body) this.removeBody(body);
-      if (collider) this.removeCollider(collider);
-    }
+    return { body, collider };
   }
 
   createInstancedBody(
@@ -185,14 +192,13 @@ export class PhysicsWorld {
     }
   }
 
-  getShape(
+  public static getShape(
     geometry:
       | THREE.BufferGeometry
       | THREE.BoxGeometry
       | THREE.SphereGeometry
       | THREE.CylinderGeometry
-      | THREE.CapsuleGeometry
-      | RoundedBoxGeometry,
+      | THREE.CapsuleGeometry,
   ) {
     if (geometry instanceof THREE.BoxGeometry) {
       const sx =
@@ -264,5 +270,21 @@ export class PhysicsWorld {
     console.error("RapierPhysics: Unsupported geometry type:", typeof geometry);
 
     return null;
+  }
+
+  public static getBoxShape(transform: THREE.Object3D, size: THREE.Vector3) {
+    const position = transform.position;
+    const quaternion = transform.quaternion;
+    return RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2)
+      .setTranslation(position.x, position.y, position.z)
+      .setRotation(quaternion);
+  }
+
+  public static getSphereShape(transform: THREE.Object3D, radius: number) {
+    const position = transform.position;
+    const quaternion = transform.quaternion;
+    return RAPIER.ColliderDesc.ball(radius)
+      .setTranslation(position.x, position.y, position.z)
+      .setRotation(quaternion);
   }
 }

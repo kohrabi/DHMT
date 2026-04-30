@@ -31,6 +31,9 @@ export class GameObject {
   addComponent<T extends Component>(component: T): T {
     component._attach(this);
     this.components.push(component);
+    console.log(
+      `Added component ${component.constructor.name} to ${this.name}`,
+    );
 
     if (this.started && component.enabled) {
       component.start();
@@ -68,12 +71,13 @@ export class GameObject {
       return;
     }
 
-    this.started = true;
     for (const component of this.components) {
-      if (component.enabled) {
+      if (component.enabled && !component.started) {
         component.start();
       }
     }
+    // Is this good?
+    this.started = true;
   }
 
   update(deltaTime: number): void {

@@ -12,10 +12,6 @@ export class CharacterController extends Component {
     return this.controller.computedGrounded();
   }
 
-  public get IsGrounded(): boolean {
-    return this.isGrounded;
-  }
-
   get CharacterController(): RAPIER.KinematicCharacterController {
     return this.controller;
   }

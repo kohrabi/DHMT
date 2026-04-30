@@ -10,8 +10,7 @@ import {
 import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
 import * as Global from "@/global";
-import { CharacterController } from "../engine/components/characterController";
-import { PlayerController } from "./gameObjects/playerController";
+import { Player } from "./gameObjects/player";
 
 type LevelObject = {
   model_path: string;
@@ -40,16 +39,6 @@ export class Scene2 extends Scene {
 
     this.world.scene.background = new THREE.Color(0x202020);
 
-    var collider1 = this.addNewGameObject("collider1");
-    collider1.addComponent(
-      new GeometryRenderer(
-        new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshPhongMaterial({ color: 0x0000ff, wireframe: false }),
-      ),
-    );
-    collider1.addComponent(new PlayerController());
-    collider1.transform.position.set(0, 10, 0);
-
     const light = new THREE.DirectionalLight(0xffffff, 2);
     light.position.set(3, 5, 2);
     this.world.scene.add(light);
@@ -63,11 +52,16 @@ export class Scene2 extends Scene {
     this.scene3D.add(new THREE.GridHelper(10, 10));
 
     try {
-      const player = await this.contentManager.loadGLTF(
+      const playerModel = await this.contentManager.loadGLTF(
         "/assets/platformer/character-oopi.glb",
       );
-      player.scene.position.set(1, 0, 0);
-      this.world.scene.add(player.scene);
+      playerModel.scene.translateY(-1);
+      playerModel.scene.rotateY(Math.PI / 2);
+      
+      var player = this.addNewGameObject("Player");
+      player.addComponent(new MeshRenderer(playerModel.scene));
+      player.addComponent(new Player());
+      player.transform.position.set(0, 10, 0);
 
       const levelData = await this.contentManager.loadJSON<LevelData>(
         "/assets/scenes/level.json",
@@ -131,27 +125,6 @@ export class Scene2 extends Scene {
             break;
         }
       }
-
-      // const s = this.addNewGameObject("something");
-      // s.transform.position.set(
-      //   this.camera.position.x,
-      //   this.camera.position.y,
-      //   this.camera.position.z,
-      // );
-      // s.transform.rotation.set(
-      //   this.camera.rotation.x,
-      //   this.camera.rotation.y,
-      //   this.camera.rotation.z,
-      // );
-      // s.addComponent(
-      //   new GeometryRenderer(
-      //     new THREE.CapsuleGeometry(0.5, 1, 4, 8),
-      //     new THREE.MeshPhongMaterial({
-      //       color: 0x00ff00,
-      //       wireframe: false,
-      //     }),
-      //   ),
-      // );
     } catch (error) {
       console.error("Error loading assets:", error);
     }
@@ -175,17 +148,5 @@ export class Scene2 extends Scene {
       this.controls?.update();
     }
     this.physicsHelper.update();
-
-    if (Global.input.isKeyPressed("KeyR")) {
-      var collider1 = this.addNewGameObject("collider1");
-      collider1.addComponent(
-        new GeometryRenderer(
-          new THREE.BoxGeometry(1, 1, 1),
-          new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: false }),
-        ),
-      );
-      collider1.addComponent(new GeometryCollider3D(1, 0.1));
-      collider1.transform.position.set(0, 10, 0);
-    }
   }
 }

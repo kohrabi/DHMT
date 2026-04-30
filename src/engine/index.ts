@@ -14,3 +14,5 @@ export * from "@/engine/inputManager";
 
 export * from "@/engine/scene";
 export * from "@/engine/sceneManager";
+
+export * from "@/engine/math";

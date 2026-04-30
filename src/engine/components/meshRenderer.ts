@@ -8,6 +8,6 @@ export class MeshRenderer extends Component {
 
   public start(): void {
     super.start();
-    this.gameObject.transform.add(this.geometry.clone());
+    this.gameObject.transform.add(this.geometry);
   }
 }

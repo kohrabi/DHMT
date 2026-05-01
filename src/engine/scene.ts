@@ -69,10 +69,6 @@ export abstract class Scene {
     return this.world.add(gameObject);
   }
 
-  protected addNewGameObject(name: string): GameObject {
-    const gameObject = new GameObject(name, this.world);
-    return this.world.add(gameObject);
-  }
   /**
    * Remove a GameObject from the world.
    * Its transform is detached and destroy() is called on it.

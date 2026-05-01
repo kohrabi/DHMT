@@ -1,8 +1,7 @@
 import * as THREE from "three";
-import { Component } from "@/engine/component";
 import type { World } from "./world";
 
-export class GameObject {
+export abstract class GameObject {
   readonly name: string;
   readonly transform: THREE.Object3D;
 
@@ -13,9 +12,7 @@ export class GameObject {
    *   this.gameObject.world.physics  → PhysicsWorld
    */
   readonly world: World;
-
-  private components: Component[] = [];
-  private started = false;
+  public started = false;
 
   constructor(
     name: string,
@@ -28,78 +25,19 @@ export class GameObject {
     this.transform.name = name;
   }
 
-  addComponent<T extends Component>(component: T): T {
-    component._attach(this);
-    this.components.push(component);
 
-    if (component.enabled && !component.started) {
-      component.start();
-    }
-
-    return component;
-  }
-
-  getComponent<T extends Component>(
-    type: new (...args: any[]) => T,
-  ): T | undefined {
-    return this.components.find((component) => component instanceof type) as
-      | T
-      | undefined;
-  }
-
-  removeComponent<T extends Component>(
-    type: new (...args: any[]) => T,
-  ): boolean {
-    const index = this.components.findIndex(
-      (component) => component instanceof type,
-    );
-
-    if (index === -1) {
-      return false;
-    }
-
-    const [component] = this.components.splice(index, 1);
-    component.onDestroy();
-    return true;
-  }
-
+  // async loadContent(): Promise<void> { return Promise.resolve(); }
   start(): void {
     if (this.started) {
       return;
     }
-
-    for (const component of this.components) {
-      if (component.enabled && !component.started) {
-        component.start();
-      }
-    }
-    // Is this good?
     this.started = true;
   }
 
-  update(deltaTime: number): void {
-    for (const component of this.components) {
-      if (component.enabled) {
-        component.update(deltaTime);
-      }
-    }
-  }
-
-  fixedUpdate(fixedDeltaTime: number): void {
-    for (const component of this.components) {
-      if (component.enabled) {
-        component.fixedUpdate(fixedDeltaTime);
-      }
-    }
-  }
+  update(deltaTime: number): void {}
+  fixedUpdate(fixedDeltaTime: number): void {}
 
   destroy(): void {
-    for (const component of this.components) {
-      component.onDestroy();
-    }
-
-    this.components = [];
-
     if (this.transform.parent) {
       this.transform.parent.remove(this.transform);
     }

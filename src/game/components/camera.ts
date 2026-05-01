@@ -1,18 +1,22 @@
-import { Component, GameObject } from "@/engine";
+import { GameObject, World } from "@/engine";
 import * as THREE from 'three';
 import * as Global from '@/global';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
-export class Camera extends Component {
+export class Camera extends GameObject {
   private target?: GameObject;
   private controlsEnabled = false;
   private controls?: OrbitControls;
 
   constructor(
     private readonly camera : THREE.Camera, 
-    target : GameObject
+    target : GameObject,
+    world : World
   ) {
-    super();
+    super(
+      `Camera`,
+      world
+    );
     this.target = target;
   }
 
@@ -37,17 +41,15 @@ export class Camera extends Component {
     }
 
     if (this.target) {
-      this.gameObject.transform.position.set(
+      this.transform.position.set(
         this.target.transform.position.x,
         this.target.transform.position.y,
-        this.gameObject.transform.position.z
+        this.transform.position.z
       );
-      this.gameObject.transform.position.y += 2;
-      this.gameObject.transform.rotation.copy(this.target.transform.rotation);
+      this.transform.position.y += 2;
     }
     
-    this.camera.position.copy(this.gameObject.transform.position);
-    this.camera.rotation.copy(this.gameObject.transform.rotation);
+    this.camera.position.copy(this.transform.position);
   }
   
 }

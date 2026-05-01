@@ -1,4 +1,4 @@
-import { CharacterController, clampf, Component, MeshRenderer, moveTowards } from "@/engine";
+import { clampf, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
@@ -38,34 +38,56 @@ const TELEPORT_Y_VELOCITY = 0x00b00 * SUBSUBSUBPIXEL_DELTA_TIME;
 
 const ENEMY_BOUNCE = 0x04000 * SUBSUBSUBPIXEL_DELTA_TIME;
 
-export class Player extends Component {
-  private controller!: CharacterController;
+export class Player extends GameObject {
+
+  // Constants
+  readonly keyLeft = "KeyA";
+  readonly keyRight = "KeyD";
+  readonly keyJump = "Space";
+  readonly keyRun = "KeyJ";
+
+  // Components
+  private controller!: RAPIER.KinematicCharacterController;
+  private collider!: RAPIER.Collider;
+
+  private velocity = new THREE.Vector3();
+  private mesh : THREE.Object3D;
+
   private inputVector = new THREE.Vector3(0, 0, 0);
   private running = false;
   private jumped = false;
   private runBeforeWalkTimer = 0.0;
   private accel = new THREE.Vector2();
 
-  private meshRenderer!: MeshRenderer;
-
-  readonly keyLeft = "KeyA";
-  readonly keyRight = "KeyD";
-  readonly keyJump = "Space";
-  readonly keyRun = "KeyJ";
-
-  constructor() {
-    super();
+  get isGrounded(): boolean {
+    return this.controller.computedGrounded();
   }
 
-  public start(): void {
-    super.start();
-    this.controller = this.gameObject.addComponent(
-      new CharacterController(new THREE.BoxGeometry(0.5, 1.0, 0.5)),
-    )!;
-    this.controller.Collider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    this.controller.Collider.setActiveHooks(RAPIER.ActiveHooks.FILTER_INTERSECTION_PAIRS);
+  constructor(world : World) {
+    super(
+      "Player",
+      world
+    );
+  }
 
-    this.meshRenderer = this.gameObject.getComponent(MeshRenderer)!;
+  public async start(): Promise<void> {
+    super.start();
+
+    this.controller = this.world.physics.world.createCharacterController(0);
+    const shape = PhysicsWorld.getShape(new THREE.BoxGeometry(0.5, 1.0, 0.5))!;
+    const collider = this.world.physics.world.createCollider(shape);
+    collider.setTranslation({
+      x: this.transform.position.x,
+      y: this.transform.position.y,
+      z: this.transform.position.z,
+    });
+    this.collider = collider;
+    const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
+    const modelMesh = model.scene.clone(true);
+    this.mesh = this.transform.add(modelMesh);
+    this.mesh.position.set(0, -0.4, 0);
+    this.mesh.rotation.y = Math.PI / 4;
+    this.mesh.add(modelMesh);
   }
 
   public update(deltaTime: number): void {
@@ -93,24 +115,24 @@ export class Player extends Component {
       (this.running ? RUNNING_ACCELERATION : WALKING_ACCELERATION);
 
     if (this.accel.x !== 0.0) {
-      if (this.controller.velocity.x === 0.0)
+      if (this.velocity.x === 0.0)
         this.accel.x = Math.sign(this.accel.x) * MINIMUM_WALK_VELOCITY;
     }
 
     let skidding = false;
     if (this.accel.x === 0.0) {
-      this.controller.velocity.x = 
-        moveTowards(this.controller.velocity.x, 0, RELEASE_DECELERATION);
+      this.velocity.x = 
+        moveTowards(this.velocity.x, 0, RELEASE_DECELERATION);
     } 
     else if (
-      Math.sign(this.accel.x) !== Math.sign(this.controller.velocity.x) &&
-      this.controller.velocity.x !== 0
+      Math.sign(this.accel.x) !== Math.sign(this.velocity.x) &&
+      this.velocity.x !== 0
     ) {
-      if (this.controller.isGrounded) 
+      if (this.isGrounded) 
         skidding = true;
       
-      this.controller.velocity.x = 
-        moveTowards(this.controller.velocity.x, 0, SKIDDING_DECELERATION);
+      this.velocity.x = 
+        moveTowards(this.velocity.x, 0, SKIDDING_DECELERATION);
     }
 
     if (this.runBeforeWalkTimer > 0) 
@@ -118,19 +140,19 @@ export class Player extends Component {
 
     if (
       this.running ||
-      (Math.abs(this.controller.velocity.x) > MAXIMUM_WALK_SPEED + WALKING_ACCELERATION && this.runBeforeWalkTimer > 0)
+      (Math.abs(this.velocity.x) > MAXIMUM_WALK_SPEED + WALKING_ACCELERATION && this.runBeforeWalkTimer > 0)
     ) {
-      this.controller.velocity.x = 
-        clampf(this.controller.velocity.x, -MAXIMUM_RUNNING_SPEED, MAXIMUM_RUNNING_SPEED);
+      this.velocity.x = 
+        clampf(this.velocity.x, -MAXIMUM_RUNNING_SPEED, MAXIMUM_RUNNING_SPEED);
     } 
     else {
-      this.controller.velocity.x = 
-        clampf(this.controller.velocity.x, -MAXIMUM_WALK_SPEED, MAXIMUM_WALK_SPEED);
+      this.velocity.x = 
+        clampf(this.velocity.x, -MAXIMUM_WALK_SPEED, MAXIMUM_WALK_SPEED);
     }
 
     let gravity = 0.0;
-    if (!this.controller.isGrounded) {
-      if (Global.input.isKeyDown(this.keyJump) && this.controller.velocity.y <= JUMP_HANG) 
+    if (!this.isGrounded) {
+      if (Global.input.isKeyDown(this.keyJump) && this.velocity.y <= JUMP_HANG) 
         gravity = -JUMP_HELD_GRAVITY;
       else
         gravity = -JUMP_GRAVITY;
@@ -138,9 +160,9 @@ export class Player extends Component {
     this.accel.y = gravity;
 
     
-    if (this.jumped && this.controller.isGrounded) {
+    if (this.jumped && this.isGrounded) {
       let initVel = JUMP_INIT_VEL;
-      let absVelX = Math.abs(this.controller.velocity.x);
+      let absVelX = Math.abs(this.velocity.x);
       if (absVelX < MAXIMUM_WALK_SPEED)
         initVel += 0x00200 * SUBSUBSUBPIXEL_DELTA_TIME;
       else if (absVelX < MAXIMUM_RUNNING_SPEED)
@@ -152,29 +174,32 @@ export class Player extends Component {
       this.jumped = false;
     }
 
-    this.controller.velocity.x += this.accel.x;
-    this.controller.velocity.y += this.accel.y;
+    this.velocity.x += this.accel.x;
+    this.velocity.y += this.accel.y;
 
-    this.controller.velocity.y = Math.max(this.controller.velocity.y, -MAX_FALL_SPEED);
+    this.velocity.y = Math.max(this.velocity.y, -MAX_FALL_SPEED);
 
-    this.controller.velocity.z = 0;
+    this.velocity.z = 0;
 
-    if (this.controller.velocity.x !== 0) {
-      this.meshRenderer.MeshTransform.scale.x = Math.sign(this.controller.velocity.x) * Math.abs(this.meshRenderer.MeshTransform.scale.x);
+    if (this.velocity.x !== 0) {
+      this.mesh.scale.x = Math.sign(this.velocity.x) * Math.abs(this.mesh.scale.x);
     }
 
-    this.controller.moveAndSlide(1);
+    this.moveAndSlide(1);
+    if (this.isGrounded) {
+      this.velocity.y = 0;
+    }
 
-    for (let i = 0; i < this.controller.CharacterController.numComputedCollisions(); i++) {
-      const collision = this.controller.CharacterController.computedCollision(i);
+    for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
+      const collision = this.controller.computedCollision(i);
       // console.log(collision);
     }
 
-    // this.gameObject.world.physics.world.intersectionPairsWith(this.controller.Collider, (otherCollider) => {
+    // this.gameObject.world.physics.world.intersectionPairsWith(this.Collider, (otherCollider) => {
     //   console.log(otherCollider);
     // });
     // const physicsWorld = this.gameObject.world.physics.world;
-    // const collider = this.controller.Collider;
+    // const collider = this.Collider;
     // physicsWorld.intersectionsWithShape(
     //   collider.translation(), 
     //   collider.rotation(), 
@@ -184,5 +209,40 @@ export class Player extends Component {
     //     return false;
     //   }
     // );
+
+    
+
+  }
+
+  public moveAndCollide(vel: THREE.Vector3): THREE.Vector3 {
+    this.controller.computeColliderMovement(
+      this.collider, 
+      vel, 
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
+    );
+
+    let correctedMovement = this.controller.computedMovement();
+
+    let t = this.collider.translation();
+    this.collider.setTranslation({
+      x: t.x + correctedMovement.x,
+      y: t.y + correctedMovement.y,
+      z: t.z + correctedMovement.z,
+    });
+    t = this.collider.translation();
+    this.transform.position.set(t.x, t.y, t.z);
+
+    return new THREE.Vector3(
+      correctedMovement.x,
+      correctedMovement.y,
+      correctedMovement.z,
+    );
+  }
+
+  public moveAndSlide(deltaTime: number): void {
+    const correctedMovement = this.moveAndCollide(
+      this.velocity.multiplyScalar(deltaTime),
+    );
+    this.velocity = correctedMovement;
   }
 }

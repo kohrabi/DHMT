@@ -1,10 +1,5 @@
 import {
-  GeometryRigidbody3D,
-  GameObject,
-  GeometryRenderer,
   Scene,
-  MeshRenderer,
-  Collider,
   PhysicsWorld,
 } from "@/engine";
 import * as THREE from "three";
@@ -13,6 +8,8 @@ import * as Global from "@/global";
 import { Player } from "./components/player";
 import { Camera } from "./components/camera";
 import { Coin } from "./components/coin";
+import { Ground } from "./components/ground";
+import { Decorate } from "./components/decorate";
 
 type LevelObject = {
   model_path: string;
@@ -37,6 +34,7 @@ export class Scene2 extends Scene {
   }
 
   protected async loadContent(): Promise<void> {
+    console.log("Loading content for Scene2...");
     Global.renderer.shadowMap.enabled = true;
 
     this.world.scene.background = new THREE.Color(0x202020);
@@ -55,23 +53,14 @@ export class Scene2 extends Scene {
 
 
     try {
-      const playerModel = await this.contentManager.loadGLTF(
-        "/assets/platformer/character-oopi.glb",
-      );
-      playerModel.scene.translateY(-0.4);
-      playerModel.scene.rotateY(Math.PI / 4);
-      
-      var player = this.addNewGameObject("Player");
+      var player = this.addGameObject(new Player(this.world));
       player.transform.position.set(0, 2, 0);
-      player.addComponent(new MeshRenderer(playerModel.scene));
-      player.addComponent(new Player());
 
       const levelData = await this.contentManager.loadJSON<LevelData>(
         "/assets/scenes/level.json",
       );
 
-      const cameraObject = this.addNewGameObject("Camera");
-      cameraObject.addComponent(new Camera(this.camera, player));
+      const cameraObject = this.addGameObject(new Camera(this.camera, player, this.world));
 
       for (const objectData of Object.values(levelData.objects)) {
         switch (objectData.object_type) {
@@ -81,7 +70,7 @@ export class Scene2 extends Scene {
               objectData.model_path,
             );
             const modelMesh = model.scene.clone();
-            const go = this.addNewGameObject("ground");
+            const go = this.addGameObject(new Ground(this.world, modelMesh));
             // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
             // Blender use Z Up, Y Forward
             // While Three.js use Y Up, Z Backward
@@ -101,24 +90,10 @@ export class Scene2 extends Scene {
               objectData.scale[1],
               objectData.scale[2],
             );
-            go.addComponent(new MeshRenderer(modelMesh));
-            go.addComponent(
-              new Collider(
-                PhysicsWorld.getBoxShape(
-                  go.transform.clone().translateY(0.5),
-                  new THREE.Vector3(
-                    objectData.scale[0],
-                    objectData.scale[1],
-                    objectData.scale[2],
-                  ),
-                ),
-              ),
-            );
             break;
           }
 
           case "Camera": {
-
             cameraObject.transform.position.set(
               objectData.position[0],
               objectData.position[2],
@@ -135,7 +110,7 @@ export class Scene2 extends Scene {
           }
           case "Coin": {
 
-            const go = this.addNewGameObject("Coin");
+            const go = this.addGameObject(new Coin(this.world));
             // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
             // Blender use Z Up, Y Forward
             // While Three.js use Y Up, Z Backward
@@ -155,7 +130,6 @@ export class Scene2 extends Scene {
               objectData.scale[1],
               objectData.scale[2],
             );
-            go.addComponent(new Coin());
             break;
             
           }
@@ -165,7 +139,7 @@ export class Scene2 extends Scene {
               objectData.model_path,
             );
             const modelMesh = model.scene.clone();
-            const go = this.addNewGameObject("background");
+            const go = this.addGameObject(new Decorate(this.world, modelMesh));
             // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
             // Blender use Z Up, Y Forward
             // While Three.js use Y Up, Z Backward
@@ -185,7 +159,6 @@ export class Scene2 extends Scene {
               objectData.scale[1],
               objectData.scale[2],
             );
-            go.addComponent(new MeshRenderer(modelMesh));
             break;
           }
         }

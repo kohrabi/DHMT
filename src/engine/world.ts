@@ -47,7 +47,10 @@ export class World {
 
   update(dt: number): void {
     for (const go of this._gameObjects) {
-      go.start();
+      if (!go.started) {
+        go.start();
+        go.started = true;
+      }
       go.update(dt);
     }
   }

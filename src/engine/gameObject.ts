@@ -31,6 +31,7 @@ export abstract class GameObject {
     if (this.started) {
       return;
     }
+    console.log(`Starting GameObject: ${this.name}`);
     this.started = true;
   }
 

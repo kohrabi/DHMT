@@ -2,6 +2,7 @@ import { clampf, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 const SUBPIXEL = 1.0 / 16.0;
 // const MAX_DELTA_TIME = 60.0 / 1000.0;
@@ -51,7 +52,7 @@ export class Player extends GameObject {
   private collider!: RAPIER.Collider;
 
   private velocity = new THREE.Vector3();
-  private mesh : THREE.Object3D;
+  private mesh: THREE.Object3D = new THREE.Object3D();
 
   private inputVector = new THREE.Vector3(0, 0, 0);
   private running = false;
@@ -83,11 +84,9 @@ export class Player extends GameObject {
     });
     this.collider = collider;
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
-    const modelMesh = model.scene.clone(true);
-    this.mesh = this.transform.add(modelMesh);
-    this.mesh.position.set(0, -0.4, 0);
-    this.mesh.rotation.y = Math.PI / 4;
-    this.mesh.add(modelMesh);
+    model.scene.position.set(0, -0.5, 0);
+    model.scene.rotation.y = Math.PI / 4;
+    this.mesh = this.transform.add(model.scene);
   }
 
   public update(deltaTime: number): void {
@@ -192,26 +191,8 @@ export class Player extends GameObject {
 
     for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
       const collision = this.controller.computedCollision(i);
-      // console.log(collision);
+      console.log(collision);
     }
-
-    // this.gameObject.world.physics.world.intersectionPairsWith(this.Collider, (otherCollider) => {
-    //   console.log(otherCollider);
-    // });
-    // const physicsWorld = this.gameObject.world.physics.world;
-    // const collider = this.Collider;
-    // physicsWorld.intersectionsWithShape(
-    //   collider.translation(), 
-    //   collider.rotation(), 
-    //   collider.shape, 
-    //   (otherCollider : RAPIER.Collider) => {
-    //     console.log("Intersecting with collider:", otherCollider);
-    //     return false;
-    //   }
-    // );
-
-    
-
   }
 
   public moveAndCollide(vel: THREE.Vector3): THREE.Vector3 {

@@ -31,11 +31,8 @@ export class GameObject {
   addComponent<T extends Component>(component: T): T {
     component._attach(this);
     this.components.push(component);
-    console.log(
-      `Added component ${component.constructor.name} to ${this.name}`,
-    );
 
-    if (this.started && component.enabled) {
+    if (component.enabled && !component.started) {
       component.start();
     }
 

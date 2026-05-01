@@ -1,6 +1,7 @@
-import { CharacterController, clampf, Component, moveTowards } from "@/engine";
+import { CharacterController, clampf, Component, MeshRenderer, moveTowards } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
+import RAPIER from '@dimforge/rapier3d-compat';
 
 const SUBPIXEL = 1.0 / 16.0;
 // const MAX_DELTA_TIME = 60.0 / 1000.0;
@@ -43,8 +44,9 @@ export class Player extends Component {
   private running = false;
   private jumped = false;
   private runBeforeWalkTimer = 0.0;
-
   private accel = new THREE.Vector2();
+
+  private meshRenderer!: MeshRenderer;
 
   readonly keyLeft = "KeyA";
   readonly keyRight = "KeyD";
@@ -58,8 +60,12 @@ export class Player extends Component {
   public start(): void {
     super.start();
     this.controller = this.gameObject.addComponent(
-      new CharacterController(new THREE.CapsuleGeometry(0.5, 1, 4, 8)),
+      new CharacterController(new THREE.BoxGeometry(0.5, 1.0, 0.5)),
     )!;
+    this.controller.Collider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+    this.controller.Collider.setActiveHooks(RAPIER.ActiveHooks.FILTER_INTERSECTION_PAIRS);
+
+    this.meshRenderer = this.gameObject.getComponent(MeshRenderer)!;
   }
 
   public update(deltaTime: number): void {
@@ -151,10 +157,32 @@ export class Player extends Component {
 
     this.controller.velocity.y = Math.max(this.controller.velocity.y, -MAX_FALL_SPEED);
 
-    console.log(this.controller.velocity.y, JUMP_HANG);
     this.controller.velocity.z = 0;
+
+    if (this.controller.velocity.x !== 0) {
+      this.meshRenderer.MeshTransform.scale.x = Math.sign(this.controller.velocity.x) * Math.abs(this.meshRenderer.MeshTransform.scale.x);
+    }
 
     this.controller.moveAndSlide(1);
 
+    for (let i = 0; i < this.controller.CharacterController.numComputedCollisions(); i++) {
+      const collision = this.controller.CharacterController.computedCollision(i);
+      // console.log(collision);
+    }
+
+    // this.gameObject.world.physics.world.intersectionPairsWith(this.controller.Collider, (otherCollider) => {
+    //   console.log(otherCollider);
+    // });
+    // const physicsWorld = this.gameObject.world.physics.world;
+    // const collider = this.controller.Collider;
+    // physicsWorld.intersectionsWithShape(
+    //   collider.translation(), 
+    //   collider.rotation(), 
+    //   collider.shape, 
+    //   (otherCollider : RAPIER.Collider) => {
+    //     console.log("Intersecting with collider:", otherCollider);
+    //     return false;
+    //   }
+    // );
   }
 }

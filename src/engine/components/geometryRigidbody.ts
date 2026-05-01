@@ -3,7 +3,7 @@ import { Component } from "@/engine/component";
 import { GeometryRenderer } from "@/engine/components/geometryRenderer";
 import RAPIER from "@dimforge/rapier3d-compat";
 
-export class GeometryCollider3D extends Component {
+export class GeometryRigidbody3D extends Component {
   private body?: RAPIER.RigidBody;
   private collider?: RAPIER.Collider;
 

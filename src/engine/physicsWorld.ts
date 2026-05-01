@@ -18,6 +18,8 @@ export class PhysicsWorld {
   readonly _quaternion = new THREE.Quaternion();
   readonly _matrix = new THREE.Matrix4();
   readonly timer = new THREE.Timer();
+  readonly eventQueue: RAPIER.EventQueue = new RAPIER.EventQueue(true);
+  readonly containPairs : Map<number, number> = new Map();
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -44,7 +46,13 @@ export class PhysicsWorld {
     this.timer.update();
 
     this.world.timestep = this.timer.getDelta();
-    this.world.step();
+    this.world.step(this.eventQueue);
+
+    this.containPairs.clear();
+    this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      this.containPairs.set(handle1, handle2);
+    });
+
     this.onFixedStep?.(frameRate / 1000);
   }
 
@@ -125,7 +133,7 @@ export class PhysicsWorld {
     return { body, collider };
   }
 
-  createInstancedBody(
+  public createInstancedBody(
     mesh: THREE.InstancedMesh,
     mass: number,
     shape: RAPIER.ColliderDesc,
@@ -155,7 +163,7 @@ export class PhysicsWorld {
     return { body: bodies, collider: colliders };
   }
 
-  createBody(
+  public createBody(
     position: THREE.Vector3,
     quaternion: THREE.Quaternion | null,
     mass: number,

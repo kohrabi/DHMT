@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { PhysicsWorld } from "./physicsWorld";
 import { GameObject } from "./gameObject";
+import { Scene } from "./scene";
 
 /**
  * The unified runtime context for a scene.
@@ -16,7 +17,7 @@ export class World {
   readonly physics = new PhysicsWorld();
   private readonly _gameObjects = new Set<GameObject>();
 
-  constructor() {
+  constructor(readonly gameScene : Scene) {
     // Wire the physics fixed-step loop to drive component fixedUpdates.
     this.physics.onFixedStep = (fdt: number) => {
       this.fixedUpdate(fdt);

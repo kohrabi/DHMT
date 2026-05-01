@@ -19,7 +19,7 @@ import { World } from "@/engine/world";
  */
 export abstract class Scene {
   readonly name: string;
-  readonly world = new World();
+  readonly world = new World(this);
   readonly content = new ContentManager();
   readonly camera = new THREE.PerspectiveCamera(
     45,

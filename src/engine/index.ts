@@ -1,5 +1,5 @@
 export * from "@/engine/component";
-export * from "@/engine/components/geometryCollider";
+export * from "@/engine/components/geometryRigidbody";
 export * from "@/engine/components/geometryRenderer";
 export * from "@/engine/components/characterController";
 export * from "@/engine/components/collider";

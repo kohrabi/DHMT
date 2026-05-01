@@ -16,9 +16,13 @@ export class CharacterController extends Component {
     return this.controller;
   }
 
-  public constructor(private readonly colliderMesh: THREE.CapsuleGeometry) {
-    super();
+  get Collider(): RAPIER.Collider {
+    return this.collider;
   }
+
+    public constructor(private readonly colliderMesh: THREE.CapsuleGeometry | THREE.BoxGeometry) {
+      super();
+    }
 
   public start(): void {
     super.start();
@@ -33,6 +37,7 @@ export class CharacterController extends Component {
     );
     const collider = this.gameObject.world.physics.world.createCollider(shape);
     this.collider = collider;
+    // console.log(this.collider);
   }
 
   public onDestroy(): void {
@@ -42,7 +47,11 @@ export class CharacterController extends Component {
   }
 
   public moveAndCollide(vel: THREE.Vector3): THREE.Vector3 {
-    this.controller.computeColliderMovement(this.collider, vel);
+    this.controller.computeColliderMovement(
+      this.collider, 
+      vel, 
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
+    );
 
     let correctedMovement = this.controller.computedMovement();
 

@@ -255,12 +255,12 @@
     "block-grass.012": {
       "name": "block-grass.012",
       "position": [
-        15.0,
+        8.0,
         0.0,
         -1.0
       ],
       "scale": [
-        15.029648780822754,
+        1.0,
         1.0,
         1.0
       ],
@@ -271,6 +271,573 @@
       ],
       "model_path": "assets/platformer/block-grass.glb",
       "object_type": "Ground",
+      "properties": {}
+    },
+    "block-grass.013": {
+      "name": "block-grass.013",
+      "position": [
+        8.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "object_type": "Ground",
+      "properties": {}
+    },
+    "block-grass.014": {
+      "name": "block-grass.014",
+      "position": [
+        7.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "object_type": "Ground",
+      "properties": {}
+    },
+    "block-grass.018": {
+      "name": "block-grass.018",
+      "position": [
+        8.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "object_type": "Ground",
+      "properties": {}
+    },
+    "block-grass.020": {
+      "name": "block-grass.020",
+      "position": [
+        7.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "object_type": "Ground",
+      "properties": {}
+    },
+    "block-grass.015": {
+      "name": "block-grass.015",
+      "position": [
+        6.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/block-grass.glb",
+      "object_type": "Ground",
+      "properties": {}
+    },
+    "coin-gold": {
+      "name": "coin-gold",
+      "position": [
+        3.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/coin-gold.glb",
+      "object_type": "Coin",
+      "properties": {}
+    },
+    "coin-gold.001": {
+      "name": "coin-gold.001",
+      "position": [
+        2.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/coin-gold.glb",
+      "object_type": "Coin",
+      "properties": {}
+    },
+    "coin-gold.002": {
+      "name": "coin-gold.002",
+      "position": [
+        4.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/coin-gold.glb",
+      "object_type": "Coin",
+      "properties": {}
+    },
+    "tree-pine": {
+      "name": "tree-pine",
+      "position": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.001": {
+      "name": "tree-pine.001",
+      "position": [
+        -2.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.002": {
+      "name": "tree-pine.002",
+      "position": [
+        4.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.003": {
+      "name": "tree-pine.003",
+      "position": [
+        8.0,
+        1.0,
+        2.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant": {
+      "name": "plant",
+      "position": [
+        2.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant.001": {
+      "name": "plant.001",
+      "position": [
+        3.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant.002": {
+      "name": "plant.002",
+      "position": [
+        5.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant.003": {
+      "name": "plant.003",
+      "position": [
+        6.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers": {
+      "name": "flowers",
+      "position": [
+        4.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.001": {
+      "name": "flowers.001",
+      "position": [
+        -2.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall": {
+      "name": "flowers-tall",
+      "position": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "brick": {
+      "name": "brick",
+      "position": [
+        1.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/brick.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight": {
+      "name": "fence-straight",
+      "position": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.001": {
+      "name": "fence-straight.001",
+      "position": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.002": {
+      "name": "fence-straight.002",
+      "position": [
+        2.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.003": {
+      "name": "fence-straight.003",
+      "position": [
+        3.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree": {
+      "name": "tree",
+      "position": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.001": {
+      "name": "tree.001",
+      "position": [
+        -3.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "rocks": {
+      "name": "rocks",
+      "position": [
+        5.0,
+        4.0,
+        0.0
+      ],
+      "scale": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/rocks.glb",
+      "object_type": "",
       "properties": {}
     }
   }

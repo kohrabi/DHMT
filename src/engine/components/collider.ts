@@ -13,7 +13,7 @@ export class Collider extends Component {
     super();
   }
 
-  get Collider(): RAPIER.Collider | undefined {
+  get Collider(): RAPIER.Collider {
     return this.collider;
   }
 

@@ -4,14 +4,14 @@ import * as Global from '@/global';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
 export class Camera extends GameObject {
-  private target?: GameObject;
+  private target?: GameObject | null;
   private controlsEnabled = false;
   private controls?: OrbitControls;
 
   constructor(
     private readonly camera : THREE.Camera, 
-    target : GameObject,
-    world : World
+    world : World,
+    target: GameObject | null = null,
   ) {
     super(
       `Camera`,
@@ -50,6 +50,10 @@ export class Camera extends GameObject {
     }
     
     this.camera.position.copy(this.transform.position);
+  }
+
+  public setTarget(target: GameObject) {
+    this.target = target;
   }
   
 }

@@ -5,12 +5,10 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { Coin } from "./coin";
 import { Brick } from "./brick";
+import { GroundOneWay } from "./oneway";
+import { MAX_DELTA_TIME, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
+import { instance } from "three/tsl";
 
-const SUBPIXEL = 1.0 / 16.0;
-// const MAX_DELTA_TIME = 60.0 / 1000.0;
-const MAX_DELTA_TIME = 60.0 / 1000.0;
-const SUBSUBSUBPIXEL = SUBPIXEL * SUBPIXEL * SUBPIXEL;
-const SUBSUBSUBPIXEL_DELTA_TIME = SUBSUBSUBPIXEL * MAX_DELTA_TIME;
 
 const MULTIPLIER = 1;
 
@@ -62,6 +60,12 @@ export class Player extends GameObject {
   private runBeforeWalkTimer = 0.0;
   private accel = new THREE.Vector2();
 
+  readonly shapeHeight = 1.0;
+
+  get bottom() {
+    return this.collider.translation().y - this.collider.halfHeight();
+  }
+
   get isGrounded(): boolean {
     return this.controller.computedGrounded();
   }
@@ -76,18 +80,13 @@ export class Player extends GameObject {
   public async start(): Promise<void> {
     super.start();
 
-    this.controller = this.world.physics.world.createCharacterController(0);
-    const shape = PhysicsWorld.getShape(new THREE.BoxGeometry(0.5, 1.0, 0.5))!;
-    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    shape.setActiveHooks(RAPIER.ActiveHooks.FILTER_CONTACT_PAIRS);
-    const collider = this.world.physics.world.createCollider(shape);
-    collider.setTranslation({
-      x: this.transform.position.x,
-      y: this.transform.position.y,
-      z: this.transform.position.z,
-    });
+    const { controller, collider } = this.world.physics.createCharacterController(
+      this,
+      new THREE.BoxGeometry(0.5, this.shapeHeight, 0.5)
+    );
+    this.controller = controller;
     this.collider = collider;
-    this.world.physics.registerCollider(collider, this);
+
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
     model.scene.position.set(0, -0.5, 0);
     model.scene.rotation.y = Math.PI / 4;
@@ -155,10 +154,14 @@ export class Player extends GameObject {
     }
 
     let gravity = 0.0;
-    if (!this.isGrounded) {
+    // isGrounded reflects the *previous* frame's computeColliderMovement result.
+    // Skip gravity if we were grounded and not moving upward, so a one-frame
+    // false-negative on computedGrounded() doesn't push velocity.y into the ground.
+    const effectivelyGrounded = this.isGrounded && this.velocity.y <= 0;
+    if (!effectivelyGrounded) {
       if (Global.input.isKeyDown(this.keyJump) && this.velocity.y <= JUMP_HANG) 
         gravity = -JUMP_HELD_GRAVITY;
-      else
+      else if (!this.isGrounded)
         gravity = -JUMP_GRAVITY;
     }
     this.accel.y = gravity;
@@ -189,8 +192,27 @@ export class Player extends GameObject {
       this.mesh.scale.x = Math.sign(this.velocity.x) * Math.abs(this.mesh.scale.x);
     }
 
-    this.moveAndSlide(1);
+    const corrected = PhysicsWorld.moveAndSlide(
+      this.controller, 
+      this.collider, 
+      this.transform, 
+      this.velocity, 
+      1, 
+      (collider) => {
+        const other = this.world.physics.getGameObjectFromCollider(collider);
+        if (other instanceof GroundOneWay) {
+          const playerBottom = this.bottom;
+          const groundTop = other.top;
+          if (playerBottom >= groundTop - 0.1) {
+            return false;
+          }
+        }
+        return true;
+      });
+
     if (this.isGrounded) {
+      this.velocity.y = 0;
+    } else if (this.velocity.y > 0 && corrected.y <= 0) {
       this.velocity.y = 0;
     }
 
@@ -221,40 +243,6 @@ export class Player extends GameObject {
         }
       }
     }
-  }
-
-  public moveAndCollide(vel: THREE.Vector3): THREE.Vector3 {
-    // Do NOT use EXCLUDE_SENSORS here — sensors (coins, triggers) must
-    // be included so computedCollisions() can report them.
-    this.controller.computeColliderMovement(
-      this.collider,
-      vel,
-      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
-    );
-
-    let correctedMovement = this.controller.computedMovement();
-
-    let t = this.collider.translation();
-    this.collider.setTranslation({
-      x: t.x + correctedMovement.x,
-      y: t.y + correctedMovement.y,
-      z: t.z + correctedMovement.z,
-    });
-    t = this.collider.translation();
-    this.transform.position.set(t.x, t.y, t.z);
-
-    return new THREE.Vector3(
-      correctedMovement.x,
-      correctedMovement.y,
-      correctedMovement.z,
-    );
-  }
-
-  public moveAndSlide(deltaTime: number): void {
-    const correctedMovement = this.moveAndCollide(
-      this.velocity.multiplyScalar(deltaTime),
-    );
-    this.velocity = correctedMovement;
   }
 
   public OnCollisionEnter(other: GameObject): void {

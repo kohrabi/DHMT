@@ -24,7 +24,8 @@ export class Brick extends GameObject {
     modelMesh.translateY(-0.25);
     this.mesh = this.transform.add(modelMesh);
     const shape = 
-      PhysicsWorld.getBoxShape(this.transform, new THREE.Vector3(0.5, 0.5, 0.5))!;
+      PhysicsWorld.getBoxShape(this.transform, 
+        this.transform.scale.clone().multiplyScalar(0.5))!;
     shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     const collider = this.world.physics.world.createCollider(shape);
     this.collider = collider;

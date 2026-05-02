@@ -46,25 +46,29 @@ export class PhysicsWorld {
   }
 
   step() {
+    
     this.timer.update();
-
+    
     this.world.timestep = this.timer.getDelta();
-    this.world.step(this.eventQueue);
-
+    this.world.step();
+    
     this.containPairs.clear();
-
+    
     // Solid vs solid contacts
-    this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-      this.containPairs.set(handle1, handle2);
-      console.log("Collision event:", handle1, handle2, started);
-    });
-
-
-    // console.log("Colliders", this.world.colliders.len());
-    this.onFixedStep?.(frameRate / 1000);
-
+    // this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+    //   this.containPairs.set(handle1, handle2);
+    //   console.log("Collision event:", handle1, handle2, started);
+    // });
+      
+      
     try {
-
+      // console.log("Colliders", this.world.colliders.len());
+      this.onFixedStep?.(frameRate / 1000);
+    } catch (error) {
+      console.error("Error during physics step:", error);
+    }
+      
+    try {
       for (const collider of this.pendingRemovals) {
         this.world.removeCollider(collider, true);
         console.log("Removed collider:", collider.handle);
@@ -219,6 +223,91 @@ export class PhysicsWorld {
     const collider = this.world.createCollider(shape, body);
 
     return { body, collider };
+  }
+
+  public createCharacterController(
+    GameObject: GameObject,
+    threeShape: THREE.BufferGeometry | THREE.BoxGeometry | THREE.SphereGeometry | THREE.CylinderGeometry | THREE.CapsuleGeometry
+  ) {
+    
+    // offset (skin width): the gap Rapier keeps between the collider and surfaces.
+    // Must be > 0 so computedGrounded() is reliable every frame.
+    const controller = this.world.createCharacterController(0.05);
+    // Snap the player down to the ground if within this distance,
+    // preventing floating / missed-ground-contact on descents.
+    controller.enableSnapToGround(0.5);
+    const shape = PhysicsWorld.getShape(threeShape)!;
+    const collider = this.world.createCollider(shape);
+    collider.setTranslation({
+      x: GameObject.transform.position.x,
+      y: GameObject.transform.position.y,
+      z: GameObject.transform.position.z,
+    });
+    this.registerCollider(collider, GameObject);
+    return {
+      controller,
+      collider,
+    };
+  }
+  
+  public static moveAndCollide(
+    controller : RAPIER.KinematicCharacterController, 
+    collider: RAPIER.Collider,
+    transform: THREE.Object3D,
+    vel: THREE.Vector3,
+    filterPredicate?: (collider: RAPIER.Collider) => boolean
+  ): THREE.Vector3 {
+    // Do NOT use EXCLUDE_SENSORS here — sensors (coins, triggers) must
+    // be included so computedCollisions() can report them.
+    controller.computeColliderMovement(
+      collider,
+      vel,
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      filterPredicate
+    );
+
+    let correctedMovement = controller.computedMovement();
+
+    let t = collider.translation();
+    collider.setTranslation({
+      x: t.x + correctedMovement.x,
+      y: t.y + correctedMovement.y,
+      z: t.z + correctedMovement.z,
+    });
+    t = collider.translation();
+    transform.position.set(t.x, t.y, t.z);
+
+    return new THREE.Vector3(
+      correctedMovement.x,
+      correctedMovement.y,
+      correctedMovement.z,
+    );
+  }
+
+  public static moveAndSlide(
+    controller : RAPIER.KinematicCharacterController, 
+    collider: RAPIER.Collider,
+    transform: THREE.Object3D,
+    vel: THREE.Vector3,
+    deltaTime: number,
+    filterPredicate?: (collider: RAPIER.Collider) => boolean
+  ): THREE.Vector3 {
+    const correctedMovement = this.moveAndCollide(
+      controller,
+      collider,
+      transform,
+      vel.clone().multiplyScalar(deltaTime),
+      filterPredicate
+    ).divideScalar(deltaTime);
+
+    // Update horizontal velocity in-place (slide feedback).
+    // Y is intentionally left to the caller — grounding/ceiling resets
+    // depend on controller state that only the caller knows.
+    vel.x = correctedMovement.x;
+    vel.z = correctedMovement.z;
+
+    return correctedMovement;
   }
 
   public static getShape(

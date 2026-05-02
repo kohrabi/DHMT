@@ -16,6 +16,7 @@ export class World {
   readonly scene = new THREE.Scene();
   readonly physics = new PhysicsWorld();
   private readonly _gameObjects = new Set<GameObject>();
+  readonly pendingRemovals: Set<GameObject> = new Set();
 
   constructor(readonly gameScene : Scene) {
     // Wire the physics fixed-step loop to drive component fixedUpdates.
@@ -29,23 +30,25 @@ export class World {
   }
 
   /** Add a GameObject and immediately attach its transform to the scene graph. */
-  add(go: GameObject): GameObject {
+  addGameObject(go: GameObject): GameObject {
     this._gameObjects.add(go);
     this.scene.add(go.transform);
     return go;
   }
 
   /** Remove a GameObject, detach its transform, and call destroy() on it. */
-  remove(go: GameObject): boolean {
+  removeGameObject(go: GameObject): boolean {
     const removed = this._gameObjects.delete(go);
     if (removed) {
       this.scene.remove(go.transform);
-      go.destroy();
+      // go.destroy();
+      this.pendingRemovals.add(go);
     }
     return removed;
   }
 
   update(dt: number): void {
+
     for (const go of this._gameObjects) {
       if (!go.started) {
         go.start();
@@ -53,6 +56,14 @@ export class World {
       }
       go.update(dt);
     }
+
+    for (const go of this.pendingRemovals) {
+      if (!go.started) {
+        continue; // Skip destroy() for GameObjects that never started.
+      }
+      go.destroy();
+    }
+    this.pendingRemovals.clear();
   }
 
   fixedUpdate(fdt: number): void {

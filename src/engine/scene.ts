@@ -66,7 +66,7 @@ export abstract class Scene {
    * Its transform is automatically attached to the Three.js scene graph.
    */
   protected addGameObject(gameObject: GameObject): GameObject {
-    return this.world.add(gameObject);
+    return this.world.addGameObject(gameObject);
   }
 
   /**
@@ -74,7 +74,7 @@ export abstract class Scene {
    * Its transform is detached and destroy() is called on it.
    */
   protected removeGameObject(gameObject: GameObject): boolean {
-    return this.world.remove(gameObject);
+    return this.world.removeGameObject(gameObject);
   }
 
   // ─── SceneManager interface ───────────────────────────────────────────────

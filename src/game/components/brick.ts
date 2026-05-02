@@ -4,16 +4,13 @@ import { sceneManager } from '../../global';
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 
-export class Coin extends GameObject {
+export class Brick extends GameObject {
   private mesh!: THREE.Object3D;
   private collider! : RAPIER.Collider;
 
-  private originalY = 0;
-  private isStarted = false;
-
   constructor(world : World) {
     super(
-      `Coin_${world.gameObjects.size}`,
+      `Brick_${world.gameObjects.size}`,
       world,
     );
   }
@@ -21,35 +18,22 @@ export class Coin extends GameObject {
   async start() : Promise<void> {
     super.start();
     const model = await this.world.gameScene.content.loadGLTF(
-      "assets/platformer/coin-gold.glb",
+      "assets/platformer/brick.glb",
     );
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
     this.mesh = this.transform.add(modelMesh);
-    
-    this.originalY = this.transform.position.y;
-
-    const shape = PhysicsWorld.getSphereShape(this.transform, 0.25)!;
+    const shape = 
+      PhysicsWorld.getBoxShape(this.transform, new THREE.Vector3(0.5, 0.5, 0.5))!;
     shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     const collider = this.world.physics.world.createCollider(shape);
-    collider.setSensor(true);
     this.collider = collider;
     this.world.physics.registerCollider(collider, this);
-    this.isStarted = true;
-  }
-
-  fixedUpdate(_fixedDeltaTime: number): void {
-    if (!this.isStarted) return;
-    this.transform.rotateY(0.1);
-    this.transform.position.y = this.originalY + 
-      Math.sin(Global.timer.getElapsed() * 5 + this.transform.position.x) * 0.1;
-    
   }
   
   destroy(): void {
     super.destroy();
     try {
-
       this.world.physics.removeCollider(this.collider);
       this.mesh.traverse((child) => {
         if (child instanceof THREE.Mesh) {
@@ -62,7 +46,12 @@ export class Coin extends GameObject {
         }
       });
     } catch (error) {
-      console.error("Error during coin destruction:", error);
+      console.error("Error during brick destruction:", error);
     }
+  }
+
+  public onHit(): void {
+    console.log("Brick hit!");
+    this.world.removeGameObject(this);
   }
 }

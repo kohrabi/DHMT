@@ -10,6 +10,7 @@ import { Camera } from "./components/camera";
 import { Coin } from "./components/coin";
 import { Ground } from "./components/ground";
 import { Decorate } from "./components/decorate";
+import { Brick } from "./components/brick";
 
 type LevelObject = {
   model_path: string;
@@ -132,6 +133,31 @@ export class Scene2 extends Scene {
             );
             break;
             
+          }
+          case "Brick": {
+
+            const go = this.addGameObject(new Brick(this.world));
+            // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
+            // Blender use Z Up, Y Forward
+            // While Three.js use Y Up, Z Backward
+            go.transform.position.set(
+              objectData.position[0],
+              objectData.position[2],
+              -objectData.position[1],
+            );
+            // But somehow the rotation is correct
+            go.transform.rotation.set(
+              objectData.rotation[0],
+              objectData.rotation[1],
+              objectData.rotation[2],
+            );
+            go.transform.scale.set(
+              objectData.scale[0],
+              objectData.scale[1],
+              objectData.scale[2],
+            );
+            break;
+
           }
 
           case "": {

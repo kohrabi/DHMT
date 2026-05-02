@@ -690,7 +690,7 @@
         0.0
       ],
       "model_path": "assets/platformer/brick.glb",
-      "object_type": "",
+      "object_type": "Brick",
       "properties": {}
     },
     "fence-straight": {

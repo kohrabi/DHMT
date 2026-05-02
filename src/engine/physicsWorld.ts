@@ -1,6 +1,6 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
-import { RoundedBoxGeometry } from "three/examples/jsm/Addons.js";
+import { GameObject } from "./gameObject";
 
 const gravity = new RAPIER.Vector3(0.0, -9.81, 0.0);
 const ZERO = new RAPIER.Vector3(0.0, 0.0, 0.0);
@@ -10,9 +10,7 @@ const _scale = new THREE.Vector3(1, 1, 1);
 export class PhysicsWorld {
   readonly world = new RAPIER.World(gravity);
 
-  // Cannot use mesh
-  // readonly meshes: THREE.Mesh[] = [];
-  // readonly meshMap = new WeakMap();
+  readonly colliderGameObjectMap: Map<RAPIER.Collider, GameObject> = new Map();
 
   readonly _vector = new THREE.Vector3();
   readonly _quaternion = new THREE.Quaternion();
@@ -20,10 +18,15 @@ export class PhysicsWorld {
   readonly timer = new THREE.Timer();
   readonly eventQueue: RAPIER.EventQueue = new RAPIER.EventQueue(true);
   readonly containPairs : Map<number, number> = new Map();
+  readonly pendingRemovals: Set<RAPIER.Collider> = new Set();
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   public onFixedStep?: (fdt: number) => void;
+  /** Fired when two NON-sensor colliders start/stop touching. */
+  public onCollision?: (go1: GameObject, go2: GameObject, started: boolean) => void;
+  /** Fired when a SENSOR collider overlaps with any other collider. */
+  public onIntersection?: (go1: GameObject, go2: GameObject, intersecting: boolean) => void;
 
   constructor() {
     this.intervalId = setInterval(() => this.step(), 1000 / frameRate);
@@ -49,11 +52,47 @@ export class PhysicsWorld {
     this.world.step(this.eventQueue);
 
     this.containPairs.clear();
+
+    // Solid vs solid contacts
     this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
       this.containPairs.set(handle1, handle2);
+      console.log("Collision event:", handle1, handle2, started);
     });
 
+
+    // console.log("Colliders", this.world.colliders.len());
     this.onFixedStep?.(frameRate / 1000);
+
+    try {
+
+      for (const collider of this.pendingRemovals) {
+        this.world.removeCollider(collider, true);
+        console.log("Removed collider:", collider.handle);
+      }
+      this.pendingRemovals.clear();
+    } catch (error) {
+      console.error("Error during collider removal:", error);
+    }
+  }
+
+  public registerCollider(collider: RAPIER.Collider, gameObject: GameObject) {
+    this.colliderGameObjectMap.set(collider, gameObject);
+  }
+
+  public unregisterCollider(collider: RAPIER.Collider) {
+    this.colliderGameObjectMap.delete(collider);
+    
+  }
+
+  public getGameObjectFromCollider(collider: RAPIER.Collider): GameObject | undefined {
+    return this.colliderGameObjectMap.get(collider);
+  }
+
+  public removeCollider(collider: RAPIER.Collider) {
+    collider.setEnabled(false);
+    this.pendingRemovals.add(collider);
+    this.colliderGameObjectMap.delete(collider);
+    console.log("Scheduled collider for removal:", collider.handle);
   }
 
   /**
@@ -90,6 +129,8 @@ export class PhysicsWorld {
             mass,
             shape,
           );
+    
+    
 
     return { body, collider };
   }
@@ -178,26 +219,6 @@ export class PhysicsWorld {
     const collider = this.world.createCollider(shape, body);
 
     return { body, collider };
-  }
-
-  public removeBody(body: RAPIER.RigidBody | RAPIER.RigidBody[]) {
-    if (Array.isArray(body)) {
-      for (let i = 0; i < body.length; i++) {
-        this.world.removeRigidBody(body[i]);
-      }
-    } else {
-      this.world.removeRigidBody(body);
-    }
-  }
-
-  public removeCollider(collider: RAPIER.Collider | RAPIER.Collider[]) {
-    if (Array.isArray(collider)) {
-      for (let i = 0; i < collider.length; i++) {
-        this.world.removeCollider(collider[i], false);
-      }
-    } else {
-      this.world.removeCollider(collider, false);
-    }
   }
 
   public static getShape(
@@ -295,4 +316,25 @@ export class PhysicsWorld {
       .setTranslation(position.x, position.y, position.z)
       .setRotation(quaternion);
   }
+  
+  public static 
+    buildCollisionGroups(membership: number[], filter: number[]): number {
+    let membershipMask = 0;
+    let filterMask = 0;
+
+    for (let i = 0; i < membership.length; i++) {
+      const group = membership[i];
+      if (group < 0 || group > 15) continue;
+      membershipMask |= 1 << group;
+    }
+
+    for (let i = 0; i < filter.length; i++) {
+      const group = filter[i];
+      if (group < 0 || group > 15) continue;
+      filterMask |= 1 << group;
+    }
+
+    return (membershipMask << 16) | filterMask;
+  }
+
 }

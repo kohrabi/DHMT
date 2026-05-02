@@ -3,6 +3,8 @@ import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
+import { Coin } from "./coin";
+import { Brick } from "./brick";
 
 const SUBPIXEL = 1.0 / 16.0;
 // const MAX_DELTA_TIME = 60.0 / 1000.0;
@@ -76,6 +78,8 @@ export class Player extends GameObject {
 
     this.controller = this.world.physics.world.createCharacterController(0);
     const shape = PhysicsWorld.getShape(new THREE.BoxGeometry(0.5, 1.0, 0.5))!;
+    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+    shape.setActiveHooks(RAPIER.ActiveHooks.FILTER_CONTACT_PAIRS);
     const collider = this.world.physics.world.createCollider(shape);
     collider.setTranslation({
       x: this.transform.position.x,
@@ -83,6 +87,7 @@ export class Player extends GameObject {
       z: this.transform.position.z,
     });
     this.collider = collider;
+    this.world.physics.registerCollider(collider, this);
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
     model.scene.position.set(0, -0.5, 0);
     model.scene.rotation.y = Math.PI / 4;
@@ -189,16 +194,41 @@ export class Player extends GameObject {
       this.velocity.y = 0;
     }
 
+    const t = this.collider.translation();
+    // t.y += 0.75;
+    this.world.physics.world.intersectionsWithShape(
+      t, 
+      this.collider.rotation(), 
+      this.collider.shape,
+      (handle) => {
+        const other = this.world.physics.getGameObjectFromCollider(handle);
+        if (other)
+          this.OnCollisionEnter(other);
+        return false;
+      }
+    );
+
     for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
       const collision = this.controller.computedCollision(i);
-      console.log(collision);
+      if (!collision) continue;
+      if (!collision.collider) continue;
+      const other = this.world.physics.getGameObjectFromCollider(collision.collider);
+      console.log("Collision with:", other?.name);
+      if (other instanceof Brick) {
+        if (collision.normal1.y < -0.5) {
+          this.velocity.y = 0;
+          other.onHit();
+        }
+      }
     }
   }
 
   public moveAndCollide(vel: THREE.Vector3): THREE.Vector3 {
+    // Do NOT use EXCLUDE_SENSORS here — sensors (coins, triggers) must
+    // be included so computedCollisions() can report them.
     this.controller.computeColliderMovement(
-      this.collider, 
-      vel, 
+      this.collider,
+      vel,
       RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
     );
 
@@ -225,5 +255,11 @@ export class Player extends GameObject {
       this.velocity.multiplyScalar(deltaTime),
     );
     this.velocity = correctedMovement;
+  }
+
+  public OnCollisionEnter(other: GameObject): void {
+    if (other instanceof Coin) {
+      this.world.removeGameObject(other);
+    }
   }
 }

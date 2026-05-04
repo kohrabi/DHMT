@@ -11,10 +11,10 @@ export class GroundOneWay extends GameObject {
   readonly shapeSize = new THREE.Vector3(2, 0.5, 1);
 
   get bottom() {
-    return this.collider.translation().y - this.collider.halfHeight();
+    return this.transform.position.y + 0.25 - this.shapeSize.y / 2.0;
   }
   get top() {
-    return this.collider.translation().y + this.collider.halfHeight();
+    return this.transform.position.y + 0.25 + this.shapeSize.y / 2.0;
   }
 
   constructor(world : World, model: THREE.Object3D) {

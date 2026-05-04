@@ -8,6 +8,7 @@ import { Brick } from "./brick";
 import { GroundOneWay } from "./oneway";
 import { MAX_DELTA_TIME, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
 import { instance } from "three/tsl";
+import { Goomba } from "./goomba";
 
 
 const MULTIPLIER = 1;
@@ -63,7 +64,7 @@ export class Player extends GameObject {
   readonly shapeHeight = 1.0;
 
   get bottom() {
-    return this.collider.translation().y - this.collider.halfHeight();
+    return this.transform.position.y - this.shapeHeight / 2.0;
   }
 
   get isGrounded(): boolean {
@@ -91,6 +92,18 @@ export class Player extends GameObject {
     model.scene.position.set(0, -0.5, 0);
     model.scene.rotation.y = Math.PI / 4;
     this.mesh = this.transform.add(model.scene);
+  }
+
+  public onDestroy(): void {
+    super.onDestroy();
+    try {
+      this.world.physics.world.removeCharacterController(this.controller);
+      this.world.physics.removeCollider(this.collider);
+      // Mesh will be cleaned by the scene's cleanup.
+    }
+    catch (error) {
+      console.error("Error during player destruction:", error);
+    }
   }
 
   public update(deltaTime: number): void {
@@ -198,17 +211,8 @@ export class Player extends GameObject {
       this.transform, 
       this.velocity, 
       1, 
-      (collider) => {
-        const other = this.world.physics.getGameObjectFromCollider(collider);
-        if (other instanceof GroundOneWay) {
-          const playerBottom = this.bottom;
-          const groundTop = other.top;
-          if (playerBottom >= groundTop - 0.1) {
-            return false;
-          }
-        }
-        return true;
-      });
+      (collider) => this.canCollideWith(collider)
+    );
 
     if (this.isGrounded) {
       this.velocity.y = 0;
@@ -225,7 +229,7 @@ export class Player extends GameObject {
       (handle) => {
         const other = this.world.physics.getGameObjectFromCollider(handle);
         if (other)
-          this.OnCollisionEnter(other);
+          this.onIntersection(other);
         return false;
       }
     );
@@ -235,19 +239,42 @@ export class Player extends GameObject {
       if (!collision) continue;
       if (!collision.collider) continue;
       const other = this.world.physics.getGameObjectFromCollider(collision.collider);
-      console.log("Collision with:", other?.name);
-      if (other instanceof Brick) {
-        if (collision.normal1.y < -0.5) {
-          this.velocity.y = 0;
-          other.onHit();
-        }
+      this.onControllerEnter(collision);
+    }
+  }
+
+  private onIntersection(other: GameObject): void {
+    if (other instanceof Coin) {
+      this.world.removeGameObject(other);
+    }
+  }
+
+  private onControllerEnter(collision : RAPIER.CharacterCollision): void {
+    if (!collision.collider) return;
+    const other = this.world.physics.getGameObjectFromCollider(collision.collider);
+    if (other instanceof Brick) {
+      if (collision.normal1.y < -0.5) {
+        this.velocity.y = 0;
+        other.onHit();
+      }
+    }
+    else if (other instanceof Goomba) {
+      if (collision.normal1.y > 0.5) {
+        this.velocity.y = 0;
+        other.onHit();
       }
     }
   }
 
-  public OnCollisionEnter(other: GameObject): void {
-    if (other instanceof Coin) {
-      this.world.removeGameObject(other);
+  private canCollideWith(collider: RAPIER.Collider): boolean {
+    const other = this.world.physics.getGameObjectFromCollider(collider);
+    if (other instanceof GroundOneWay) {
+      const playerBottom = this.bottom;
+      const groundTop = other.top;
+      if (playerBottom <= groundTop + 0.05) {
+        return false;
+      }
     }
+    return true;
   }
 }

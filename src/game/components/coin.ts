@@ -46,8 +46,8 @@ export class Coin extends GameObject {
     
   }
   
-  destroy(): void {
-    super.destroy();
+  onDestroy(): void {
+    super.onDestroy();
     try {
 
       this.world.physics.removeCollider(this.collider);

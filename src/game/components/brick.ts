@@ -32,8 +32,8 @@ export class Brick extends GameObject {
     this.world.physics.registerCollider(collider, this);
   }
   
-  destroy(): void {
-    super.destroy();
+  onDestroy(): void {
+    super.onDestroy();
     try {
       this.world.physics.removeCollider(this.collider);
       this.mesh.traverse((child) => {

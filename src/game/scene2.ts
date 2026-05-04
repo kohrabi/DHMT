@@ -1,6 +1,7 @@
 import {
   Scene,
   PhysicsWorld,
+  GameObject,
 } from "@/engine";
 import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
@@ -78,6 +79,7 @@ export class Scene2 extends Scene {
     const cameraObject = this.addGameObject(camera);
     
     for (const objectData of Object.values(levelData.objects)) {
+      let go: GameObject | null = null;
       switch (objectData.object_type) {
         case "Ground": {
 
@@ -85,26 +87,7 @@ export class Scene2 extends Scene {
             objectData.model_path,
           );
           const modelMesh = model.scene.clone();
-          const go = this.addGameObject(new Ground(this.world, modelMesh));
-          // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
-          // Blender use Z Up, Y Forward
-          // While Three.js use Y Up, Z Backward
-          go.transform.position.set(
-            objectData.position[0],
-            objectData.position[2],
-            -objectData.position[1],
-          );
-          // But somehow the rotation is correct
-          go.transform.rotation.set(
-            objectData.rotation[0],
-            objectData.rotation[1],
-            objectData.rotation[2],
-          );
-          go.transform.scale.set(
-            objectData.scale[0],
-            objectData.scale[1],
-            objectData.scale[2],
-          );
+          go = this.addGameObject(new Ground(this.world, modelMesh));
           break;
         }
         case "OneWay": {
@@ -113,26 +96,7 @@ export class Scene2 extends Scene {
             objectData.model_path,
           );
           const modelMesh = model.scene.clone();
-          const go = this.addGameObject(new GroundOneWay(this.world, modelMesh));
-          // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
-          // Blender use Z Up, Y Forward
-          // While Three.js use Y Up, Z Backward
-          go.transform.position.set(
-            objectData.position[0],
-            objectData.position[2],
-            -objectData.position[1],
-          );
-          // But somehow the rotation is correct
-          go.transform.rotation.set(
-            objectData.rotation[0],
-            objectData.rotation[1],
-            objectData.rotation[2],
-          );
-          go.transform.scale.set(
-            objectData.scale[0],
-            objectData.scale[1],
-            objectData.scale[2],
-          );
+          go = this.addGameObject(new GroundOneWay(this.world, modelMesh));
           break;
         }
         case "PlayerSpawn": {
@@ -171,54 +135,12 @@ export class Scene2 extends Scene {
           break;
         }
         case "Coin": {
-
-          const go = this.addGameObject(new Coin(this.world));
-          // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
-          // Blender use Z Up, Y Forward
-          // While Three.js use Y Up, Z Backward
-          go.transform.position.set(
-            objectData.position[0],
-            objectData.position[2],
-            -objectData.position[1],
-          );
-          // But somehow the rotation is correct
-          go.transform.rotation.set(
-            objectData.rotation[0],
-            objectData.rotation[1],
-            objectData.rotation[2],
-          );
-          go.transform.scale.set(
-            objectData.scale[0],
-            objectData.scale[1],
-            objectData.scale[2],
-          );
+          go = this.addGameObject(new Coin(this.world));
           break;
-          
         }
         case "Brick": {
-
-          const go = this.addGameObject(new Brick(this.world));
-          // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
-          // Blender use Z Up, Y Forward
-          // While Three.js use Y Up, Z Backward
-          go.transform.position.set(
-            objectData.position[0],
-            objectData.position[2],
-            -objectData.position[1],
-          );
-          // But somehow the rotation is correct
-          go.transform.rotation.set(
-            objectData.rotation[0],
-            objectData.rotation[1],
-            objectData.rotation[2],
-          );
-          go.transform.scale.set(
-            objectData.scale[0],
-            objectData.scale[1],
-            objectData.scale[2],
-          );
+          go = this.addGameObject(new Brick(this.world));
           break;
-
         }
 
         case "": {
@@ -226,29 +148,31 @@ export class Scene2 extends Scene {
             objectData.model_path,
           );
           const modelMesh = model.scene.clone();
-          const go = this.addGameObject(new Decorate(this.world, modelMesh));
-          // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
-          // Blender use Z Up, Y Forward
-          // While Three.js use Y Up, Z Backward
-          go.transform.position.set(
-            objectData.position[0],
-            objectData.position[2],
-            -objectData.position[1],
-          );
-          // But somehow the rotation is correct
-          go.transform.rotation.set(
-            objectData.rotation[0],
-            objectData.rotation[1],
-            objectData.rotation[2],
-          );
-          go.transform.scale.set(
-            objectData.scale[0],
-            objectData.scale[1],
-            objectData.scale[2],
-          );
+          go = this.addGameObject(new Decorate(this.world, modelMesh));
           break;
         }
       }
+      
+      if (!go) continue;
+      // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
+      // Blender use Z Up, Y Forward
+      // While Three.js use Y Up, Z Backward
+      go.transform.position.set(
+        objectData.position[0],
+        objectData.position[2],
+        -objectData.position[1],
+      );
+      // But somehow the rotation is correct
+      go.transform.rotation.set(
+        objectData.rotation[0],
+        objectData.rotation[1],
+        objectData.rotation[2],
+      );
+      go.transform.scale.set(
+        objectData.scale[0],
+        objectData.scale[2],
+        objectData.scale[1],
+      );
     }
   }
 }

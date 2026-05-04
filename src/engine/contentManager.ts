@@ -110,6 +110,9 @@ export class ContentManager {
               object.material.dispose();
             }
           }
+          if (object instanceof THREE.Skeleton) {
+            object.dispose();
+          }
         }),
       );
     });

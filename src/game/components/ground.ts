@@ -20,7 +20,7 @@ export class Ground extends GameObject {
   async start() : Promise<void> {
     super.start();
     const shape = PhysicsWorld.getBoxShape(
-      this.transform.clone().translateY(0.5),
+      this.transform.clone().translateY(0.5 * this.transform.scale.y),
       new THREE.Vector3(
         this.transform.scale.x,
         this.transform.scale.y,

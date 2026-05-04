@@ -61,7 +61,7 @@ export class World {
       if (!go.started) {
         continue; // Skip destroy() for GameObjects that never started.
       }
-      go.destroy();
+      go.onDestroy();
     }
     this.pendingRemovals.clear();
   }
@@ -76,7 +76,7 @@ export class World {
   dispose(): void {
     // Snapshot the set before iterating so destroy() can mutate it safely.
     for (const go of [...this._gameObjects]) {
-      go.destroy();
+      go.onDestroy();
     }
     this._gameObjects.clear();
     this.physics.dispose();

@@ -31,16 +31,21 @@ export abstract class GameObject {
     if (this.started) {
       return;
     }
-    console.log(`Starting GameObject: ${this.name}`);
+    // console.log(`Starting GameObject: ${this.name}`);
     this.started = true;
   }
 
   update(deltaTime: number): void {}
   fixedUpdate(fixedDeltaTime: number): void {}
 
-  destroy(): void {
-    if (this.transform.parent) {
-      this.transform.parent.remove(this.transform);
-    }
+  destroy() : void {
+    this.world.removeGameObject(this);
+  }
+  
+  onDestroy(): void {
+    // if (this.transform.parent) {
+    //   this.transform.parent.remove(this.transform);
+    // }
+    this.transform.remove(this.transform);
   }
 }

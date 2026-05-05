@@ -6,6 +6,7 @@ import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import { Ground } from "./ground";
 import { GroundOneWay } from "./oneway";
 import { Animator } from "@/engine/animator";
+import { Goomba, GoombaState } from "./goomba";
 
 const GREEN_KOOPA_X_SPEED = 0x00800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GREEN_KOOPA_SHELL_X_SPEED = 0x02700 * SUBSUBSUBPIXEL_DELTA_TIME;
@@ -143,34 +144,34 @@ export class Koopa extends GameObject {
     
     switch (this._currentState)
     {
-    case KoopaState.NORMAL:
-    {
-      // Check for wall collisions to flip direction
-      let ShouldFlip = true;
-      this.flipCollider.setTranslation({
-        x: this.transform.position.x + 0.5 * this.dir,
-        y: this.transform.position.y - 0.5,
-        z: this.transform.position.z
-      });
-      this.world.physics.world.intersectionsWithShape(
-        this.flipCollider.translation(),
-        this.flipCollider.rotation(),
-        this.flipCollider.shape,
-        (otherCollider) => {
-          ShouldFlip = false;
-          return false;
-        },
-        RAPIER.QueryFilterFlags.EXCLUDE_KINEMATIC | RAPIER.QueryFilterFlags.EXCLUDE_SENSORS | RAPIER.QueryFilterFlags.EXCLUDE_DYNAMIC
-      )
-      if (ShouldFlip) {
-        this.dir *= -1;
-      }
+      case KoopaState.NORMAL:
+      {
+        // Check for wall collisions to flip direction
+        let ShouldFlip = true;
+        this.flipCollider.setTranslation({
+          x: this.transform.position.x + 0.5 * this.dir,
+          y: this.transform.position.y - 0.5,
+          z: this.transform.position.z
+        });
+        this.world.physics.world.intersectionsWithShape(
+          this.flipCollider.translation(),
+          this.flipCollider.rotation(),
+          this.flipCollider.shape,
+          (otherCollider) => {
+            ShouldFlip = false;
+            return false;
+          },
+          RAPIER.QueryFilterFlags.EXCLUDE_KINEMATIC | RAPIER.QueryFilterFlags.EXCLUDE_SENSORS | RAPIER.QueryFilterFlags.EXCLUDE_DYNAMIC
+        )
+        if (ShouldFlip) {
+          this.dir *= -1;
+        }
 
-      this.velocity.x = GREEN_KOOPA_X_SPEED * this.dir;
-    }
-    break;
-    case KoopaState.IN_SHELL:
-    {
+        this.velocity.x = GREEN_KOOPA_X_SPEED * this.dir;
+        break;
+      }
+      case KoopaState.IN_SHELL:
+      {
         if (this.velocity.x == 0)
         {
             if (this.respawnTimer > 0) this.respawnTimer -= fixedDeltaTime;
@@ -181,8 +182,21 @@ export class Koopa extends GameObject {
             }
         }
         this.velocity.x = GREEN_KOOPA_SHELL_X_SPEED * this.dir;
-    }
-    break;
+        break;
+      }
+      
+      case KoopaState.DEAD_BOUNCE: {
+        this.collider.setEnabled(false);
+        this.velocity.y -= OBJECT_FALL;
+        this.velocity.y = Math.max(this.velocity.y, -OBJECT_MAX_FALL);
+
+        this.transform.position.x += this.velocity.x;
+        this.transform.position.y += this.velocity.y;
+        if (this.transform.position.y < -10) {
+          this.destroy();
+        }
+        break;
+      }
     // case KoopaState.RESPAWNING:
     // {
     //     if (this.respawnTimer > 0) this.respawnTimer -= fixedDeltaTime;
@@ -207,22 +221,29 @@ export class Koopa extends GameObject {
     case KoopaState.DEAD_BOUNCE: break;
     }
 
-    this.velocity.z = 0;
-    PhysicsWorld.moveAndSlide(
-      this.controller,
-      this.collider,
-      this.transform,
-      this.velocity,
-      1,
-    )
-    for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
-      const collision = this.controller.computedCollision(i);
-      if (!collision) continue;
-      if (Math.abs(collision.normal1.x) > 0.5) {
-        this.dir *= -1;
+    if (this._currentState !== KoopaState.DEAD_BOUNCE) {
+      this.velocity.z = 0;
+      PhysicsWorld.moveAndSlide(
+        this.controller,
+        this.collider,
+        this.transform,
+        this.velocity,
+        1,
+      )
+      for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
+        const collision = this.controller.computedCollision(i);
+        if (!collision) continue;
+        const go = this.world.physics.getGameObjectFromCollider(collision.collider!)!;
+        if ((go instanceof Ground || go instanceof GroundOneWay) && Math.abs(collision.normal1.x) > 0.5) {
+          this.dir *= -1;
+        }
+        else {
+          this.onColliderEnter(go);
+        }
+        
       }
     }
-
+      
     this.animationCode(fixedDeltaTime);
   }
 
@@ -233,13 +254,21 @@ export class Koopa extends GameObject {
         if (this.ignoreDamageTimer > 0) return;
         // CGame::GetInstance()->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
         // layer = SortingLayer::CORPSE;
-        this.velocity.y = -OBJECT_DEAD_BOUNCE;
+        this.velocity.y = OBJECT_DEAD_BOUNCE;
         this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
+        this.world.physics.addDeferedCall(() => {
+          this.collider.setEnabled(false);
+        });
       }
     break;
     default: break;
     }
     this._currentState = newState;
+  }
+
+  public deadBounce(dir : number): void {
+    this.dir = dir;
+    this.setState(KoopaState.DEAD_BOUNCE);
   }
 
   public onHit(dir : number) : void {
@@ -257,6 +286,16 @@ export class Koopa extends GameObject {
           this.dir = 0;
         else
             this.dir = -dir;
+    }
+  }
+
+  private onColliderEnter(go : GameObject) : void {
+    if (this._currentState !== KoopaState.IN_SHELL) return;
+    if (go instanceof Goomba) {
+      go.deadBounce(-Math.sign(this.transform.position.x - go.transform.position.x));
+    }
+    else if (go instanceof Koopa) {
+      go.setState(KoopaState.DEAD_BOUNCE);
     }
   }
 }

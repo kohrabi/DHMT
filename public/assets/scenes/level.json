@@ -903,90 +903,6 @@
       "object_type": "Ground",
       "properties": {}
     },
-    "brick": {
-      "name": "brick",
-      "position": [
-        11.0,
-        0.0,
-        2.0
-      ],
-      "scale": [
-        1.5,
-        1.5,
-        1.5
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/brick.glb",
-      "object_type": "Brick",
-      "properties": {}
-    },
-    "brick.001": {
-      "name": "brick.001",
-      "position": [
-        12.0,
-        0.0,
-        2.0
-      ],
-      "scale": [
-        1.5,
-        1.5,
-        1.5
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/brick.glb",
-      "object_type": "Brick",
-      "properties": {}
-    },
-    "brick.002": {
-      "name": "brick.002",
-      "position": [
-        14.0,
-        0.0,
-        6.0
-      ],
-      "scale": [
-        1.5,
-        1.5,
-        1.5
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/brick.glb",
-      "object_type": "Brick",
-      "properties": {}
-    },
-    "brick.003": {
-      "name": "brick.003",
-      "position": [
-        15.0,
-        0.0,
-        6.0
-      ],
-      "scale": [
-        1.5,
-        1.5,
-        1.5
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/brick.glb",
-      "object_type": "Brick",
-      "properties": {}
-    },
     "hedge": {
       "name": "hedge",
       "position": [
@@ -1116,9 +1032,9 @@
     "body-mesh.003": {
       "name": "body-mesh.003",
       "position": [
-        32.0,
+        8.0,
         0.0,
-        3.0
+        0.0
       ],
       "scale": [
         1.0,
@@ -1635,8 +1551,11 @@
         0.0
       ],
       "model_path": "assets/platformer/crate-item.glb",
-      "object_type": "",
-      "properties": {}
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
     },
     "crate-item.001": {
       "name": "crate-item.001",
@@ -1656,8 +1575,11 @@
         0.0
       ],
       "model_path": "assets/platformer/crate-item.glb",
-      "object_type": "",
-      "properties": {}
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
     },
     "block-grass.047": {
       "name": "block-grass.047",
@@ -2912,6 +2834,144 @@
           1.0
         ]
       }
+    },
+    "crate-item.002": {
+      "name": "crate-item.002",
+      "position": [
+        12.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/crate-item.glb",
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
+    },
+    "crate-item.003": {
+      "name": "crate-item.003",
+      "position": [
+        11.0,
+        0.0,
+        2.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/crate-item.glb",
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
+    },
+    "crate-item.004": {
+      "name": "crate-item.004",
+      "position": [
+        15.5,
+        0.10000000149011612,
+        5.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/crate-item.glb",
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
+    },
+    "crate-item.005": {
+      "name": "crate-item.005",
+      "position": [
+        14.5,
+        0.10000000149011612,
+        5.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/crate-item.glb",
+      "object_type": "QuestionBlock",
+      "properties": {
+        "spawn_count": 1,
+        "spawn_type": "COIN"
+      }
+    },
+    "body-mesh.004": {
+      "name": "body-mesh.004",
+      "position": [
+        12.0,
+        0.0,
+        3.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/body-mesh.glb",
+      "object_type": "Koopa",
+      "properties": {}
+    },
+    "coin-gold": {
+      "name": "coin-gold",
+      "position": [
+        9.0,
+        0.0,
+        3.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/coin-gold.glb",
+      "object_type": "Coin",
+      "properties": {}
     }
   }
 }

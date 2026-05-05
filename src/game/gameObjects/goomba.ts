@@ -9,7 +9,7 @@ const GOOMBA_X_SPEED =  0x00A00 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GOOMBA_KILL_TIME = 2;
 const GOOMA_IGNORE_DAMAGE_TIME = 200;
 
-enum GoombaState {
+export enum GoombaState {
   NORMAL,
   DEAD,
   DEAD_BOUNCE,
@@ -167,18 +167,18 @@ export class Goomba extends GameObject {
     
     switch (state)
     {
-    case GoombaState.DEAD:
-    {
+      case GoombaState.DEAD: {
         if (this.ignoreDamageTimer > 0) return;
         // game->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
         this.killTimer = GOOMBA_KILL_TIME;
-        this.collider.setEnabled(false);
+        this.world.physics.addDeferedCall(() => {
+          this.collider.setEnabled(false);
+        });
         this.mesh.scale.y = 0.5;
         this.mesh.position.y -= 0.25;
-    }
-    break;
-    case GoombaState.DEAD_BOUNCE:
-    {
+        break;
+      }
+      case GoombaState.DEAD_BOUNCE: {
         if (this.ignoreDamageTimer > 0) return;
         if (this._currentState == GoombaState.DEAD)
             return;
@@ -186,12 +186,19 @@ export class Goomba extends GameObject {
         // layer = SortingLayer::CORPSE;
         this.velocity.y = OBJECT_DEAD_BOUNCE;
         this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
-        this.collider.setEnabled(false);
-    }
-    break;
-    default: break;
+        this.world.physics.addDeferedCall(() => {
+          this.collider.setEnabled(false);
+        });
+        break;
+      }
+      default: break;
     }
     this._currentState = state;
+  }
+
+  public deadBounce(dir : number) : void {
+    this.dir = dir;
+    this.setState(GoombaState.DEAD_BOUNCE);
   }
 
   public onHit() : void {

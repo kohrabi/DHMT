@@ -15,6 +15,7 @@ import { Brick } from "./gameObjects/brick";
 import { GroundOneWay } from "./gameObjects/oneway";
 import { Goomba } from "./gameObjects/goomba";
 import { Koopa } from "./gameObjects/koopa";
+import { QuestionBlock, QuestionBlockSpawnType } from "./gameObjects/questionBlock";
 
 type LevelObject = {
   model_path: string;
@@ -188,6 +189,21 @@ export class Scene2 extends Scene {
         }
         case "Brick": {
           go = this.addGameObject(new Brick(this.world));
+          break;
+        }
+        case "QuestionBlock": {
+          console.log("Spawning Question Block with properties:", objectData.properties);
+          let coinType = QuestionBlockSpawnType.COIN;
+          switch (objectData.properties["spawn_type"]) {
+            case "COIN" : coinType = QuestionBlockSpawnType.COIN; break;
+            case "LEAF" : coinType = QuestionBlockSpawnType.LEAF; break;
+            default: console.warn("Unknown spawn type for Question Block:", objectData.properties["spawn_type"]);
+          }
+          go = this.addGameObject(new QuestionBlock(
+            this.world, 
+            objectData.properties["spawn_count"], 
+            coinType)
+          );
           break;
         }
         case "": {

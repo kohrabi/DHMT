@@ -20,6 +20,7 @@ export class PhysicsWorld {
   readonly containPairs : Map<number, number> = new Map();
   readonly pendingRemovals: Set<RAPIER.Collider> = new Set();
   private readonly controllers: Set<RAPIER.KinematicCharacterController> = new Set();
+  private deferedCalls: (() => void)[] = [];
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -47,7 +48,10 @@ export class PhysicsWorld {
   }
 
   step() {
-    
+    for (const fn of this.deferedCalls) {
+      fn();
+    }
+    this.deferedCalls.length = 0;
     this.timer.update();
     
     this.world.timestep = this.timer.getDelta();
@@ -78,6 +82,10 @@ export class PhysicsWorld {
     } catch (error) {
       console.error("Error during collider removal:", error);
     }
+  }
+
+  public addDeferedCall(fn: () => void) {
+    this.deferedCalls.push(fn);
   }
 
   public registerCollider(collider: RAPIER.Collider, gameObject: GameObject) {

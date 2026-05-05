@@ -13,6 +13,7 @@ export abstract class GameObject {
    */
   readonly world: World;
   public started = false;
+  protected isActive = true;
 
   constructor(
     name: string,

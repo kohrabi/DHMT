@@ -11,6 +11,7 @@ import { instance } from "three/tsl";
 import { Goomba } from "./goomba";
 import { Animator } from "@/engine/animator";
 import { Koopa } from "./koopa";
+import { QuestionBlock } from "./questionBlock";
 
 
 const MULTIPLIER = 1;
@@ -234,15 +235,12 @@ export class Player extends GameObject {
         clampf(this.velocity.x, -MAXIMUM_WALK_SPEED, MAXIMUM_WALK_SPEED);
     }
 
+    // Y Movement
     let gravity = 0.0;
-    // isGrounded reflects the *previous* frame's computeColliderMovement result.
-    // Skip gravity if we were grounded and not moving upward, so a one-frame
-    // false-negative on computedGrounded() doesn't push velocity.y into the ground.
-    const effectivelyGrounded = this.isGrounded && this.velocity.y <= 0;
-    if (!effectivelyGrounded) {
+    if (!this.isGrounded) {
       if (Global.input.isKeyDown(this.keyJump) && this.velocity.y <= JUMP_HANG) 
         gravity = -JUMP_HELD_GRAVITY;
-      else if (!this.isGrounded)
+      else
         gravity = -JUMP_GRAVITY;
     }
     this.accel.y = gravity;
@@ -341,6 +339,15 @@ export class Player extends GameObject {
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
+    }
+    else if (other instanceof QuestionBlock) {
+      if (collision.normal1.y < -0.5) {
+        this.velocity.y = 0;
+        other.Hit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
+      }
+    }
+    else if (other instanceof Coin) {
+      other.destroy();
     }
   }
 

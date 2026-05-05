@@ -8,13 +8,13 @@ import * as THREE from "three";
 export class GroundOneWay extends GameObject {
   private mesh!: THREE.Mesh;
   private collider! : RAPIER.Collider;
-  readonly shapeSize = new THREE.Vector3(2, 0.5, 1);
+  readonly shapeSize = new THREE.Vector3(1, 0.25, 1);
 
   get bottom() {
-    return this.transform.position.y + 0.25 - this.shapeSize.y / 2.0;
+    return this.transform.position.y + 0.5 - this.shapeSize.y / 2.0;
   }
   get top() {
-    return this.transform.position.y + 0.25 + this.shapeSize.y / 2.0;
+    return this.transform.position.y + 0.5 + this.shapeSize.y / 2.0;
   }
 
   constructor(world : World, model: THREE.Object3D) {
@@ -28,7 +28,7 @@ export class GroundOneWay extends GameObject {
   async start() : Promise<void> {
     super.start();
     const shape = PhysicsWorld.getBoxShape(
-      this.transform.clone().translateY(0.25),
+      this.transform.clone().translateY(0.5),
       new THREE.Vector3(
         this.transform.scale.x * this.shapeSize.x,
         this.transform.scale.y * this.shapeSize.y,

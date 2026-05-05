@@ -9,6 +9,8 @@ import { GroundOneWay } from "./oneway";
 import { MAX_DELTA_TIME, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
 import { instance } from "three/tsl";
 import { Goomba } from "./goomba";
+import { Animator } from "@/engine/animator";
+import { Koopa } from "./koopa";
 
 
 const MULTIPLIER = 1;
@@ -39,8 +41,22 @@ const FLY_Y_VELOCITY = -0x01800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const TELEPORT_Y_VELOCITY = 0x00b00 * SUBSUBSUBPIXEL_DELTA_TIME;
 
 const ENEMY_BOUNCE = 0x04000 * SUBSUBSUBPIXEL_DELTA_TIME;
+enum PlayerState {
+  NORMAL,
+  POWER_UP,
+  DEAD,
+}
+
+enum AnimationState {
+  IDLE,
+  WALK,
+  RUN,
+  JUMP,
+  FALL
+}
 
 export class Player extends GameObject {
+
 
   // Constants
   readonly keyLeft = "KeyA";
@@ -60,6 +76,19 @@ export class Player extends GameObject {
   private jumped = false;
   private runBeforeWalkTimer = 0.0;
   private accel = new THREE.Vector2();
+  private _currentState = PlayerState.NORMAL;
+  
+  private animator : Animator = new Animator();
+
+  get currentState() {
+    return this._currentState;
+  }
+  set currentState(state: PlayerState) {
+    this._currentState = state;
+    switch (this._currentState){
+
+    }
+  }
 
   readonly shapeHeight = 1.0;
 
@@ -92,12 +121,20 @@ export class Player extends GameObject {
     model.scene.position.set(0, -0.5, 0);
     model.scene.rotation.y = Math.PI / 4;
     this.mesh = this.transform.add(model.scene);
+    this.animator.initialize(this.mesh);
+    this.animator.setAnimations({
+      [AnimationState.IDLE]: model.animations[1],
+      [AnimationState.WALK]: model.animations[2],
+      [AnimationState.RUN]: model.animations[3],
+      [AnimationState.JUMP]: model.animations[4],
+      [AnimationState.FALL]: model.animations[5],
+    });
   }
 
   public onDestroy(): void {
     super.onDestroy();
     try {
-      this.world.physics.world.removeCharacterController(this.controller);
+      this.world.physics.removeCharacterController(this.controller);
       this.world.physics.removeCollider(this.collider);
       // Mesh will be cleaned by the scene's cleanup.
     }
@@ -122,9 +159,40 @@ export class Player extends GameObject {
     if (Global.input.isKeyPressed(this.keyJump)) {
       this.jumped = true;
     }
+    this.animator.update(deltaTime);
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
+    switch (this.currentState) {
+      case PlayerState.NORMAL: this._normalState(fixedDeltaTime); break;
+    }
+    this.animationCode(fixedDeltaTime);
+  }
+
+  private animationCode(fixedDeltaTime: number): void {
+    if (!this.isGrounded) {
+      if (this.velocity.y > 0) {
+        this.animator.playAnimation(AnimationState.JUMP, 0.1);
+      }
+      else {
+        this.animator.playAnimation(AnimationState.FALL, 0.1);
+      }
+    }
+    else {
+      if (this.inputVector.x === 0) {
+        this.animator.playAnimation(AnimationState.IDLE, 0.3);
+      }
+      else if (this.running) {
+        this.animator.playAnimation(AnimationState.RUN, 0.3);
+      }
+      else {
+        this.animator.playAnimation(AnimationState.WALK, 0.3);
+      }
+    }
+  }
+
+  private _normalState(fixedDeltaTime: number): void {
+    
     this.accel.x = 0.0;
     this.accel.x =
       this.inputVector.x *
@@ -216,7 +284,8 @@ export class Player extends GameObject {
 
     if (this.isGrounded) {
       this.velocity.y = 0;
-    } else if (this.velocity.y > 0 && corrected.y <= 0) {
+    } 
+    else if (this.velocity.y > 0 && corrected.y <= 0) {
       this.velocity.y = 0;
     }
 
@@ -238,7 +307,6 @@ export class Player extends GameObject {
       const collision = this.controller.computedCollision(i);
       if (!collision) continue;
       if (!collision.collider) continue;
-      const other = this.world.physics.getGameObjectFromCollider(collision.collider);
       this.onControllerEnter(collision);
     }
   }
@@ -259,9 +327,19 @@ export class Player extends GameObject {
       }
     }
     else if (other instanceof Goomba) {
-      if (collision.normal1.y > 0.5) {
-        this.velocity.y = 0;
+      console.log("Collided with Goomba ", this.collider);
+      if (collision.normal1.y > 0.5 || 
+        (collision.collider.translation().y + collision.collider.halfHeight() / 2
+          < this.transform.position.y)
+      ) {
+        this.velocity.y = ENEMY_BOUNCE;
         other.onHit();
+      }
+    }
+    else if (other instanceof Koopa) {
+      if (collision.normal1.y > 0.5) {
+        this.velocity.y = ENEMY_BOUNCE;
+        other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
     }
   }

@@ -1,4 +1,4 @@
-import RAPIER from "@dimforge/rapier3d-compat";
+import RAPIER, { QueryFilterFlags } from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import { GameObject } from "./gameObject";
 
@@ -19,6 +19,7 @@ export class PhysicsWorld {
   readonly eventQueue: RAPIER.EventQueue = new RAPIER.EventQueue(true);
   readonly containPairs : Map<number, number> = new Map();
   readonly pendingRemovals: Set<RAPIER.Collider> = new Set();
+  private readonly controllers: Set<RAPIER.KinematicCharacterController> = new Set();
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -244,10 +245,36 @@ export class PhysicsWorld {
       z: GameObject.transform.position.z,
     });
     this.registerCollider(collider, GameObject);
+    this.controllers.add(controller);
     return {
       controller,
       collider,
     };
+  }
+
+  public removeCharacterController(controller: RAPIER.KinematicCharacterController): void {
+    this.controllers.delete(controller);
+    this.world.removeCharacterController(controller);
+  }
+
+  get controllerCount(): number {
+    return this.controllers.size;
+  }
+
+  public castShape(
+    position: THREE.Vector3,
+    quaternion: THREE.Quaternion,
+    vel : THREE.Vector3,
+    shape : RAPIER.Shape,
+    targetDistance: number,
+    maxToi: number,
+  ) {
+    let stopAtPenetration = true;
+    let filterFlags = QueryFilterFlags.EXCLUDE_DYNAMIC;
+
+    return this.world.castShape(
+      position, quaternion, vel, 
+      shape, targetDistance, maxToi, stopAtPenetration, filterFlags);
   }
   
   public static moveAndCollide(

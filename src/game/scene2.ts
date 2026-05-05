@@ -6,14 +6,15 @@ import {
 import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
 import * as Global from "@/global";
-import { Player } from "./components/player";
-import { Camera } from "./components/camera";
-import { Coin } from "./components/coin";
-import { Ground } from "./components/ground";
-import { Decorate } from "./components/decorate";
-import { Brick } from "./components/brick";
-import { GroundOneWay } from "./components/oneway";
-import { Goomba } from "./components/goomba";
+import { Player } from "./gameObjects/player";
+import { Camera } from "./gameObjects/camera";
+import { Coin } from "./gameObjects/coin";
+import { Ground } from "./gameObjects/ground";
+import { Decorate } from "./gameObjects/decorate";
+import { Brick } from "./gameObjects/brick";
+import { GroundOneWay } from "./gameObjects/oneway";
+import { Goomba } from "./gameObjects/goomba";
+import { Koopa } from "./gameObjects/koopa";
 
 type LevelObject = {
   model_path: string;
@@ -32,6 +33,7 @@ export class Scene2 extends Scene {
   private controls?: OrbitControls;
   private physicsHelper!: RapierHelper;
   private controlsEnabled = false;
+  private skyTexture?: THREE.Texture;
 
   public constructor() {
     super("scene2");
@@ -41,12 +43,15 @@ export class Scene2 extends Scene {
     console.log("Loading content for Scene2...");
     Global.renderer.shadowMap.enabled = true;
 
-    this.world.scene.background = new THREE.Color(0x202020);
+    this.skyTexture = this.buildSkyTexture();
+    this.world.scene.background = this.skyTexture;
 
-    const light = new THREE.DirectionalLight(0xffffff, 2);
-    light.position.set(3, 5, 2);
-    this.world.scene.add(light);
-    this.world.scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+    const sunLight = new THREE.DirectionalLight(0xfff2cc, 2);
+    sunLight.position.set(6, 10, 4);
+    this.world.scene.add(sunLight);
+
+    const skyLight = new THREE.HemisphereLight(0x8ad7ff, 0x6bbf5a, 2);
+    this.world.scene.add(skyLight);
 
     // Ignore this warning.
     this.physicsHelper = new RapierHelper(this.world.physics.world);
@@ -72,6 +77,42 @@ export class Scene2 extends Scene {
     this.physicsHelper.update();
   }
 
+  protected unloadContent(): void {
+
+    if (this.skyTexture) {
+      this.skyTexture.dispose();
+      this.skyTexture = undefined;
+      this.world.scene.background = null;
+    }
+
+    super.unloadContent();
+  }
+
+  private buildSkyTexture(): THREE.Texture {
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      const fallback = new THREE.Texture();
+      fallback.needsUpdate = true;
+      return fallback;
+    }
+
+    const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, "#7fd4ff");
+    gradient.addColorStop(0.6, "#6ec6ff");
+    gradient.addColorStop(1, "#b8ecff");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+    return texture;
+  }
+
   public async loadLevel(levelData: LevelData): Promise<void>
   {
 
@@ -82,7 +123,6 @@ export class Scene2 extends Scene {
       let go: GameObject | null = null;
       switch (objectData.object_type) {
         case "Ground": {
-
           const model = await this.contentManager.loadGLTF(
             objectData.model_path,
           );
@@ -91,7 +131,6 @@ export class Scene2 extends Scene {
           break;
         }
         case "OneWay": {
-
           const model = await this.contentManager.loadGLTF(
             objectData.model_path,
           );
@@ -114,6 +153,15 @@ export class Scene2 extends Scene {
           goomba.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.55,
+            -objectData.position[1]
+          );
+          break;
+        }
+        case "Koopa": {
+          var koopa = this.addGameObject(new Koopa(this.world));
+          koopa.transform.position.set(
+            objectData.position[0],
+            objectData.position[2] + 0.6,
             -objectData.position[1]
           );
           break;
@@ -142,7 +190,6 @@ export class Scene2 extends Scene {
           go = this.addGameObject(new Brick(this.world));
           break;
         }
-
         case "": {
           const model = await this.contentManager.loadGLTF(
             objectData.model_path,

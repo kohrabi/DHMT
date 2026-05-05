@@ -2,13 +2,16 @@ import * as THREE from "three";
 import { ContentManager } from "./engine/contentManager";
 import { InputManager } from "./engine/inputManager";
 import { SceneManager } from "./engine/sceneManager";
-import { Coin } from "./game/components/coin";
+import { Coin } from "./game/gameObjects/coin";
+import { InspectorPanel } from "./engine/inspector";
 
 export const timer = new THREE.Timer();
 export const input = new InputManager();
 export const sceneManager = new SceneManager();
 export const contentManager = ContentManager.global;
 export const renderer = new THREE.WebGLRenderer();
+
+export const inspector = new InspectorPanel();
 
 
 export const PhysicsGroups = {

@@ -2880,7 +2880,7 @@
       "object_type": "QuestionBlock",
       "properties": {
         "spawn_count": 1,
-        "spawn_type": "COIN"
+        "spawn_type": "LEAF"
       }
     },
     "crate-item.004": {
@@ -2927,7 +2927,7 @@
       "model_path": "assets/platformer/crate-item.glb",
       "object_type": "QuestionBlock",
       "properties": {
-        "spawn_count": 1,
+        "spawn_count": 4,
         "spawn_type": "COIN"
       }
     },

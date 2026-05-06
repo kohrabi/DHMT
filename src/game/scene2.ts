@@ -192,7 +192,6 @@ export class Scene2 extends Scene {
           break;
         }
         case "QuestionBlock": {
-          console.log("Spawning Question Block with properties:", objectData.properties);
           let coinType = QuestionBlockSpawnType.COIN;
           switch (objectData.properties["spawn_type"]) {
             case "COIN" : coinType = QuestionBlockSpawnType.COIN; break;

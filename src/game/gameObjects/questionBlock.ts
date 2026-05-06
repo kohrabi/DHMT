@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { Goomba } from './goomba';
 import { Koopa } from './koopa';
 import { Coin, CoinState } from './coin';
+import { Mushroom } from './mushroom';
 
 const QUESTION_BLOCK_ANIMATION_TIME = 100
 const QUESTION_BLOCK_ANIMATION_Y_VEL = 0.1
@@ -25,7 +26,7 @@ export class QuestionBlock extends GameObject {
   private isHit = false;
   private hitCollider !: RAPIER.Collider;
   private spawnCount = 1;
-  private spawnType = 0; 
+  private spawnType = QuestionBlockSpawnType.COIN; 
 
   constructor(world : World, spawnCount : number, spawnType : QuestionBlockSpawnType) {
     super(
@@ -139,22 +140,14 @@ export class QuestionBlock extends GameObject {
       }
     case QuestionBlockSpawnType.LEAF:
       {
-        // CMario* player = dynamic_cast<CMario*>(game->GetCurrentScene()->GetPlayer());
-        // if (player != NULL)
-        // {
-        //     LPGAMEOBJECT powerUp = NULL;
-        //     if (player->GetPowerUp() == MARIO_POWERUP_SMALL)
-        //     {
-        //         powerUp = new CMushroom(position.x, position.y);
-        //         powerUp->SetNx(dx);
-        //     }
-        //     else
-        //     {
-        //         powerUp = new CLeaf(position.x, position.y);
-        //         powerUp->SetNx(dx);
-        //     }
-        //     game->GetCurrentScene()->AddObject(powerUp); 
-        // }
+        const mushroom = new Mushroom(this.world);
+        this.world.addGameObject(mushroom);
+        mushroom.transform.position.set(
+          this.transform.position.x,
+          this.transform.position.y,
+          this.transform.position.z
+        );
+        mushroom.setDir(dx);
         break;
       }
     case QuestionBlockSpawnType.ONE_UP:

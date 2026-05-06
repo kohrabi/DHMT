@@ -45,13 +45,25 @@ export class Koopa extends GameObject {
   private mesh: THREE.Object3D = new THREE.Object3D();
   private dir = -1;
 
-  private _currentState = KoopaState.NORMAL;
+  private currentState = KoopaState.NORMAL;
   private animator : Animator = new Animator();
   private ignoreDamageTimer = 0;
   private killTimer = 0;
   private respawnTimer = 0;
 
   readonly shapeHeight = 1.0;
+
+  get IsInShell() {
+    return this.currentState === KoopaState.IN_SHELL;
+  }
+
+  public setDir(value: number) {
+    this.dir = value;
+  }
+  
+  get Velocity() {
+    return this.velocity;
+  }
 
   constructor(world : World) {
     super(
@@ -76,7 +88,7 @@ export class Koopa extends GameObject {
         )
         .setSensor(true)
     );
-    this.world.physics.registerCollider(this.flipCollider, this);
+    // this.world.physics.registerCollider(this.flipCollider, this);
 
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oodi.glb");
     const mesh = SkeletonUtils.clone(model.scene);
@@ -119,7 +131,7 @@ export class Koopa extends GameObject {
   }
 
   private animationCode(fixedDeltaTime: number): void {
-    if (this._currentState === KoopaState.DEAD_BOUNCE) {
+    if (this.currentState === KoopaState.DEAD_BOUNCE) {
       this.animator.playAnimation(AnimationState.FALL, 0.1);
     }
     else {
@@ -142,7 +154,7 @@ export class Koopa extends GameObject {
       this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL, -OBJECT_MAX_FALL);
     }
     
-    switch (this._currentState)
+    switch (this.currentState)
     {
       case KoopaState.NORMAL:
       {
@@ -178,7 +190,7 @@ export class Koopa extends GameObject {
             else
             {
                 this.respawnTimer = KOOPA_RESPAWNING_TIME;
-                this._currentState = KoopaState.RESPAWNING;
+                this.currentState = KoopaState.RESPAWNING;
             }
         }
         this.velocity.x = GREEN_KOOPA_SHELL_X_SPEED * this.dir;
@@ -221,7 +233,7 @@ export class Koopa extends GameObject {
     case KoopaState.DEAD_BOUNCE: break;
     }
 
-    if (this._currentState !== KoopaState.DEAD_BOUNCE) {
+    if (this.currentState !== KoopaState.DEAD_BOUNCE) {
       this.velocity.z = 0;
       PhysicsWorld.moveAndSlide(
         this.controller,
@@ -263,7 +275,7 @@ export class Koopa extends GameObject {
     break;
     default: break;
     }
-    this._currentState = newState;
+    this.currentState = newState;
   }
 
   public deadBounce(dir : number): void {
@@ -272,10 +284,10 @@ export class Koopa extends GameObject {
   }
 
   public onHit(dir : number) : void {
-    if (this._currentState != KoopaState.IN_SHELL)
+    if (this.currentState != KoopaState.IN_SHELL)
     {
         this.velocity.x = 0;
-        this._currentState = KoopaState.IN_SHELL;
+        this.currentState = KoopaState.IN_SHELL;
         this.respawnTimer = GREEN_KOOPA_SPAWN_TIME;
         this.dir = 0;
     }
@@ -290,7 +302,7 @@ export class Koopa extends GameObject {
   }
 
   private onColliderEnter(go : GameObject) : void {
-    if (this._currentState !== KoopaState.IN_SHELL) return;
+    if (this.currentState !== KoopaState.IN_SHELL) return;
     if (go instanceof Goomba) {
       go.deadBounce(-Math.sign(this.transform.position.x - go.transform.position.x));
     }

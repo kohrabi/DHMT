@@ -12,6 +12,7 @@ import { Goomba } from "./goomba";
 import { Animator } from "@/engine/animator";
 import { Koopa } from "./koopa";
 import { QuestionBlock } from "./questionBlock";
+import { Mushroom } from "./mushroom";
 
 
 const MULTIPLIER = 1;
@@ -245,7 +246,6 @@ export class Player extends GameObject {
     }
     this.accel.y = gravity;
 
-    
     if (this.jumped && this.isGrounded) {
       let initVel = JUMP_INIT_VEL;
       let absVelX = Math.abs(this.velocity.x);
@@ -256,7 +256,8 @@ export class Player extends GameObject {
       else if (absVelX < MAXIMUM_POWER_SPEED)
         initVel += 0x00800 * SUBSUBSUBPIXEL_DELTA_TIME;
 
-      this.accel.y = initVel;
+      this.accel.y = 0;
+      this.velocity.y = initVel;
       this.jumped = false;
     }
 
@@ -271,7 +272,7 @@ export class Player extends GameObject {
       this.mesh.scale.x = Math.sign(this.velocity.x) * Math.abs(this.mesh.scale.x);
     }
 
-    const corrected = PhysicsWorld.moveAndSlide(
+    PhysicsWorld.moveAndSlide(
       this.controller, 
       this.collider, 
       this.transform, 
@@ -279,13 +280,6 @@ export class Player extends GameObject {
       1, 
       (collider) => this.canCollideWith(collider)
     );
-
-    if (this.isGrounded) {
-      this.velocity.y = 0;
-    } 
-    else if (this.velocity.y > 0 && corrected.y <= 0) {
-      this.velocity.y = 0;
-    }
 
     const t = this.collider.translation();
     // t.y += 0.75;
@@ -313,6 +307,10 @@ export class Player extends GameObject {
     if (other instanceof Coin) {
       this.world.removeGameObject(other);
     }
+    else if (other instanceof Mushroom) {
+      other.destroy();
+      console.log("Power up!");
+    }
   }
 
   private onControllerEnter(collision : RAPIER.CharacterCollision): void {
@@ -325,25 +323,29 @@ export class Player extends GameObject {
       }
     }
     else if (other instanceof Goomba) {
-      console.log("Collided with Goomba ", this.collider);
-      if (collision.normal1.y > 0.5 || 
-        (collision.collider.translation().y + collision.collider.halfHeight() / 2
-          < this.transform.position.y)
-      ) {
+      const stompFromAbove = collision.normal1.y > 0.5 && this.velocity.y <= 0;
+      if (stompFromAbove) {
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit();
       }
     }
     else if (other instanceof Koopa) {
-      if (collision.normal1.y > 0.5) {
+      if (collision.normal1.y > 0.5 && this.velocity.y <= 0) {
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
+      }
+      else {
+        console.log("Hit Koopa from the side", other.IsInShell, other.Velocity.length());
+        if (other.IsInShell && Math.abs(other.Velocity.x) < 0.05) {
+          
+          other.setDir(1);
+        }
       }
     }
     else if (other instanceof QuestionBlock) {
       if (collision.normal1.y < -0.5) {
         this.velocity.y = 0;
-        other.Hit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
+        other.Hit(Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
     }
     else if (other instanceof Coin) {

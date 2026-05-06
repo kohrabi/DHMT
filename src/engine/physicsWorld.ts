@@ -290,10 +290,9 @@ export class PhysicsWorld {
     collider: RAPIER.Collider,
     transform: THREE.Object3D,
     vel: THREE.Vector3,
-    filterPredicate?: (collider: RAPIER.Collider) => boolean
+    filterPredicate?: (collider: RAPIER.Collider) => boolean,
+    flags: QueryFilterFlags = RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
   ): THREE.Vector3 {
-    // Do NOT use EXCLUDE_SENSORS here — sensors (coins, triggers) must
-    // be included so computedCollisions() can report them.
     controller.computeColliderMovement(
       collider,
       vel,
@@ -303,6 +302,7 @@ export class PhysicsWorld {
     );
 
     let correctedMovement = controller.computedMovement();
+    correctedMovement.z = 0;
 
     let t = collider.translation();
     collider.setTranslation({
@@ -326,23 +326,29 @@ export class PhysicsWorld {
     transform: THREE.Object3D,
     vel: THREE.Vector3,
     deltaTime: number,
-    filterPredicate?: (collider: RAPIER.Collider) => boolean
+    filterPredicate?: (collider: RAPIER.Collider) => boolean,
+    flags: QueryFilterFlags = RAPIER.QueryFilterFlags.EXCLUDE_SENSORS
   ): THREE.Vector3 {
+    if (deltaTime <= 0) {
+      console.error("deltaTime must be greater than 0");
+      return vel;
+    }
     const correctedMovement = this.moveAndCollide(
       controller,
       collider,
       transform,
       vel.clone().multiplyScalar(deltaTime),
-      filterPredicate
+      filterPredicate,
+      flags
     ).divideScalar(deltaTime);
 
-    // Update horizontal velocity in-place (slide feedback).
-    // Y is intentionally left to the caller — grounding/ceiling resets
-    // depend on controller state that only the caller knows.
-    vel.x = correctedMovement.x;
-    vel.z = correctedMovement.z;
+    vel = correctedMovement.clone();
 
-    return correctedMovement;
+    if (controller.computedGrounded() || (vel.y > 0 && correctedMovement.y <= 0)) {
+      vel.y = 0;
+    } 
+
+    return vel;
   }
 
   public static getShape(

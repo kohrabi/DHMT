@@ -140,6 +140,13 @@ export class Koopa extends GameObject {
     if (this.dir !== 0) {
       this.mesh.scale.x = this.dir * Math.abs(this.mesh.scale.x);
     }
+
+    if (this.currentState === KoopaState.IN_SHELL) {
+      this.mesh.scale.y = 0.5;
+      this.mesh.position.y -= 0.25;
+      if (this.velocity.x !== 0)
+        this.mesh.rotation.y += 0.5;
+    }
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {

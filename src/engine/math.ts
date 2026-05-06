@@ -8,4 +8,8 @@ function moveTowards(value: number, end: number, delta: number): number {
   else return Math.min(value + Math.abs(delta), end);
 }
 
-export { clampf, moveTowards };
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
+
+export { clampf, moveTowards, lerp };

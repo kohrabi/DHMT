@@ -1,4 +1,4 @@
-import { clampf, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
+import { clampf, GameObject, lerp, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
@@ -191,6 +191,22 @@ export class Player extends GameObject {
         this.animator.playAnimation(AnimationState.WALK, 0.3);
       }
     }
+    let scale = this.mesh.scale;
+    let velSign =  Math.sign(this.velocity.x);
+    if (velSign == 0)
+        velSign = Math.sign(scale.x);
+    if (velSign == 0)
+        velSign = 1;
+
+    
+    scale.x = lerp(Math.abs(scale.x), 1, 0.2);
+    scale.y = lerp(Math.abs(scale.y), 1, 0.2);
+    if (!this.isGrounded && Math.abs(this.velocity.y) > MAX_FALL_SPEED * 0.75) {
+        scale.x = lerp(Math.abs(scale.x), 0.7, Math.abs(this.velocity.x) / (MAXIMUM_RUNNING_SPEED));
+        scale.y = lerp(Math.abs(scale.y), 1.5, Math.abs(this.velocity.y) / (MAX_FALL_SPEED));
+    }
+    scale.x = Math.abs(scale.x) * Math.sign(velSign);
+    this.mesh.scale.set(scale.x, scale.y, scale.z);
   }
 
   private _normalState(fixedDeltaTime: number): void {
@@ -267,10 +283,6 @@ export class Player extends GameObject {
     this.velocity.y = Math.max(this.velocity.y, -MAX_FALL_SPEED);
 
     this.velocity.z = 0;
-
-    if (this.velocity.x !== 0) {
-      this.mesh.scale.x = Math.sign(this.velocity.x) * Math.abs(this.mesh.scale.x);
-    }
 
     PhysicsWorld.moveAndSlide(
       this.controller, 

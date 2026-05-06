@@ -107,6 +107,10 @@ export class Goomba extends GameObject {
     if (this.dir !== 0) {
       this.mesh.scale.x = this.dir * Math.abs(this.mesh.scale.x);
     }
+
+    if (this._currentState === GoombaState.DEAD_BOUNCE) {
+      this.mesh.rotation.x += 0.1;
+    }
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {

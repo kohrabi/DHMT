@@ -50,6 +50,9 @@ export class Camera extends GameObject {
     }
     
     this.camera.position.copy(this.transform.position);
+    
+    // Update to get the correct view-projection matrix for frustum culling.
+    this.world.updateFrustum(this.camera);
   }
 
   public setTarget(target: GameObject) {

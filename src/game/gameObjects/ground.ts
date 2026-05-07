@@ -9,7 +9,9 @@ export class Ground extends GameObject {
   private mesh!: THREE.Mesh;
   private collider! : RAPIER.Collider;
 
-  constructor(world : World, model: THREE.Object3D) {
+  constructor(world : World, model: THREE.Object3D, 
+    private readonly colliderSize : THREE.Vector3 = new THREE.Vector3(1, 1, 1),
+    private readonly colliderOffset : THREE.Vector3 = new THREE.Vector3(0, 0.5, 0)) {
     super(
       `Ground_${world.gameObjects.size}`,
       world,
@@ -19,12 +21,14 @@ export class Ground extends GameObject {
 
   async start() : Promise<void> {
     super.start();
+    const t = this.transform.clone();
+    t.position.add(this.colliderOffset.multiply(this.transform.scale));
     const shape = PhysicsWorld.getBoxShape(
-      this.transform.clone().translateY(0.5 * this.transform.scale.y),
+      t,
       new THREE.Vector3(
-        this.transform.scale.x,
-        this.transform.scale.y,
-        this.transform.scale.z,
+        this.colliderSize.x * this.transform.scale.x,
+        this.colliderSize.y * this.transform.scale.y,
+        this.colliderSize.z,
       )
     );
     const collider = this.world.physics.world.createCollider(shape);

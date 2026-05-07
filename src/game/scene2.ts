@@ -128,7 +128,23 @@ export class Scene2 extends Scene {
             objectData.model_path,
           );
           const modelMesh = model.scene.clone();
-          go = this.addGameObject(new Ground(this.world, modelMesh));
+          const colliderSizeData = objectData.properties?.["collider_size"] as
+            | [number, number, number]
+            | undefined;
+          const colliderSize = new THREE.Vector3(
+            colliderSizeData?.[0] ?? 1,
+            colliderSizeData?.[1] ?? 1,
+            colliderSizeData?.[2] ?? 1,
+          );
+          const colliderOffsetData = objectData.properties?.["collider_offset"] as
+            | [number, number, number]
+            | undefined;
+          const colliderOffset = new THREE.Vector3(
+            colliderOffsetData?.[0] ?? 0,
+            colliderOffsetData?.[1] ?? 0.5,
+            colliderOffsetData?.[2] ?? 0,
+          );
+          go = this.addGameObject(new Ground(this.world, modelMesh, colliderSize, colliderOffset));
           break;
         }
         case "OneWay": {

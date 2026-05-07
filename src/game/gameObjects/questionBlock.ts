@@ -8,8 +8,8 @@ import { Koopa } from './koopa';
 import { Coin, CoinState } from './coin';
 import { Mushroom } from './mushroom';
 
-const QUESTION_BLOCK_ANIMATION_TIME = 100
-const QUESTION_BLOCK_ANIMATION_Y_VEL = 0.1
+const QUESTION_BLOCK_ANIMATION_TIME = 0.5;
+const QUESTION_BLOCK_ANIMATION_Y_VEL = 1;
 export enum QuestionBlockSpawnType {
   COIN,
   LEAF,
@@ -27,6 +27,7 @@ export class QuestionBlock extends GameObject {
   private hitCollider !: RAPIER.Collider;
   private spawnCount = 1;
   private spawnType = QuestionBlockSpawnType.COIN; 
+  private ogY = 0;
 
   constructor(world : World, spawnCount : number, spawnType : QuestionBlockSpawnType) {
     super(
@@ -39,6 +40,7 @@ export class QuestionBlock extends GameObject {
 
   async start() : Promise<void> {
     super.start();
+    this.transform.position.y += 0.5;
 
     const shape = 
       PhysicsWorld.getBoxShape(this.transform, 
@@ -68,6 +70,7 @@ export class QuestionBlock extends GameObject {
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
     this.mesh = this.transform.add(modelMesh);
+    this.ogY = this.transform.position.y;
   }
   
   onDestroy(): void {
@@ -96,12 +99,13 @@ export class QuestionBlock extends GameObject {
     {
         this.animationTimer -= fixedDeltaTime;
         if (this.animationTimer >= QUESTION_BLOCK_ANIMATION_TIME / 2)
-            this.yOffset -= QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
-        else
             this.yOffset += QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
-        this.yOffset = Math.min(this.yOffset, 0);
+        else
+            this.yOffset -= QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
+        this.yOffset = Math.max(this.yOffset, 0);
+        this.mesh.position.y = this.ogY + this.yOffset;
+        console.log("Question block animation timer:", this.animationTimer, "yOffset:", this.yOffset, this.mesh.position.y);
     }
-    //position.y = min(position.y, ogYPos);
 
     if (this.isHit)
     {

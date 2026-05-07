@@ -79,7 +79,8 @@ export class Player extends GameObject {
   private runBeforeWalkTimer = 0.0;
   private accel = new THREE.Vector2();
   private _currentState = PlayerState.NORMAL;
-  
+  private eatShape = RAPIER.ColliderDesc.ball(1).setSensor(true);
+
   private animator : Animator = new Animator();
 
   get currentState() {
@@ -293,12 +294,10 @@ export class Player extends GameObject {
       (collider) => this.canCollideWith(collider)
     );
 
-    const t = this.collider.translation();
-    // t.y += 0.75;
     this.world.physics.world.intersectionsWithShape(
-      t, 
+      this.collider.translation(), 
       this.collider.rotation(), 
-      this.collider.shape,
+      this.eatShape.shape,
       (handle) => {
         const other = this.world.physics.getGameObjectFromCollider(handle);
         if (other)

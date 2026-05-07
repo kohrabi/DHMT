@@ -1,7 +1,7 @@
 import { clampf, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import RAPIER from '@dimforge/rapier3d-compat';
-import { OBJECT_DEAD_BOUNCE, OBJECT_DEAD_X_VEL, OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
+import { MESH_BOX_EXPAND, OBJECT_DEAD_BOUNCE, OBJECT_DEAD_X_VEL, OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
 import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import { Ground } from "./ground";
 import { GroundOneWay } from "./oneway";
@@ -50,6 +50,8 @@ export class Koopa extends GameObject {
   private ignoreDamageTimer = 0;
   private killTimer = 0;
   private respawnTimer = 0;
+  private meshBox?: THREE.Box3;
+  private meshSphere: THREE.Sphere = new THREE.Sphere();
 
   readonly shapeHeight = 1.0;
 
@@ -95,6 +97,10 @@ export class Koopa extends GameObject {
     mesh.position.set(0, -0.5, 0);
     mesh.rotation.y = Math.PI / 4;
     this.mesh = this.transform.add(mesh);
+    this.meshBox = new THREE.Box3().setFromObject(this.mesh);
+    this.meshBox.expandByScalar(MESH_BOX_EXPAND);
+    this.meshBox.getBoundingSphere(this.meshSphere);
+
     this.animator.initialize(this.mesh);
     this.animator.setAnimations({
       [AnimationState.IDLE]: model.animations[1],
@@ -150,6 +156,9 @@ export class Koopa extends GameObject {
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
+    if (this.meshBox && !this.world.isCameraVisible(this.meshSphere)) {
+      return;
+    }
     if (!this.controller) return;
 
     if (this.ignoreDamageTimer > 0) {

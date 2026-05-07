@@ -17,6 +17,8 @@ export class World {
   readonly physics = new PhysicsWorld();
   private readonly _gameObjects = new Set<GameObject>();
   readonly pendingRemovals: Set<GameObject> = new Set();
+  readonly frustum = new THREE.Frustum();
+  readonly projView = new THREE.Matrix4();
 
   constructor(readonly gameScene : Scene) {
     // Wire the physics fixed-step loop to drive component fixedUpdates.
@@ -70,6 +72,19 @@ export class World {
     for (const go of this._gameObjects) {
       go.fixedUpdate(fdt);
     }
+  }
+
+  public updateFrustum(camera: THREE.Camera): void {
+    this.projView.multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse
+    );
+    this.frustum.setFromProjectionMatrix(this.projView);
+  }
+
+  public isCameraVisible(boundingSphere : THREE.Sphere): boolean {
+
+    return this.frustum.intersectsSphere(boundingSphere);
   }
 
   /** Destroy all GameObjects and dispose the physics world. */

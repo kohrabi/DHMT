@@ -4,6 +4,7 @@ import { sceneManager } from '../../global';
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 import { OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL, SUBSUBSUBPIXEL_DELTA_TIME } from '@/engine/constants';
+import { Player } from './player';
 
 
 const COIN_KILL_TIME = 1
@@ -23,6 +24,8 @@ export class Coin extends GameObject {
   private originalY = 0;
   private velocity = new THREE.Vector3();
   private killTimer = COIN_KILL_TIME;
+  private meshBox?: THREE.Box3;
+  private meshSphere: THREE.Sphere = new THREE.Sphere();
 
   private currentState = CoinState.NORMAL;
 
@@ -38,7 +41,7 @@ export class Coin extends GameObject {
     
     this.originalY = this.transform.position.y;
 
-    const shape = PhysicsWorld.getSphereShape(this.transform, 0.5)!;
+    const shape = PhysicsWorld.getSphereShape(this.transform, 0.25)!;
     shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     const collider = this.world.physics.world.createCollider(shape);
     collider.setSensor(true);
@@ -50,13 +53,33 @@ export class Coin extends GameObject {
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
     this.mesh = this.transform.add(modelMesh);
+
+    this.meshBox = new THREE.Box3().setFromObject(this.mesh);
+    this.meshBox.expandByScalar(1);
+    this.meshBox.getBoundingSphere(this.meshSphere);
   }
 
   fixedUpdate(fixedDeltaTime: number): void {
     if (this.currentState === CoinState.NORMAL) {
+      if (this.meshSphere && !this.world.isCameraVisible(this.meshSphere)) {
+        return;
+      }
       this.transform.rotateY(0.1);
       this.transform.position.y = this.originalY + 
         Math.sin(Global.timer.getElapsed() * 5 + this.transform.position.x) * 0.1;
+      
+      this.world.physics.world.intersectionsWithShape(
+        this.collider.translation(), 
+        this.collider.rotation(), 
+        this.collider.shape,
+        (handle) => {
+          const other = this.world.physics.getGameObjectFromCollider(handle);
+          if (other instanceof Player) {
+            this.destroy();
+          }
+          return false;
+        }
+      );
     }
     else {
       this.transform.rotateY(0.25);

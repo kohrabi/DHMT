@@ -27,7 +27,6 @@ export class QuestionBlock extends GameObject {
   private hitCollider !: RAPIER.Collider;
   private spawnCount = 1;
   private spawnType = QuestionBlockSpawnType.COIN; 
-  private ogY = 0;
 
   constructor(world : World, spawnCount : number, spawnType : QuestionBlockSpawnType) {
     super(
@@ -69,8 +68,8 @@ export class QuestionBlock extends GameObject {
     );
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
-    this.mesh = this.transform.add(modelMesh);
-    this.ogY = this.transform.position.y;
+    this.mesh = modelMesh;
+    this.transform.add(this.mesh);
   }
   
   onDestroy(): void {
@@ -103,8 +102,7 @@ export class QuestionBlock extends GameObject {
         else
             this.yOffset -= QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
         this.yOffset = Math.max(this.yOffset, 0);
-        this.mesh.position.y = this.ogY + this.yOffset;
-        console.log("Question block animation timer:", this.animationTimer, "yOffset:", this.yOffset, this.mesh.position.y);
+        this.mesh.position.y = -0.25 + this.yOffset;
     }
 
     if (this.isHit)

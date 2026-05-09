@@ -13,7 +13,6 @@ export const renderer = new THREE.WebGLRenderer();
 
 export const inspector = new InspectorPanel();
 
-
 export const PhysicsGroups = {
   Player: 1 << 0,
   Enemy: 1 << 1,

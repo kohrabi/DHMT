@@ -22,7 +22,8 @@ export class Brick extends GameObject {
     );
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
-    this.mesh = this.transform.add(modelMesh);
+    this.mesh = modelMesh;
+    this.transform.add(this.mesh);
     const shape = 
       PhysicsWorld.getBoxShape(this.transform, 
         this.transform.scale.clone().multiplyScalar(0.5))!;

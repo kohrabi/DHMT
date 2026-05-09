@@ -174,8 +174,8 @@ export class Scene2 extends Scene {
           );
           break;
         }
-        case "Koopa": {
-          var koopa = this.addGameObject(new Koopa(this.world));
+        case "RedKoopa": {
+          var koopa = this.addGameObject(new Koopa(this.world, true));
           koopa.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.6,
@@ -184,6 +184,15 @@ export class Scene2 extends Scene {
           break;
         }
 
+        case "Koopa": {
+          var koopa = this.addGameObject(new Koopa(this.world, false));
+          koopa.transform.position.set(
+            objectData.position[0],
+            objectData.position[2] + 0.6,
+            -objectData.position[1]
+          );
+          break;
+        }
         case "Camera": {
           cameraObject.transform.position.set(
             objectData.position[0],

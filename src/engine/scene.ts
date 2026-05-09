@@ -100,8 +100,9 @@ export abstract class Scene {
     this.contentLoaded = false;
   }
 
-  update(deltaTime: number): void {
-    this.world.update(deltaTime);
+  // Use World timer
+  update(): void {
+    this.world.update();
   }
 
   // Fixed Update will be called by PhysicsWorld.

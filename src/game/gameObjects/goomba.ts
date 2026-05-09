@@ -63,7 +63,8 @@ export class Goomba extends GameObject {
     const mesh = SkeletonUtils.clone(model.scene);
     mesh.position.set(0, -0.5, 0);
     mesh.rotation.y = Math.PI / 4;
-    this.mesh = this.transform.add(mesh);
+    this.mesh = mesh;
+    this.transform.add(mesh);
 
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);
     this.meshBox.expandByScalar(MESH_BOX_EXPAND);
@@ -111,16 +112,16 @@ export class Goomba extends GameObject {
       this.animator.playAnimation(AnimationState.WALK, 0.3);
     }
     if (this.dir !== 0) {
-      this.mesh.scale.x = this.dir * Math.abs(this.mesh.scale.x);
+      this.transform.scale.x = this.dir * Math.abs(this.transform.scale.x);
     }
 
     if (this._currentState === GoombaState.DEAD_BOUNCE) {
-      this.mesh.rotation.x += 0.1;
+      this.transform.rotation.x += 0.1;
     }
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
-    if (this.meshBox && !this.world.isCameraVisible(this.meshSphere)) {
+    if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
       return;
     }
     if (!this.controller) return;

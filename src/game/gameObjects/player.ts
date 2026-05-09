@@ -43,10 +43,35 @@ const FLY_Y_VELOCITY = -0x01800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const TELEPORT_Y_VELOCITY = 0x00b00 * SUBSUBSUBPIXEL_DELTA_TIME;
 
 const ENEMY_BOUNCE = 0x04000 * SUBSUBSUBPIXEL_DELTA_TIME;
+
+const POWER_TIME = 8 / 60.0 * 1.0;
+const POWER_REDUCE_TIME = 23 / 60.0;
+const MAX_POWER_COUNT = 7;
+const FLY_P_TIMER = 0x80 / 60.0;
+
+const POWER_UP_ANIMATION_TIME = 0.7;
+const KICK_ANIMATION_TIME = 0.3;
+
+const DEAD_STAY_TIME = 1;
+const DEAD_RESET_TIME = 1;
+
+const INVINCIBLE_TIME = 1;
+const WAG_TIME = 0x10 * 1 / 60.0;
+
+const SPIN_TIME = 6 * 0.05;
+
+const STAY_OUTRO_TIME = 1.0;
+const SWITCH_LEVEL_TIME = 3.0;
+
+const COMBO_TIME = 1.0;
+
 enum PlayerState {
   NORMAL,
   POWER_UP,
   DEAD,
+  TELEPORT,
+  OUTRO,
+  SIT
 }
 
 enum AnimationState {
@@ -57,14 +82,25 @@ enum AnimationState {
   FALL
 }
 
+enum PowerUpState {
+  SMALL,
+  BIG,
+  RACOON
+}
+
 export class Player extends GameObject {
 
-
+  
   // Constants
+  readonly DEBUG_INVINCIBLE = false;
   readonly keyLeft = "KeyA";
   readonly keyRight = "KeyD";
+  readonly keyDown = "KeyS";
   readonly keyJump = "Space";
   readonly keyRun = "KeyJ";
+  readonly bigScale = 1.5;
+
+  readonly shapeHeight = 1.0;
 
   // Components
   private controller!: RAPIER.KinematicCharacterController;
@@ -72,28 +108,81 @@ export class Player extends GameObject {
 
   private velocity = new THREE.Vector3();
   private mesh: THREE.Object3D = new THREE.Object3D();
+  private _currentState = PlayerState.NORMAL;
 
   private inputVector = new THREE.Vector3(0, 0, 0);
   private running = false;
   private jumped = false;
   private runBeforeWalkTimer = 0.0;
   private accel = new THREE.Vector2();
-  private _currentState = PlayerState.NORMAL;
-  private eatShape = RAPIER.ColliderDesc.ball(1).setSensor(true);
+
+  private powerUpStartTimer = 0.0;
+  private invincibleTimer = 0.0;
+  private powerUp = 0;
+  private nextPowerUp = 0;
+  private deadTimer = 0.0;
+
+  private enterPipe = false;
+  private beforeTeleportY = 0.0;
+
+  private comboTimer = 0.0;
+  private comboCounter = 0;
+  private kickTimer = 0.0;
+  private spinTimer = 0.0;
+  private hitParticleTimer = 0.0;
+  private deadJump = false;
+  private isResetting = false
+  private levelResetTimer = 0.0;
 
   private animator : Animator = new Animator();
 
   get currentState() {
     return this._currentState;
   }
-  set currentState(state: PlayerState) {
-    this._currentState = state;
-    switch (this._currentState){
-
+  setCurrentState(state: PlayerState) {
+    console.log("PLAYER: Transitioning to state", PlayerState[state]);
+    switch (state) {
+      case PlayerState.POWER_UP:
+      {
+        // this.world.timer.setTimescale(0.0);
+        this.powerUpStartTimer = this.world.timer.getElapsed();
+        console.log("Entering power up state", this.powerUpStartTimer);
+        break;
+      }
+      case PlayerState.DEAD:
+      {
+        if (this.DEBUG_INVINCIBLE)
+            return;
+        if (this.invincibleTimer > 0)
+            return;
+        if (this.powerUp != PowerUpState.SMALL)
+        {
+          state = (PlayerState.POWER_UP);
+          if (this.powerUp == PowerUpState.RACOON)
+              this.nextPowerUp = PowerUpState.BIG;
+          else    
+              this.nextPowerUp = PowerUpState.SMALL;
+          this.transform.position.y += 8.0;
+          this.powerUpStartTimer = this.world.timer.getElapsed();
+        }
+        else 
+        {
+            this.deadTimer = DEAD_STAY_TIME;
+            this.velocity = new THREE.Vector3(0, 0, 0);
+        }
+        this.world.timer.setTimescale(0.0);
+        break;
+      }
+      case PlayerState.TELEPORT:
+      {
+        this.enterPipe = false;
+        this.beforeTeleportY = this.transform.position.y;
+        this.velocity.x = 0.0;
+        break;
+      }
     }
+    this._currentState = state;
   }
-
-  readonly shapeHeight = 1.0;
 
   get bottom() {
     return this.transform.position.y - this.shapeHeight / 2.0;
@@ -101,6 +190,12 @@ export class Player extends GameObject {
 
   get isGrounded(): boolean {
     return this.controller.computedGrounded();
+  }
+
+  public PowerUp() : void {
+    this.nextPowerUp = PowerUpState.BIG;
+    this.setCurrentState(PlayerState.POWER_UP);
+    console.log("Power up!");
   }
 
   constructor(world : World) {
@@ -123,7 +218,8 @@ export class Player extends GameObject {
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
     model.scene.position.set(0, -0.5, 0);
     model.scene.rotation.y = Math.PI / 4;
-    this.mesh = this.transform.add(model.scene);
+    this.mesh = model.scene;
+    this.transform.add(model.scene);
     this.animator.initialize(this.mesh);
     this.animator.setAnimations({
       [AnimationState.IDLE]: model.animations[1],
@@ -166,48 +262,149 @@ export class Player extends GameObject {
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
+
+    
+    if (this.kickTimer > 0) this.kickTimer -= fixedDeltaTime;
+    if (this.invincibleTimer > 0) this.invincibleTimer -= fixedDeltaTime;
+    if (this.spinTimer > 0) this.spinTimer -= fixedDeltaTime;
+    if (this.hitParticleTimer > 0.0) this.hitParticleTimer -= fixedDeltaTime;
+
+    if (this.comboTimer > 0) this.comboTimer -= fixedDeltaTime;
+    else this.comboCounter = 0;
+
     switch (this.currentState) {
-      case PlayerState.NORMAL: this._normalState(fixedDeltaTime); break;
+      case PlayerState.NORMAL: this._normalState(fixedDeltaTime); break; 
+      case PlayerState.POWER_UP: this._powerupUpdate(fixedDeltaTime); break;
+      case PlayerState.DEAD: 
+      {
+        const unscaledDt = Global.timer.getDelta();
+        if (this.deadTimer > 0) this.deadTimer -= unscaledDt;
+        else
+        {
+            if (!this.deadJump)
+            {
+                this.velocity.y = -0.4;
+                this.deadJump = true;
+            }
+            //velocity.y = min(velocity.y + JUMP_GRAVITY / 2.0f, MAX_FALL_SPEED / 2.0f);
+            this.velocity.y = this.velocity.y + JUMP_GRAVITY / 5.0;
+            this.transform.position.y += this.velocity.y * unscaledDt;
+        }
+
+        // Camera visible
+        if (this.transform.position.y <= -10.0)
+        {
+            if (!this.isResetting)
+            {
+                this.isResetting = true;
+                this.levelResetTimer = DEAD_RESET_TIME;
+            }
+
+            if (this.levelResetTimer > 0) this.levelResetTimer -= unscaledDt;
+            else
+            {
+              // Reset Scene
+            }
+        }
+        break;
+      }
+      case PlayerState.SIT:
+      {
+        if (!Global.input.isKeyDown(this.keyDown))
+            this.setCurrentState(PlayerState.NORMAL);
+        this.velocity.x = moveTowards(this.velocity.x, 0, RELEASE_DECELERATION);
+        this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
+
+        this.move();
+        break;
+      }
     }
     this.animationCode(fixedDeltaTime);
   }
 
   private animationCode(fixedDeltaTime: number): void {
-    if (!this.isGrounded) {
-      if (this.velocity.y > 0) {
-        this.animator.playAnimation(AnimationState.JUMP, 0.1);
+    if (this.currentState == PlayerState.POWER_UP) {
+      const blink = 0.05;
+      if (Global.timer.getElapsed() % blink < blink / this.bigScale) {
+        this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
       }
       else {
-        this.animator.playAnimation(AnimationState.FALL, 0.1);
+        this.transform.scale.set(1.0, 1.0, 1.0);
       }
     }
     else {
-      if (this.inputVector.x === 0) {
-        this.animator.playAnimation(AnimationState.IDLE, 0.3);
-      }
-      else if (this.running) {
-        this.animator.playAnimation(AnimationState.RUN, 0.3);
+
+      if (!this.isGrounded) {
+        if (this.velocity.y > 0) {
+          this.animator.playAnimation(AnimationState.JUMP, 0.1);
+        }
+        else {
+          this.animator.playAnimation(AnimationState.FALL, 0.1);
+        }
       }
       else {
-        this.animator.playAnimation(AnimationState.WALK, 0.3);
+        if (this.inputVector.x === 0) {
+          this.animator.playAnimation(AnimationState.IDLE, 0.3);
+        }
+        else if (this.running) {
+          this.animator.playAnimation(AnimationState.RUN, 0.3);
+        }
+        else {
+          this.animator.playAnimation(AnimationState.WALK, 0.3);
+        }
       }
-    }
-    let scale = this.mesh.scale;
-    let velSign =  Math.sign(this.velocity.x);
-    if (velSign == 0)
+      
+      const scaleX = this.powerUp == PowerUpState.BIG ? this.bigScale : 1.0;
+      
+      let scale = this.transform.scale;
+      let velSign =  Math.sign(this.velocity.x);
+      if (velSign == 0)
         velSign = Math.sign(scale.x);
-    if (velSign == 0)
+      if (velSign == 0)
         velSign = 1;
-
-    
-    scale.x = lerp(Math.abs(scale.x), 1, 0.2);
-    scale.y = lerp(Math.abs(scale.y), 1, 0.2);
-    if (!this.isGrounded && Math.abs(this.velocity.y) > MAX_FALL_SPEED * 0.75) {
-        scale.x = lerp(Math.abs(scale.x), 0.7, Math.abs(this.velocity.x) / (MAXIMUM_RUNNING_SPEED));
-        scale.y = lerp(Math.abs(scale.y), 1.5, Math.abs(this.velocity.y) / (MAX_FALL_SPEED));
+      
+      
+      scale.x = lerp(Math.abs(scale.x), scaleX, 0.2);
+      scale.y = lerp(Math.abs(scale.y), scaleX, 0.2);
+      if (!this.isGrounded && Math.abs(this.velocity.y) > MAX_FALL_SPEED * 0.75) {
+        scale.x = lerp(Math.abs(scale.x), scaleX * 0.7, Math.abs(this.velocity.x) / (MAXIMUM_RUNNING_SPEED));
+        scale.y = lerp(Math.abs(scale.y), scaleX * 1.5, Math.abs(this.velocity.y) / (MAX_FALL_SPEED));
+      }
+      scale.x = Math.abs(scale.x) * Math.sign(velSign);
+      this.transform.scale.set(scale.x, scale.y, scale.z);
     }
-    scale.x = Math.abs(scale.x) * Math.sign(velSign);
-    this.mesh.scale.set(scale.x, scale.y, scale.z);
+  }
+
+  private move() {
+
+    PhysicsWorld.moveAndSlide(
+      this.controller, 
+      this.collider, 
+      this.transform, 
+      this.velocity, 
+      1, 
+      (collider) => this.canCollideWith(collider)
+    );
+
+    this.world.physics.world.intersectionsWithShape(
+      this.collider.translation(), 
+      this.collider.rotation(), 
+      this.collider.shape,
+      (handle) => {
+        const other = this.world.physics.getGameObjectFromCollider(handle);
+        if (other)
+          this.onIntersection(other);
+        return false;
+      }
+    );
+
+    for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
+      const collision = this.controller.computedCollision(i);
+      if (!collision) continue;
+      if (!collision.collider) continue;
+      this.onControllerEnter(collision);
+    }
+
   }
 
   private _normalState(fixedDeltaTime: number): void {
@@ -285,42 +482,30 @@ export class Player extends GameObject {
 
     this.velocity.z = 0;
 
-    PhysicsWorld.moveAndSlide(
-      this.controller, 
-      this.collider, 
-      this.transform, 
-      this.velocity, 
-      1, 
-      (collider) => this.canCollideWith(collider)
-    );
+    this.move();
+  }
 
-    this.world.physics.world.intersectionsWithShape(
-      this.collider.translation(), 
-      this.collider.rotation(), 
-      this.eatShape.shape,
-      (handle) => {
-        const other = this.world.physics.getGameObjectFromCollider(handle);
-        if (other)
-          this.onIntersection(other);
-        return false;
+  private _powerupUpdate(fixedDeltaTime: number): void {
+    
+    this.powerUpStartTimer += fixedDeltaTime;
+    console.log(this.powerUpStartTimer);
+    if (this.powerUpStartTimer > POWER_UP_ANIMATION_TIME)
+    {
+      // this.world.timer.setTimescale(1.0);
+      this.powerUp = this.nextPowerUp;
+      this.setCurrentState(PlayerState.NORMAL);
+      if (this.nextPowerUp != PowerUpState.SMALL) {
+        this.transform.position.y -= 1.0;
       }
-    );
-
-    for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
-      const collision = this.controller.computedCollision(i);
-      if (!collision) continue;
-      if (!collision.collider) continue;
-      this.onControllerEnter(collision);
+      this.mesh.translateY(0.15);
+      //else
+      this.invincibleTimer = INVINCIBLE_TIME;
     }
   }
 
   private onIntersection(other: GameObject): void {
     if (other instanceof Coin) {
       this.world.removeGameObject(other);
-    }
-    else if (other instanceof Mushroom) {
-      other.destroy();
-      console.log("Power up!");
     }
   }
 

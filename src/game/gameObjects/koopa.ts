@@ -67,7 +67,7 @@ export class Koopa extends GameObject {
     return this.velocity;
   }
 
-  constructor(world : World) {
+  constructor(world : World, private readonly isRed = true) {
     super(
       "Koopa",
       world
@@ -92,11 +92,18 @@ export class Koopa extends GameObject {
     );
     // this.world.physics.registerCollider(this.flipCollider, this);
 
-    const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oodi.glb");
+    let model;
+    if (this.isRed) {
+      model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oodi.glb");
+    }
+    else {
+      model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-ooli.glb");
+    }
     const mesh = SkeletonUtils.clone(model.scene);
     mesh.position.set(0, -0.5, 0);
     mesh.rotation.y = Math.PI / 4;
-    this.mesh = this.transform.add(mesh);
+    this.mesh = mesh;
+    this.transform.add(this.mesh);
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);
     this.meshBox.expandByScalar(MESH_BOX_EXPAND);
     this.meshBox.getBoundingSphere(this.meshSphere);
@@ -144,19 +151,19 @@ export class Koopa extends GameObject {
       this.animator.playAnimation(AnimationState.WALK, 0.3);
     }
     if (this.dir !== 0) {
-      this.mesh.scale.x = this.dir * Math.abs(this.mesh.scale.x);
+      this.transform.scale.x = this.dir * Math.abs(this.transform.scale.x);
     }
 
     if (this.currentState === KoopaState.IN_SHELL) {
-      this.mesh.scale.y = 0.5;
-      this.mesh.position.y -= 0.25;
+      this.transform.scale.y = 0.5;
+      this.transform.position.y -= 0.25;
       if (this.velocity.x !== 0)
-        this.mesh.rotation.y += 0.5;
+        this.transform.rotation.y += 0.5;
     }
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
-    if (this.meshBox && !this.world.isCameraVisible(this.meshSphere)) {
+    if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
       return;
     }
     if (!this.controller) return;
@@ -175,24 +182,26 @@ export class Koopa extends GameObject {
       case KoopaState.NORMAL:
       {
         // Check for wall collisions to flip direction
-        let ShouldFlip = true;
-        this.flipCollider.setTranslation({
-          x: this.transform.position.x + 0.5 * this.dir,
-          y: this.transform.position.y - 0.5,
-          z: this.transform.position.z
-        });
-        this.world.physics.world.intersectionsWithShape(
-          this.flipCollider.translation(),
-          this.flipCollider.rotation(),
-          this.flipCollider.shape,
-          (otherCollider) => {
-            ShouldFlip = false;
-            return false;
-          },
-          RAPIER.QueryFilterFlags.EXCLUDE_KINEMATIC | RAPIER.QueryFilterFlags.EXCLUDE_SENSORS | RAPIER.QueryFilterFlags.EXCLUDE_DYNAMIC
-        )
-        if (ShouldFlip) {
-          this.dir *= -1;
+        if (this.isRed) {
+          let ShouldFlip = true;
+          this.flipCollider.setTranslation({
+            x: this.transform.position.x + 0.5 * this.dir,
+            y: this.transform.position.y - 0.5,
+            z: this.transform.position.z
+          });
+          this.world.physics.world.intersectionsWithShape(
+            this.flipCollider.translation(),
+            this.flipCollider.rotation(),
+            this.flipCollider.shape,
+            (otherCollider) => {
+              ShouldFlip = false;
+              return false;
+            },
+            RAPIER.QueryFilterFlags.EXCLUDE_KINEMATIC | RAPIER.QueryFilterFlags.EXCLUDE_SENSORS | RAPIER.QueryFilterFlags.EXCLUDE_DYNAMIC
+          )
+          if (ShouldFlip) {
+            this.dir *= -1;
+          }
         }
 
         this.velocity.x = GREEN_KOOPA_X_SPEED * this.dir;

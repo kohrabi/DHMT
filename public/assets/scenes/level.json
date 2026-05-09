@@ -539,7 +539,7 @@
     "body-mesh.003": {
       "name": "body-mesh.003",
       "position": [
-        8.0,
+        5.0,
         0.0,
         0.0
       ],
@@ -638,7 +638,7 @@
         0.0
       ],
       "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
+      "object_type": "RedKoopa",
       "properties": {}
     },
     "block-grass.046": {
@@ -968,48 +968,6 @@
         "spawn_type": "COIN"
       }
     },
-    "body-mesh.004": {
-      "name": "body-mesh.004",
-      "position": [
-        12.0,
-        0.0,
-        3.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
-      "properties": {}
-    },
-    "coin-gold": {
-      "name": "coin-gold",
-      "position": [
-        9.0,
-        0.0,
-        3.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/coin-gold.glb",
-      "object_type": "Coin",
-      "properties": {}
-    },
     "body-mesh.005": {
       "name": "body-mesh.005",
       "position": [
@@ -1199,33 +1157,12 @@
       "object_type": "Ground",
       "properties": {}
     },
-    "body-mesh.008": {
-      "name": "body-mesh.008",
-      "position": [
-        93.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
-      "properties": {}
-    },
     "platform-overhang.009": {
       "name": "platform-overhang.009",
       "position": [
         82.0,
         0.0,
-        0.5
+        1.5
       ],
       "scale": [
         7.0,
@@ -1246,69 +1183,6 @@
           1.0
         ]
       }
-    },
-    "body-mesh.009": {
-      "name": "body-mesh.009",
-      "position": [
-        90.0,
-        0.0,
-        5.5
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
-      "properties": {}
-    },
-    "body-mesh.010": {
-      "name": "body-mesh.010",
-      "position": [
-        87.0,
-        0.0,
-        5.5
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
-      "properties": {}
-    },
-    "body-mesh.011": {
-      "name": "body-mesh.011",
-      "position": [
-        84.0,
-        0.0,
-        5.5
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "model_path": "assets/platformer/body-mesh.glb",
-      "object_type": "Koopa",
-      "properties": {}
     },
     "block-grass.025": {
       "name": "block-grass.025",
@@ -1504,7 +1378,7 @@
       "position": [
         85.0,
         -0.5,
-        2.5
+        3.5
       ],
       "scale": [
         7.0,
@@ -1531,7 +1405,7 @@
       "position": [
         87.0,
         -0.5,
-        4.5
+        5.5
       ],
       "scale": [
         7.0,
@@ -1552,6 +1426,90 @@
           1.0
         ]
       }
+    },
+    "body-mesh.004": {
+      "name": "body-mesh.004",
+      "position": [
+        84.0,
+        0.0,
+        6.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/body-mesh.glb",
+      "object_type": "Koopa",
+      "properties": {}
+    },
+    "body-mesh.009": {
+      "name": "body-mesh.009",
+      "position": [
+        87.0,
+        0.0,
+        6.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/body-mesh.glb",
+      "object_type": "Koopa",
+      "properties": {}
+    },
+    "body-mesh.010": {
+      "name": "body-mesh.010",
+      "position": [
+        90.0,
+        0.0,
+        6.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/body-mesh.glb",
+      "object_type": "Koopa",
+      "properties": {}
+    },
+    "body-mesh.011": {
+      "name": "body-mesh.011",
+      "position": [
+        93.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/body-mesh.glb",
+      "object_type": "Koopa",
+      "properties": {}
     }
   }
 }

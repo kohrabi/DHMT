@@ -21,8 +21,9 @@ export class SceneManager {
     this.active.activate();
   }
 
-  update(deltaTime: number): void {
-    this.active?.update(deltaTime);
+  update(): void {
+    // Use Scene own timer.
+    this.active?.update();
   }
 
   draw(renderer: THREE.WebGLRenderer): void {

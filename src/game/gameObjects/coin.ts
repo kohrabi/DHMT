@@ -5,6 +5,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 import { OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL, SUBSUBSUBPIXEL_DELTA_TIME } from '@/engine/constants';
 import { Player } from './player';
+import { thickness } from 'three/tsl';
 
 
 const COIN_KILL_TIME = 1
@@ -52,7 +53,8 @@ export class Coin extends GameObject {
     );
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.25);
-    this.mesh = this.transform.add(modelMesh);
+    this.mesh = modelMesh;
+    this.transform.add(modelMesh);
 
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);
     this.meshBox.expandByScalar(1);
@@ -61,7 +63,7 @@ export class Coin extends GameObject {
 
   fixedUpdate(fixedDeltaTime: number): void {
     if (this.currentState === CoinState.NORMAL) {
-      if (this.meshSphere && !this.world.isCameraVisible(this.meshSphere)) {
+      if (this.meshSphere && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
         return;
       }
       this.transform.rotateY(0.1);

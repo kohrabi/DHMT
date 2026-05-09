@@ -19,6 +19,7 @@ export class World {
   readonly pendingRemovals: Set<GameObject> = new Set();
   readonly frustum = new THREE.Frustum();
   readonly projView = new THREE.Matrix4();
+  public readonly timer : THREE.Timer = new THREE.Timer();
 
   constructor(readonly gameScene : Scene) {
     // Wire the physics fixed-step loop to drive component fixedUpdates.
@@ -49,7 +50,9 @@ export class World {
     return removed;
   }
 
-  update(dt: number): void {
+  update(): void {
+    this.timer.update();
+    const dt = this.timer.getDelta();
 
     for (const go of this._gameObjects) {
       if (!go.started) {
@@ -82,8 +85,8 @@ export class World {
     this.frustum.setFromProjectionMatrix(this.projView);
   }
 
-  public isCameraVisible(boundingSphere : THREE.Sphere): boolean {
-
+  public isCameraVisible(transform : THREE.Object3D, boundingSphere : THREE.Sphere): boolean {
+    boundingSphere.center = transform.position;
     return this.frustum.intersectsSphere(boundingSphere);
   }
 

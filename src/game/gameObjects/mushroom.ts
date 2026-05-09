@@ -73,8 +73,9 @@ export class Mushroom extends GameObject {
     );
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.1);
-    this.mesh = this.transform.add(modelMesh);
-    
+    this.mesh = modelMesh;
+    this.transform.add(this.mesh);
+
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);
     this.meshBox.expandByScalar(MESH_BOX_EXPAND);
     this.meshBox.getBoundingSphere(this.meshSphere);
@@ -84,7 +85,7 @@ export class Mushroom extends GameObject {
     if (this.started === false) {
       return;
     }
-    if (this.meshBox && !this.world.isCameraVisible(this.meshSphere)) {
+    if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
       return;
     }
     if (this.currentState === State.NORMAL) {
@@ -131,6 +132,7 @@ export class Mushroom extends GameObject {
         (handle) => {
           const other = this.world.physics.getGameObjectFromCollider(handle);
           if (other instanceof Player) {
+            other.PowerUp();
             this.destroy();
           }
           return false;

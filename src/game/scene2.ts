@@ -44,6 +44,7 @@ export class Scene2 extends Scene {
     console.log("Loading content for Scene2...");
     Global.renderer.shadowMap.enabled = true;
 
+
     this.skyTexture = this.buildSkyTexture();
     this.world.scene.background = this.skyTexture;
 

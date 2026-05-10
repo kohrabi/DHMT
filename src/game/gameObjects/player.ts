@@ -533,8 +533,7 @@ export class Player extends GameObject {
       else {
         console.log("Hit Koopa from the side", other.IsInShell, other.Velocity.length());
         if (other.IsInShell && Math.abs(other.Velocity.x) < 0.05) {
-          
-          other.setDir(1);
+          other.setDir(Math.sign(collision.collider.translation().x - this.collider.translation().x));
         }
       }
     }

@@ -25,8 +25,16 @@ export abstract class Scene {
     45,
     window.innerWidth / window.innerHeight,
     1,
-    1000,
+    500,
   );
+  // readonly camera = new THREE.OrthographicCamera(
+  //   window.innerWidth / -2,
+  //   window.innerWidth / 2,
+  //   window.innerHeight / 2,
+  //   window.innerHeight / -2,
+  //   1,
+  //   500,
+  // );
 
   private initialized = false;
   private contentLoaded = false;

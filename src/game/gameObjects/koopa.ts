@@ -7,6 +7,7 @@ import { Ground } from "./ground";
 import { GroundOneWay } from "./oneway";
 import { Animator } from "@/engine/animator";
 import { Goomba, GoombaState } from "./goomba";
+import { Brick } from "./brick";
 
 const GREEN_KOOPA_X_SPEED = 0x00800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GREEN_KOOPA_SHELL_X_SPEED = 0x02700 * SUBSUBSUBPIXEL_DELTA_TIME;
@@ -36,10 +37,16 @@ enum AnimationState {
 
 export class Koopa extends GameObject {
 
+
+  readonly shapeHeight = 1.0;
+  private readonly normalColliderHeight = 1.0;
+  private readonly shellColliderHeight = 0.5;
   // Components
   private controller!: RAPIER.KinematicCharacterController;
   private collider!: RAPIER.Collider;
   private flipCollider!: RAPIER.Collider;
+  private shape = new THREE.BoxGeometry(0.5, this.shapeHeight, 0.5);
+  private colliderHeight = this.normalColliderHeight;
 
   private velocity = new THREE.Vector3();
   private mesh: THREE.Object3D = new THREE.Object3D();
@@ -52,8 +59,6 @@ export class Koopa extends GameObject {
   private respawnTimer = 0;
   private meshBox?: THREE.Box3;
   private meshSphere: THREE.Sphere = new THREE.Sphere();
-
-  readonly shapeHeight = 1.0;
 
   get IsInShell() {
     return this.currentState === KoopaState.IN_SHELL;
@@ -78,7 +83,7 @@ export class Koopa extends GameObject {
     super.start();
     const { controller, collider } = this.world.physics.createCharacterController(
       this,
-      new THREE.BoxGeometry(0.5, this.shapeHeight, 0.5)
+      this.shape
     );
     this.controller = controller;
     this.collider = collider;
@@ -275,7 +280,7 @@ export class Koopa extends GameObject {
           this.dir *= -1;
         }
         else {
-          this.onColliderEnter(go);
+          this.onColliderEnter(collision, go as GameObject);
         }
         
       }
@@ -286,21 +291,52 @@ export class Koopa extends GameObject {
 
   private setState(newState: KoopaState): void {
     switch (newState) {
-    case KoopaState.DEAD_BOUNCE:
+    case KoopaState.NORMAL:
       {
-        if (this.ignoreDamageTimer > 0) return;
-        // CGame::GetInstance()->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
-        // layer = SortingLayer::CORPSE;
-        this.velocity.y = OBJECT_DEAD_BOUNCE;
-        this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
-        this.world.physics.addDeferedCall(() => {
-          this.collider.setEnabled(false);
-        });
+        this.rebuildCollider(this.normalColliderHeight);
+        break;
       }
-    break;
+    case KoopaState.DEAD_BOUNCE:
+    {
+      if (this.ignoreDamageTimer > 0) return;
+      // CGame::GetInstance()->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
+      // layer = SortingLayer::CORPSE;
+      this.velocity.y = OBJECT_DEAD_BOUNCE;
+      this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
+      this.world.physics.addDeferedCall(() => {
+        this.collider.setEnabled(false);
+      });
+      break;
+    }
+    case KoopaState.IN_SHELL:
+    {
+      console.log("Koopa in shell");
+      this.rebuildCollider(this.shellColliderHeight);
+    }
     default: break;
     }
     this.currentState = newState;
+  }
+
+  private rebuildCollider(newHeight: number): void {
+    if (!this.collider || this.colliderHeight === newHeight) return;
+
+    const oldHeight = this.colliderHeight;
+    this.colliderHeight = newHeight;
+
+    const current = this.collider.translation();
+    const yOffset = (oldHeight - newHeight) * 0.5;
+    const shape = RAPIER.ColliderDesc.cuboid(0.25, newHeight * 0.5, 0.25)
+      .setTranslation(current.x, current.y - yOffset, current.z)
+      .setRotation(this.collider.rotation());
+
+    const newCollider = this.world.physics.world.createCollider(shape);
+    this.world.physics.registerCollider(newCollider, this);
+    this.world.physics.removeCollider(this.collider);
+    this.collider = newCollider;
+    this.mesh.translateY(0.5);
+
+    this.transform.position.set(current.x, current.y - yOffset, current.z);
   }
 
   public deadBounce(dir : number): void {
@@ -312,7 +348,7 @@ export class Koopa extends GameObject {
     if (this.currentState != KoopaState.IN_SHELL)
     {
         this.velocity.x = 0;
-        this.currentState = KoopaState.IN_SHELL;
+        this.setState(KoopaState.IN_SHELL);
         this.respawnTimer = GREEN_KOOPA_SPAWN_TIME;
         this.dir = 0;
     }
@@ -326,13 +362,18 @@ export class Koopa extends GameObject {
     }
   }
 
-  private onColliderEnter(go : GameObject) : void {
+  private onColliderEnter(collision : RAPIER.CharacterCollision, go : GameObject) : void {
     if (this.currentState !== KoopaState.IN_SHELL) return;
     if (go instanceof Goomba) {
       go.deadBounce(-Math.sign(this.transform.position.x - go.transform.position.x));
     }
     else if (go instanceof Koopa) {
       go.setState(KoopaState.DEAD_BOUNCE);
+    }
+    else if (go instanceof Brick) {
+      if (Math.abs(collision.normal1.y) < 0.5) {
+        go.onHit();
+      }
     }
   }
 }

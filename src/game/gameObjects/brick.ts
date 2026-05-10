@@ -17,6 +17,7 @@ export class Brick extends GameObject {
 
   async start() : Promise<void> {
     super.start();
+    this.transform.translateY(0.5);
     const model = await this.world.gameScene.content.loadGLTF(
       "assets/platformer/brick.glb",
     );
@@ -53,7 +54,6 @@ export class Brick extends GameObject {
   }
 
   public onHit(): void {
-    console.log("Brick hit!");
-    this.world.removeGameObject(this);
+    this.destroy();
   }
 }

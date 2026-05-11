@@ -100,6 +100,8 @@ export class Player extends GameObject {
   readonly keyRun = "KeyJ";
   readonly bigScale = 1.5;
 
+  readonly modelOffsetY = -0.5;
+
   readonly shapeHeight = 1.0;
 
   // Components
@@ -145,8 +147,7 @@ export class Player extends GameObject {
       case PlayerState.POWER_UP:
       {
         // this.world.timer.setTimescale(0.0);
-        this.powerUpStartTimer = this.world.timer.getElapsed();
-        console.log("Entering power up state", this.powerUpStartTimer);
+        this.powerUpStartTimer = POWER_UP_ANIMATION_TIME
         break;
       }
       case PlayerState.DEAD:
@@ -216,7 +217,7 @@ export class Player extends GameObject {
     this.collider = collider;
 
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
-    model.scene.position.set(0, -0.5, 0);
+    model.scene.position.set(0, this.modelOffsetY, 0);
     model.scene.rotation.y = Math.PI / 4;
     this.mesh = model.scene;
     this.transform.add(model.scene);
@@ -324,12 +325,15 @@ export class Player extends GameObject {
 
   private animationCode(fixedDeltaTime: number): void {
     if (this.currentState == PlayerState.POWER_UP) {
-      const blink = 0.05;
+      const blink = 0.1;
+      console.log("Power up animation", this.world.timer.getElapsed(), this.powerUpStartTimer, blink);
       if (Global.timer.getElapsed() % blink < blink / this.bigScale) {
         this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
+        this.mesh.position.y = this.modelOffsetY + (0.15);
       }
       else {
         this.transform.scale.set(1.0, 1.0, 1.0);
+        this.mesh.position.y = this.modelOffsetY;
       }
     }
     else {
@@ -487,18 +491,17 @@ export class Player extends GameObject {
 
   private _powerupUpdate(fixedDeltaTime: number): void {
     
-    this.powerUpStartTimer += fixedDeltaTime;
-    console.log(this.powerUpStartTimer);
-    if (this.powerUpStartTimer > POWER_UP_ANIMATION_TIME)
+    this.powerUpStartTimer -= fixedDeltaTime;
+    if (this.powerUpStartTimer <= 0)
     {
       // this.world.timer.setTimescale(1.0);
       this.powerUp = this.nextPowerUp;
       this.setCurrentState(PlayerState.NORMAL);
-      if (this.nextPowerUp != PowerUpState.SMALL) {
-        this.transform.position.y -= 1.0;
-      }
-      this.mesh.translateY(0.15);
-      //else
+      this.mesh.position.y = this.modelOffsetY + (0.15);
+      this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
+      // if (this.nextPowerUp != PowerUpState.SMALL) {
+      //   this.transform.position.y += 1.0;
+      // }
       this.invincibleTimer = INVINCIBLE_TIME;
     }
   }

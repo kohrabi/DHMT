@@ -8,6 +8,7 @@ import { GroundOneWay } from "./oneway";
 import { Animator } from "@/engine/animator";
 import { Goomba, GoombaState } from "./goomba";
 import { Brick } from "./brick";
+import { QuestionBlock } from "./questionBlock";
 
 const GREEN_KOOPA_X_SPEED = 0x00800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GREEN_KOOPA_SHELL_X_SPEED = 0x02700 * SUBSUBSUBPIXEL_DELTA_TIME;
@@ -165,6 +166,10 @@ export class Koopa extends GameObject {
       if (this.velocity.x !== 0)
         this.transform.rotation.y += 0.5;
     }
+    
+    if (this.currentState === KoopaState.DEAD_BOUNCE) {
+      this.transform.rotation.x += 0.1;
+    }
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
@@ -178,8 +183,10 @@ export class Koopa extends GameObject {
     }
 
     if (!this.controller.computedGrounded()) {
-      this.velocity.y -= OBJECT_FALL;
       this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL, -OBJECT_MAX_FALL);
+      if (this.currentState === KoopaState.IN_SHELL) {
+        this.velocity.y *= 0.85
+      }
     }
     
     switch (this.currentState)
@@ -227,16 +234,14 @@ export class Koopa extends GameObject {
         break;
       }
       
-      case KoopaState.DEAD_BOUNCE: {
+      case KoopaState.DEAD_BOUNCE: 
+      {
         this.collider.setEnabled(false);
         this.velocity.y -= OBJECT_FALL;
         this.velocity.y = Math.max(this.velocity.y, -OBJECT_MAX_FALL);
 
         this.transform.position.x += this.velocity.x;
         this.transform.position.y += this.velocity.y;
-        if (this.transform.position.y < -10) {
-          this.destroy();
-        }
         break;
       }
     // case KoopaState.RESPAWNING:
@@ -358,7 +363,7 @@ export class Koopa extends GameObject {
         if (this.dir != 0)
           this.dir = 0;
         else
-            this.dir = -dir;
+          this.dir = -dir;
     }
   }
 
@@ -371,8 +376,14 @@ export class Koopa extends GameObject {
       go.setState(KoopaState.DEAD_BOUNCE);
     }
     else if (go instanceof Brick) {
-      if (Math.abs(collision.normal1.y) < 0.5) {
+      if (Math.abs(collision.normal1.x) > 0.5) {
         go.onHit();
+      }
+    }
+    else if (go instanceof QuestionBlock) {
+      if (Math.abs(collision.normal1.x) > 0.5) {
+        go.Hit(Math.sign(this.transform.position.x - go.transform.position.x));
+        this.dir *= -1;
       }
     }
   }

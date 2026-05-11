@@ -16,6 +16,7 @@ import { GroundOneWay } from "./gameObjects/oneway";
 import { Goomba } from "./gameObjects/goomba";
 import { Koopa } from "./gameObjects/koopa";
 import { QuestionBlock, QuestionBlockSpawnType } from "./gameObjects/questionBlock";
+import { KillZone } from "./gameObjects/killzone";
 
 type LevelObject = {
   model_path: string;
@@ -215,6 +216,10 @@ export class Scene2 extends Scene {
         }
         case "Brick": {
           go = this.addGameObject(new Brick(this.world));
+          break;
+        }
+        case "KillZone": {
+          go = this.addGameObject(new KillZone(this.world));
           break;
         }
         case "QuestionBlock": {

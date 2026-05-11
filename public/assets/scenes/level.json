@@ -3413,6 +3413,48 @@
       "model_path": "assets/platformer/rocks.glb",
       "object_type": "",
       "properties": {}
+    },
+    "KillZone": {
+      "name": "KillZone",
+      "position": [
+        92.0,
+        0.0,
+        -1.5
+      ],
+      "scale": [
+        127.3672866821289,
+        6.659506797790527,
+        0.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "null",
+      "object_type": "KillZone",
+      "properties": {}
+    },
+    "PlayZone": {
+      "name": "PlayZone",
+      "position": [
+        88.0,
+        5.0,
+        5.0
+      ],
+      "scale": [
+        88.0,
+        0.5,
+        6.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "null",
+      "object_type": "PlayZone",
+      "properties": {}
     }
   }
 }

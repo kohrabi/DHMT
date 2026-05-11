@@ -130,13 +130,17 @@ export class Mushroom extends GameObject {
         this.collider.rotation(), 
         this.collider.shape,
         (handle) => {
+          if (handle.handle === this.collider.handle) {
+            return true;
+          }
           const other = this.world.physics.getGameObjectFromCollider(handle);
+          console.log("Mushroom collision with", other?.name);
           if (other instanceof Player) {
             other.PowerUp();
             this.destroy();
           }
-          return false;
-        }
+          return true;
+        },
       );
     }
     else {

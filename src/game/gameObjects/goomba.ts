@@ -131,8 +131,7 @@ export class Goomba extends GameObject {
 
         this.velocity.x = GOOMBA_X_SPEED * this.dir;
         if (!this.controller.computedGrounded()) {
-          this.velocity.y -= OBJECT_FALL;
-          this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL, -OBJECT_MAX_FALL);
+          this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL * fixedDeltaTime, -OBJECT_MAX_FALL);
         }
         this.velocity.z = 0;
         PhysicsWorld.moveAndSlide(
@@ -162,19 +161,16 @@ export class Goomba extends GameObject {
         break;
       }
       case GoombaState.DEAD_BOUNCE: {
-        this.velocity.y -= OBJECT_FALL;
-        this.velocity.y = Math.max(this.velocity.y, -OBJECT_MAX_FALL);
+        this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL, -OBJECT_MAX_FALL);
 
         this.transform.position.x += this.velocity.x;
         this.transform.position.y += this.velocity.y;
-        if (this.transform.position.y < -10) {
-          this.destroy();
-        }
         break;
       }
       
     }
     this.animationCode(fixedDeltaTime);
+
   }
 
   public setState(state: GoombaState): void {

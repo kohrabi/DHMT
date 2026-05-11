@@ -1,22 +1,15 @@
-import {
-  Scene,
-  PhysicsWorld,
-  GameObject,
-} from "@/engine";
+import { Scene, PhysicsWorld, GameObject } from "@/engine";
 import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
 import * as Global from "@/global";
-import { Player } from "./gameObjects/player";
-import { Camera } from "./gameObjects/camera";
-import { Coin } from "./gameObjects/coin";
-import { Ground } from "./gameObjects/ground";
-import { Decorate } from "./gameObjects/decorate";
-import { Brick } from "./gameObjects/brick";
-import { GroundOneWay } from "./gameObjects/oneway";
-import { Goomba } from "./gameObjects/goomba";
-import { Koopa } from "./gameObjects/koopa";
-import { QuestionBlock, QuestionBlockSpawnType } from "./gameObjects/questionBlock";
-import { KillZone } from "./gameObjects/killzone";
+import { Player } from "../components/player";
+import { Camera } from "../components/camera";
+import { Coin } from "../components/coin";
+import { Ground } from "../components/ground";
+import { Decorate } from "../components/decorate";
+import { Brick } from "../components/brick";
+import { GroundOneWay } from "../components/oneway";
+import { Goomba } from "../components/goomba";
 
 type LevelObject = {
   model_path: string;
@@ -63,9 +56,7 @@ export class Scene2 extends Scene {
     this.scene3D.add(new THREE.AxesHelper(1));
     this.scene3D.add(new THREE.GridHelper(10, 10));
 
-
     try {
-
       const levelData = await this.contentManager.loadJSON<LevelData>(
         "/assets/scenes/level.json",
       );
@@ -80,7 +71,7 @@ export class Scene2 extends Scene {
     this.physicsHelper.update();
   }
 
-  protected unloadContent(): void {
+protected unloadContent(): void {
 
     if (this.skyTexture) {
       this.skyTexture.dispose();
@@ -116,12 +107,10 @@ export class Scene2 extends Scene {
     return texture;
   }
 
-  public async loadLevel(levelData: LevelData): Promise<void>
-  {
-
+  public async loadLevel(levelData: LevelData): Promise<void> {
     const camera = new Camera(this.camera, this.world, null);
     const cameraObject = this.addGameObject(camera);
-    
+
     for (const objectData of Object.values(levelData.objects)) {
       let go: GameObject | null = null;
       switch (objectData.object_type) {
@@ -162,7 +151,7 @@ export class Scene2 extends Scene {
           player.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.55,
-            -objectData.position[1]
+            -objectData.position[1],
           );
           camera.setTarget(player);
           break;
@@ -172,7 +161,7 @@ export class Scene2 extends Scene {
           goomba.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.55,
-            -objectData.position[1]
+            -objectData.position[1],
           );
           break;
         }
@@ -245,7 +234,7 @@ export class Scene2 extends Scene {
           break;
         }
       }
-      
+
       if (!go) continue;
       // Blender's coordinate system is different from Three.js, so we need to swap Y and Z axes.
       // Blender use Z Up, Y Forward

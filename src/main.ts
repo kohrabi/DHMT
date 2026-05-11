@@ -1,7 +1,7 @@
 import * as Global from "./global";
-import { Scene2 } from "./game/scene2";
-import { InspectorPanel } from "./engine/inspector";
+import { Scene2 } from "./game/scenes/scene2";
 import RAPIER from "@dimforge/rapier3d-compat";
+import { MainMenu } from "./game/scenes/mainMenu";
 
 await RAPIER.init();
 
@@ -9,7 +9,7 @@ Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);
 document.getElementById("webgl")!.appendChild(Global.renderer.domElement);
 
-Global.sceneManager.setScene(new Scene2());
+Global.sceneManager.setScene(new MainMenu());
 
 Global.renderer.setAnimationLoop(animate);
 

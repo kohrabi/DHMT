@@ -13,6 +13,7 @@ import { Animator } from "@/engine/animator";
 import { Koopa } from "./koopa";
 import { QuestionBlock } from "./questionBlock";
 import { Mushroom } from "./mushroom";
+import { spawnJumpingParticles, spawnLandingParticles, spawnRunningParticles, spawnWalkingParticles } from "./playerParticles";
 
 
 const MULTIPLIER = 1;
@@ -135,6 +136,9 @@ export class Player extends GameObject {
   private deadJump = false;
   private isResetting = false
   private levelResetTimer = 0.0;
+
+  private wasGrounded = false;
+  private particleTimer = 0.0;
 
   private animator : Animator = new Animator();
 
@@ -269,6 +273,7 @@ export class Player extends GameObject {
     if (this.invincibleTimer > 0) this.invincibleTimer -= fixedDeltaTime;
     if (this.spinTimer > 0) this.spinTimer -= fixedDeltaTime;
     if (this.hitParticleTimer > 0.0) this.hitParticleTimer -= fixedDeltaTime;
+    if (this.particleTimer > 0.0) this.particleTimer -= fixedDeltaTime;
 
     if (this.comboTimer > 0) this.comboTimer -= fixedDeltaTime;
     else this.comboCounter = 0;
@@ -321,6 +326,12 @@ export class Player extends GameObject {
       }
     }
     this.animationCode(fixedDeltaTime);
+
+    const grounded = this.isGrounded;
+    if (!this.wasGrounded && grounded) {
+      spawnLandingParticles(this.world, this.transform.position);
+    }
+    this.wasGrounded = grounded;
   }
 
   private animationCode(fixedDeltaTime: number): void {
@@ -454,6 +465,18 @@ export class Player extends GameObject {
         clampf(this.velocity.x, -MAXIMUM_WALK_SPEED, MAXIMUM_WALK_SPEED);
     }
 
+    if (this.isGrounded && Math.abs(this.velocity.x) > MINIMUM_WALK_VELOCITY) {
+      if (this.particleTimer <= 0) {
+        if (this.running) {
+          spawnRunningParticles(this.world, this.transform.position, Math.sign(this.velocity.x));
+          this.particleTimer = 0.1;
+        } else {
+          spawnWalkingParticles(this.world, this.transform.position, Math.sign(this.velocity.x));
+          this.particleTimer = 0.2;
+        }
+      }
+    }
+
     // Y Movement
     let gravity = 0.0;
     if (!this.isGrounded) {
@@ -477,6 +500,7 @@ export class Player extends GameObject {
       this.accel.y = 0;
       this.velocity.y = initVel;
       this.jumped = false;
+      spawnJumpingParticles(this.world, this.transform.position);
     }
 
     this.velocity.x += this.accel.x;

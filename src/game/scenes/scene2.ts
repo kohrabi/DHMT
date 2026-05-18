@@ -207,10 +207,10 @@ protected unloadContent(): void {
           go = this.addGameObject(new Brick(this.world));
           break;
         }
-        case "KillZone": {
-          go = this.addGameObject(new KillZone(this.world));
-          break;
-        }
+        // case "KillZone": {
+        //   go = this.addGameObject(new KillZone(this.world));
+        //   break;
+        // }
         case "QuestionBlock": {
           let coinType = QuestionBlockSpawnType.COIN;
           switch (objectData.properties["spawn_type"]) {

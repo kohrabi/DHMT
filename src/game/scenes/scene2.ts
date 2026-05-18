@@ -2,14 +2,16 @@ import { Scene, PhysicsWorld, GameObject } from "@/engine";
 import * as THREE from "three";
 import { OrbitControls, RapierHelper } from "three/examples/jsm/Addons.js";
 import * as Global from "@/global";
-import { Player } from "../components/player";
-import { Camera } from "../components/camera";
-import { Coin } from "../components/coin";
-import { Ground } from "../components/ground";
-import { Decorate } from "../components/decorate";
-import { Brick } from "../components/brick";
-import { GroundOneWay } from "../components/oneway";
-import { Goomba } from "../components/goomba";
+import { Player } from "../gameObjects/player";
+import { Camera } from "../gameObjects/camera";
+import { Coin } from "../gameObjects/coin";
+import { Ground } from "../gameObjects/ground";
+import { Decorate } from "../gameObjects/decorate";
+import { Brick } from "../gameObjects/brick";
+import { GroundOneWay } from "../gameObjects/oneway";
+import { Goomba } from "../gameObjects/goomba";
+import { Koopa } from "../gameObjects/koopa";
+import { QuestionBlock, QuestionBlockSpawnType } from "../gameObjects/questionBlock";
 
 type LevelObject = {
   model_path: string;
@@ -38,7 +40,6 @@ export class Scene2 extends Scene {
     console.log("Loading content for Scene2...");
     Global.renderer.shadowMap.enabled = true;
 
-
     this.skyTexture = this.buildSkyTexture();
     this.world.scene.background = this.skyTexture;
 
@@ -66,13 +67,12 @@ export class Scene2 extends Scene {
     }
   }
 
-  public update(deltaTime: number): void {
-    super.update(deltaTime);
+  public update(): void {
+    super.update();
     this.physicsHelper.update();
   }
 
-protected unloadContent(): void {
-
+  protected unloadContent(): void {
     if (this.skyTexture) {
       this.skyTexture.dispose();
       this.skyTexture = undefined;
@@ -127,15 +127,17 @@ protected unloadContent(): void {
             colliderSizeData?.[1] ?? 1,
             colliderSizeData?.[2] ?? 1,
           );
-          const colliderOffsetData = objectData.properties?.["collider_offset"] as
-            | [number, number, number]
-            | undefined;
+          const colliderOffsetData = objectData.properties?.[
+            "collider_offset"
+          ] as [number, number, number] | undefined;
           const colliderOffset = new THREE.Vector3(
             colliderOffsetData?.[0] ?? 0,
             colliderOffsetData?.[1] ?? 0.5,
             colliderOffsetData?.[2] ?? 0,
           );
-          go = this.addGameObject(new Ground(this.world, modelMesh, colliderSize, colliderOffset));
+          go = this.addGameObject(
+            new Ground(this.world, modelMesh, colliderSize, colliderOffset),
+          );
           break;
         }
         case "OneWay": {
@@ -170,7 +172,7 @@ protected unloadContent(): void {
           koopa.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.6,
-            -objectData.position[1]
+            -objectData.position[1],
           );
           break;
         }
@@ -180,7 +182,7 @@ protected unloadContent(): void {
           koopa.transform.position.set(
             objectData.position[0],
             objectData.position[2] + 0.6,
-            -objectData.position[1]
+            -objectData.position[1],
           );
           break;
         }
@@ -214,14 +216,24 @@ protected unloadContent(): void {
         case "QuestionBlock": {
           let coinType = QuestionBlockSpawnType.COIN;
           switch (objectData.properties["spawn_type"]) {
-            case "COIN" : coinType = QuestionBlockSpawnType.COIN; break;
-            case "LEAF" : coinType = QuestionBlockSpawnType.LEAF; break;
-            default: console.warn("Unknown spawn type for Question Block:", objectData.properties["spawn_type"]);
+            case "COIN":
+              coinType = QuestionBlockSpawnType.COIN;
+              break;
+            case "LEAF":
+              coinType = QuestionBlockSpawnType.LEAF;
+              break;
+            default:
+              console.warn(
+                "Unknown spawn type for Question Block:",
+                objectData.properties["spawn_type"],
+              );
           }
-          go = this.addGameObject(new QuestionBlock(
-            this.world, 
-            objectData.properties["spawn_count"], 
-            coinType)
+          go = this.addGameObject(
+            new QuestionBlock(
+              this.world,
+              objectData.properties["spawn_count"],
+              coinType,
+            ),
           );
           break;
         }

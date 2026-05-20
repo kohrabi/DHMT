@@ -85,6 +85,10 @@ export abstract class Scene {
     return this.world.removeGameObject(gameObject);
   }
 
+  protected findGameObjectByName(name: string): GameObject | undefined {
+    return this.world.findGameObjectByName(name);
+  }
+
   // ─── SceneManager interface ───────────────────────────────────────────────
 
   activate(): void {

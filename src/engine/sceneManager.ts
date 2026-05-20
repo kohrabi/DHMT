@@ -21,6 +21,17 @@ export class SceneManager {
     this.active.activate();
   }
 
+  /**
+   * Tear down the current scene and create a fresh instance of the same type.
+   * This gives a completely clean reset (new World, PhysicsWorld, GameObjects).
+   */
+  resetScene(): void {
+    if (!this.active) return;
+
+    const SceneClass = this.active.constructor as new () => Scene;
+    this.setScene(new SceneClass());
+  }
+
   update(): void {
     // Use Scene own timer.
     this.active?.update();

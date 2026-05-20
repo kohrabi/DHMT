@@ -7,6 +7,7 @@ export class Camera extends GameObject {
   private target?: GameObject | null;
   private controlsEnabled = false;
   private controls?: OrbitControls;
+  public isFollowingTarget = true;
 
   constructor(
     private readonly camera : THREE.Camera, 
@@ -40,7 +41,7 @@ export class Camera extends GameObject {
       return;
     }
 
-    if (this.target) {
+    if (this.target && this.isFollowingTarget) {
       this.transform.position.set(
         this.target.transform.position.x,
         this.target.transform.position.y,

@@ -42,6 +42,10 @@ export class Goomba extends GameObject {
   private meshBox?: THREE.Box3;
   private meshSphere: THREE.Sphere = new THREE.Sphere();
 
+  public get isDead(): boolean {
+    return this._currentState === GoombaState.DEAD || this._currentState === GoombaState.DEAD_BOUNCE;
+  }
+
   constructor(world : World) {
     super(
       "Goomba",

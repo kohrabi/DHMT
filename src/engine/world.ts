@@ -50,6 +50,15 @@ export class World {
     return removed;
   }
 
+  findGameObjectByName(name: string): GameObject | undefined {
+    for (const go of this._gameObjects) {
+      if (go.name === name) {
+        return go;
+      }
+    }
+    return undefined;
+  }
+
   update(): void {
     this.timer.update();
     const dt = this.timer.getDelta();

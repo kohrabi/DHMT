@@ -14,6 +14,7 @@ import { Koopa } from "./koopa";
 import { QuestionBlock } from "./questionBlock";
 import { Mushroom } from "./mushroom";
 import { spawnJumpingParticles, spawnLandingParticles, spawnRunningParticles, spawnWalkingParticles } from "./playerParticles";
+import { Camera } from "./camera";
 
 
 const MULTIPLIER = 1;
@@ -108,6 +109,7 @@ export class Player extends GameObject {
   // Components
   private controller!: RAPIER.KinematicCharacterController;
   private collider!: RAPIER.Collider;
+  private camera!: Camera;
 
   private velocity = new THREE.Vector3();
   private mesh: THREE.Object3D = new THREE.Object3D();
@@ -160,6 +162,7 @@ export class Player extends GameObject {
             return;
         if (this.invincibleTimer > 0)
             return;
+        this.camera.isFollowingTarget = false;
         if (this.powerUp != PowerUpState.SMALL)
         {
           state = (PlayerState.POWER_UP);
@@ -175,7 +178,7 @@ export class Player extends GameObject {
             this.deadTimer = DEAD_STAY_TIME;
             this.velocity = new THREE.Vector3(0, 0, 0);
         }
-        this.world.timer.setTimescale(0.0);
+        // this.world.timer.setTimescale(0.0);
         break;
       }
       case PlayerState.TELEPORT:
@@ -219,6 +222,8 @@ export class Player extends GameObject {
     );
     this.controller = controller;
     this.collider = collider;
+
+    this.camera = this.world.findGameObjectByName("Camera") as Camera;
 
     const model = await this.world.gameScene.content.loadGLTF("/assets/platformer/character-oopi.glb");
     model.scene.position.set(0, this.modelOffsetY, 0);
@@ -289,16 +294,16 @@ export class Player extends GameObject {
         {
             if (!this.deadJump)
             {
-                this.velocity.y = -0.4;
+                this.velocity.y = 30 * unscaledDt;
                 this.deadJump = true;
             }
-            //velocity.y = min(velocity.y + JUMP_GRAVITY / 2.0f, MAX_FALL_SPEED / 2.0f);
-            this.velocity.y = this.velocity.y + JUMP_GRAVITY / 5.0;
-            this.transform.position.y += this.velocity.y * unscaledDt;
+            this.transform.rotation.x += 0.1;
+            this.velocity.y = this.velocity.y - JUMP_GRAVITY * 30 * unscaledDt;
+            this.transform.position.y += this.velocity.y;
         }
 
         // Camera visible
-        if (this.transform.position.y <= -10.0)
+        if (this.transform.position.y <= -3.0)
         {
             if (!this.isResetting)
             {
@@ -309,7 +314,8 @@ export class Player extends GameObject {
             if (this.levelResetTimer > 0) this.levelResetTimer -= unscaledDt;
             else
             {
-              // Reset Scene
+              console.log("Resetting level");
+              Global.sceneManager.resetScene();
             }
         }
         break;
@@ -347,8 +353,10 @@ export class Player extends GameObject {
         this.mesh.position.y = this.modelOffsetY;
       }
     }
+    else if (this.currentState == PlayerState.DEAD) {
+      
+    }
     else {
-
       if (!this.isGrounded) {
         if (this.velocity.y > 0) {
           this.animator.playAnimation(AnimationState.JUMP, 0.1);
@@ -546,21 +554,28 @@ export class Player extends GameObject {
       }
     }
     else if (other instanceof Goomba) {
-      const stompFromAbove = collision.normal1.y > 0.5 && this.velocity.y <= 0;
-      if (stompFromAbove) {
-        this.velocity.y = ENEMY_BOUNCE;
-        other.onHit();
+      if (!other.isDead) {
+        if (collision.normal1.y > 0.5) {
+          this.velocity.y = ENEMY_BOUNCE;
+          other.onHit();
+          console.log("Hit goomba with bounce");
+        }
+        else {
+          this.setCurrentState(PlayerState.DEAD);
+        }
       }
     }
     else if (other instanceof Koopa) {
-      if (collision.normal1.y > 0.5 && this.velocity.y <= 0) {
+      if (collision.normal1.y > 0.5) {
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
       else {
-        console.log("Hit Koopa from the side", other.IsInShell, other.Velocity.length());
         if (other.IsInShell && Math.abs(other.Velocity.x) < 0.05) {
           other.setDir(Math.sign(collision.collider.translation().x - this.collider.translation().x));
+        }
+        else {
+          this.setCurrentState(PlayerState.DEAD);
         }
       }
     }

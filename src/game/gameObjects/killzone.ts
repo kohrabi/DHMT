@@ -42,7 +42,7 @@ export class KillZone extends GameObject {
         }
         const other = this.world.physics.getGameObjectFromCollider(handle);
         if (other instanceof Player) {
-          other?.destroy();
+          other?.kill();
         }
         else if (other instanceof Koopa || other instanceof Goomba || other instanceof Mushroom) {
           other?.destroy();

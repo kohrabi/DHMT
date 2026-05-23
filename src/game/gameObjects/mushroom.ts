@@ -87,7 +87,7 @@ export class Mushroom extends GameObject {
     }
     if (this.currentState === State.NORMAL) {
       this.velocity.x = MUSHROOM_X_SPEED * this.dir;
-      this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL * fixedDeltaTime, -OBJECT_MAX_FALL);
+      this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL * fixedDeltaTime * 5.0, -OBJECT_MAX_FALL);
       PhysicsWorld.moveAndSlide(
         this.controller,
         this.collider,

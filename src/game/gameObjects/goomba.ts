@@ -143,7 +143,7 @@ export class Goomba extends GameObject {
           this.collider,
           this.transform,
           this.velocity,
-          1,
+          (this.world.timer.timescale == 1) ? 1 : 0,
         )
 
         for (let i = 0; i < this.controller.numComputedCollisions(); i++) {

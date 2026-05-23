@@ -12,6 +12,8 @@ import { GroundOneWay } from "../gameObjects/oneway";
 import { Goomba } from "../gameObjects/goomba";
 import { Koopa } from "../gameObjects/koopa";
 import { QuestionBlock, QuestionBlockSpawnType } from "../gameObjects/questionBlock";
+import { KillZone } from "../gameObjects/killzone";
+import { PlayZone } from "../gameObjects/playzone";
 
 type LevelObject = {
   model_path: string;
@@ -211,10 +213,15 @@ export class Scene2 extends Scene {
           go = this.addGameObject(new Brick(this.world));
           break;
         }
-        // case "KillZone": {
-        //   go = this.addGameObject(new KillZone(this.world));
-        //   break;
-        // }
+        case "KillZone": {
+          go = this.addGameObject(new KillZone(this.world));
+          break;
+        }
+        case "PlayZone": {
+          go = this.addGameObject(new PlayZone(this.world));
+          camera.setZone(go as PlayZone);
+          break;
+        }
         case "QuestionBlock": {
           let coinType = QuestionBlockSpawnType.COIN;
           switch (objectData.properties["spawn_type"]) {

@@ -130,6 +130,9 @@ export class Player extends GameObject {
   private enterPipe = false;
   private beforeTeleportY = 0.0;
 
+  private dir = 1;
+  private skidding = false;
+
   private comboTimer = 0.0;
   private comboCounter = 0;
   private kickTimer = 0.0;
@@ -142,11 +145,24 @@ export class Player extends GameObject {
   private wasGrounded = false;
   private particleTimer = 0.0;
 
+  private outroStayTimer = 0.0;
+  private switchLevelTimer = 0.0;
+
   private animator : Animator = new Animator();
+
+  public kill(): void {
+    if (this.currentState == PlayerState.DEAD || this.currentState == PlayerState.POWER_UP || this.currentState == PlayerState.TELEPORT)  
+      return;
+    this.powerUp = PowerUpState.SMALL;
+    this.mesh.position.y = this.modelOffsetY;
+    this.transform.scale.set(1.0, 1.0, 1.0);
+    this.setCurrentState(PlayerState.DEAD);
+  }
 
   get currentState() {
     return this._currentState;
   }
+
   setCurrentState(state: PlayerState) {
     console.log("PLAYER: Transitioning to state", PlayerState[state]);
     switch (state) {
@@ -162,22 +178,19 @@ export class Player extends GameObject {
             return;
         if (this.invincibleTimer > 0)
             return;
-        this.camera.isFollowingTarget = false;
         if (this.powerUp != PowerUpState.SMALL)
         {
           state = (PlayerState.POWER_UP);
-          if (this.powerUp == PowerUpState.RACOON)
-              this.nextPowerUp = PowerUpState.BIG;
-          else    
-              this.nextPowerUp = PowerUpState.SMALL;
-          this.transform.position.y += 8.0;
+          this.nextPowerUp = PowerUpState.SMALL;
+          // this.transform.position.y += 8.0;
           this.powerUpStartTimer = POWER_UP_ANIMATION_TIME;
           this.world.timer.timescale = 0.0;
         }
         else 
         {
-            this.deadTimer = DEAD_STAY_TIME;
-            this.velocity = new THREE.Vector3(0, 0, 0);
+          this.camera.isFollowingTarget = false;
+          this.deadTimer = DEAD_STAY_TIME;
+          this.velocity = new THREE.Vector3(0, 0, 0);
         }
         break;
       }
@@ -188,6 +201,21 @@ export class Player extends GameObject {
         this.velocity.x = 0.0;
         break;
       }
+      case PlayerState.OUTRO: 
+      {
+          // CGame* const game = CGame::GetInstance();
+          // LPPLAYSCENE scene = dynamic_cast<LPPLAYSCENE>(game->GetCurrentScene());
+          // ASSERT(scene != NULL, "HEY");
+          // scene->SetStopTimer(true);
+          this.velocity.x = 0.0; 
+          this.velocity.y /= 2.0;
+          this.outroStayTimer = STAY_OUTRO_TIME;
+          // this.powerCounter = 0;
+          this.skidding = false;
+          this.kickTimer = 0.0;
+          this.dir = 1;
+          break;
+      }   
     }
     this._currentState = state;
   }
@@ -256,9 +284,11 @@ export class Player extends GameObject {
     this.inputVector.set(0, 0, 0);
     if (Global.input.isKeyDown(this.keyLeft)) {
       this.inputVector.x += -1;
+      this.dir = -1;
     }
     if (Global.input.isKeyDown(this.keyRight)) {
       this.inputVector.x += 1;
+      this.dir = 1;
     }
     if (Global.input.isKeyReleased(this.keyRun)) {
       this.runBeforeWalkTimer = RUN_TIME_BEFORE_WALK;
@@ -318,6 +348,7 @@ export class Player extends GameObject {
             else
             {
               console.log("Resetting level");
+              this.world.timer.timescale = 1.0;
               Global.sceneManager.resetScene();
             }
         }
@@ -331,6 +362,29 @@ export class Player extends GameObject {
         this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
 
         this.move();
+        break;
+      }
+      case PlayerState.OUTRO:
+      {
+        if (this.outroStayTimer > 0.0)
+        {
+            this.outroStayTimer -= fixedDeltaTime;
+            this.velocity.y = Math.min(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
+            
+            this.move();
+
+            this.switchLevelTimer = SWITCH_LEVEL_TIME;
+        }
+        else
+        {
+            if (this.switchLevelTimer > 0) this.switchLevelTimer -= fixedDeltaTime;
+            else
+            {
+              Global.sceneManager.resetScene();
+            }
+            this.velocity = new THREE.Vector3(MAXIMUM_WALK_SPEED, 0.0, 0.0);
+            this.transform.position.x += this.velocity.x * fixedDeltaTime;
+        }
         break;
       }
     }
@@ -382,11 +436,7 @@ export class Player extends GameObject {
       const scaleX = this.powerUp == PowerUpState.BIG ? this.bigScale : 1.0;
       
       let scale = this.transform.scale;
-      let velSign =  Math.sign(this.velocity.x);
-      if (velSign == 0)
-        velSign = Math.sign(scale.x);
-      if (velSign == 0)
-        velSign = 1;
+      let velSign =  Math.sign(this.dir);
       
       
       scale.x = lerp(Math.abs(scale.x), scaleX, 0.2);
@@ -444,7 +494,7 @@ export class Player extends GameObject {
         this.accel.x = Math.sign(this.accel.x) * MINIMUM_WALK_VELOCITY;
     }
 
-    let skidding = false;
+    this.skidding = false;
     if (this.accel.x === 0.0) {
       this.velocity.x = 
         moveTowards(this.velocity.x, 0, RELEASE_DECELERATION);
@@ -454,7 +504,7 @@ export class Player extends GameObject {
       this.velocity.x !== 0
     ) {
       if (this.isGrounded) 
-        skidding = true;
+        this.skidding = true;
       
       this.velocity.x = 
         moveTowards(this.velocity.x, 0, SKIDDING_DECELERATION);
@@ -531,8 +581,14 @@ export class Player extends GameObject {
       this.world.timer.timescale = 1.0;
       this.powerUp = this.nextPowerUp;
       this.setCurrentState(PlayerState.NORMAL);
-      this.mesh.position.y = this.modelOffsetY + (0.15);
-      this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
+      if (this.powerUp == PowerUpState.BIG) {
+        this.mesh.position.y = this.modelOffsetY + (0.15);
+        this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
+      }
+      else {
+        this.mesh.position.y = this.modelOffsetY;
+        this.transform.scale.set(1.0, 1.0, 1.0);
+      }
       // if (this.nextPowerUp != PowerUpState.SMALL) {
       //   this.transform.position.y += 1.0;
       // }

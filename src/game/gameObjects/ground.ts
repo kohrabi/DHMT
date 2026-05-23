@@ -20,7 +20,7 @@ export class Ground extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     const t = this.transform.clone();
     t.position.add(this.colliderOffset.multiply(this.transform.scale));
     const shape = PhysicsWorld.getBoxShape(

@@ -26,7 +26,7 @@ export class GroundOneWay extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     const shape = PhysicsWorld.getBoxShape(
       this.transform.clone().translateY(0.5),
       new THREE.Vector3(

@@ -53,6 +53,8 @@ export class InspectorPanel {
       this.refresh();
       return;
     }
+    if (world.gameScene.isLoading || !world.physics.world.colliders)
+      return;
 
     const gameObjects = [...world.gameObjects];
     this.stats.gameObjects = gameObjects.length;

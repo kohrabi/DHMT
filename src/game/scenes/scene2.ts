@@ -28,7 +28,7 @@ type LevelData = {
 
 export class Scene2 extends Scene {
   private controls?: OrbitControls;
-  private physicsHelper!: RapierHelper;
+  private physicsHelper?: RapierHelper;
   private controlsEnabled = false;
   private skyTexture?: THREE.Texture;
 
@@ -69,17 +69,19 @@ export class Scene2 extends Scene {
 
   public update(): void {
     super.update();
-    this.physicsHelper.update();
+    this.physicsHelper?.update();
   }
 
-  protected unloadContent(): void {
+  protected async unloadContent(): Promise<void> {
     if (this.skyTexture) {
       this.skyTexture.dispose();
       this.skyTexture = undefined;
       this.world.scene.background = null;
     }
 
-    super.unloadContent();
+    this.physicsHelper = undefined;
+
+    await super.unloadContent();
   }
 
   private buildSkyTexture(): THREE.Texture {

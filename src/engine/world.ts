@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { PhysicsWorld } from "./physicsWorld";
 import { GameObject } from "./gameObject";
 import { Scene } from "./scene";
+import { GameTimer } from "./gameTimer";
 
 /**
  * The unified runtime context for a scene.
@@ -19,7 +20,8 @@ export class World {
   readonly pendingRemovals: Set<GameObject> = new Set();
   readonly frustum = new THREE.Frustum();
   readonly projView = new THREE.Matrix4();
-  public readonly timer : THREE.Timer = new THREE.Timer();
+  public readonly timer : GameTimer = new GameTimer();
+  private physicsAccumulator = 0;
 
   constructor(readonly gameScene : Scene) {
     // Wire the physics fixed-step loop to drive component fixedUpdates.
@@ -32,10 +34,21 @@ export class World {
     return this._gameObjects;
   }
 
-  /** Add a GameObject and immediately attach its transform to the scene graph. */
+  /**
+   * Add a GameObject, attach its transform to the scene graph, and kick off
+   * its async start() in the background. Update/fixedUpdate will be skipped
+   * until isReady flips true.
+   */
   addGameObject(go: GameObject): GameObject {
     this._gameObjects.add(go);
     this.scene.add(go.transform);
+    // Fire-and-forget: start() may be async (model/physics loading).
+    // isReady gates update() calls so no logic runs on a half-built object.
+    go.start().then(() => {
+      go.isReady = true;
+    }).catch((err) => {
+      console.error(`[World] Error starting GameObject "${go.name}":`, err);
+    });
     return go;
   }
 
@@ -61,13 +74,23 @@ export class World {
 
   update(): void {
     this.timer.update();
-    const dt = this.timer.getDelta();
+
+    if (this.timer.timescale === 0) {
+      this.physics.fixedStep(0);
+    } else {
+      this.physicsAccumulator += this.timer.delta;
+      const fixedDt = 1 / 60;
+      while (this.physicsAccumulator >= fixedDt) {
+        this.physicsAccumulator -= fixedDt;
+        this.physics.step(fixedDt);
+      }
+    }
+
+    const dt = this.timer.delta;
 
     for (const go of this._gameObjects) {
-      if (!go.started) {
-        go.start();
-        go.started = true;
-      }
+      // Skip objects still loading (async start() hasn't resolved yet).
+      if (!go.isReady) continue;
       go.update(dt);
     }
 
@@ -82,6 +105,8 @@ export class World {
 
   fixedUpdate(fdt: number): void {
     for (const go of this._gameObjects) {
+      // Skip objects still loading.
+      if (!go.isReady) continue;
       go.fixedUpdate(fdt);
     }
   }

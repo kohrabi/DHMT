@@ -8,7 +8,7 @@ import { Player } from './player';
 import { thickness } from 'three/tsl';
 
 
-const COIN_KILL_TIME = 1
+const COIN_KILL_TIME = 0.5
 const COIN_INIT_Y_VEL = 0x07A00 * SUBSUBSUBPIXEL_DELTA_TIME;
 const COIN_Y_DESTROY = 0x02000 * SUBSUBSUBPIXEL;
 
@@ -38,7 +38,7 @@ export class Coin extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     
     this.originalY = this.transform.position.y;
 
@@ -68,7 +68,7 @@ export class Coin extends GameObject {
       }
       this.transform.rotateY(0.1);
       this.transform.position.y = this.originalY + 
-        Math.sin(Global.timer.getElapsed() * 5 + this.transform.position.x) * 0.1;
+        Math.sin(this.world.timer.elapsed * 5 + this.transform.position.x) * 0.1;
       
       this.world.physics.world.intersectionsWithShape(
         this.collider.translation(), 
@@ -86,7 +86,9 @@ export class Coin extends GameObject {
     else {
       this.transform.rotateY(0.25);
       console.log("Coin velocity:", this.velocity.y);
-      this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL * 8.0, -OBJECT_MAX_FALL * 8.0);
+      const something = 20.0;
+      this.velocity.y = 
+        Math.max(this.velocity.y - OBJECT_FALL * something, -OBJECT_MAX_FALL * something);
       this.transform.position.y += this.velocity.y * fixedDeltaTime;
 
       if (this.killTimer > 0) this.killTimer -= fixedDeltaTime;
@@ -102,7 +104,7 @@ export class Coin extends GameObject {
     switch (state) {
       case CoinState.INTRO:
       {
-        this.velocity.y = COIN_INIT_Y_VEL * 3;
+        this.velocity.y = COIN_INIT_Y_VEL * 10;
         this.killTimer = COIN_KILL_TIME;
         this.world.physics.addDeferedCall(() => {
           this.collider.setEnabled(false);

@@ -9,13 +9,11 @@ Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);
 document.getElementById("webgl")!.appendChild(Global.renderer.domElement);
 
-Global.sceneManager.setScene(new MainMenu());
+await Global.sceneManager.setScene(new MainMenu());
 
 Global.renderer.setAnimationLoop(animate);
 
 function animate() {
-  Global.timer.update();
-  const deltaTime = Global.timer.getDelta();
   Global.sceneManager.update();
   Global.sceneManager.draw(Global.renderer);
   Global.inspector.update(Global.sceneManager.currentScene?.world);

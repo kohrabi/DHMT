@@ -8,8 +8,8 @@ import { Koopa } from './koopa';
 import { Coin, CoinState } from './coin';
 import { Mushroom } from './mushroom';
 
-const QUESTION_BLOCK_ANIMATION_TIME = 0.5;
-const QUESTION_BLOCK_ANIMATION_Y_VEL = 1;
+const QUESTION_BLOCK_ANIMATION_TIME = 0.2;
+const QUESTION_BLOCK_ANIMATION_Y_VEL = 2;
 export enum QuestionBlockSpawnType {
   COIN,
   LEAF,
@@ -38,7 +38,7 @@ export class QuestionBlock extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     this.transform.position.y += 0.5;
 
     const shape = 

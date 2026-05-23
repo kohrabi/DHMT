@@ -56,8 +56,8 @@ export class MainMenu extends Scene {
     if (ui) ui.remove();
   }
 
-  public deactivate(): void {
-    super.deactivate();
+  public async deactivate(): Promise<void> {
+    await super.deactivate();
 
     this.cleanupUI();
   }

@@ -152,7 +152,7 @@ export class Player extends GameObject {
     switch (state) {
       case PlayerState.POWER_UP:
       {
-        // this.world.timer.setTimescale(0.0);
+        this.world.timer.timescale = 0.0;
         this.powerUpStartTimer = POWER_UP_ANIMATION_TIME
         break;
       }
@@ -171,14 +171,14 @@ export class Player extends GameObject {
           else    
               this.nextPowerUp = PowerUpState.SMALL;
           this.transform.position.y += 8.0;
-          this.powerUpStartTimer = this.world.timer.getElapsed();
+          this.powerUpStartTimer = POWER_UP_ANIMATION_TIME;
+          this.world.timer.timescale = 0.0;
         }
         else 
         {
             this.deadTimer = DEAD_STAY_TIME;
             this.velocity = new THREE.Vector3(0, 0, 0);
         }
-        // this.world.timer.setTimescale(0.0);
         break;
       }
       case PlayerState.TELEPORT:
@@ -214,7 +214,7 @@ export class Player extends GameObject {
   }
 
   public async start(): Promise<void> {
-    super.start();
+    await super.start();
 
     const { controller, collider } = this.world.physics.createCharacterController(
       this,
@@ -268,6 +268,9 @@ export class Player extends GameObject {
     if (Global.input.isKeyPressed(this.keyJump)) {
       this.jumped = true;
     }
+    if (Global.input.isKeyDown("KeyI")) {
+      this.world.timer.timescale = 0.5;
+    }
     this.animator.update(deltaTime);
   }
 
@@ -288,7 +291,7 @@ export class Player extends GameObject {
       case PlayerState.POWER_UP: this._powerupUpdate(fixedDeltaTime); break;
       case PlayerState.DEAD: 
       {
-        const unscaledDt = Global.timer.getDelta();
+        const unscaledDt = this.world.timer.unscaledDelta;
         if (this.deadTimer > 0) this.deadTimer -= unscaledDt;
         else
         {
@@ -343,8 +346,7 @@ export class Player extends GameObject {
   private animationCode(fixedDeltaTime: number): void {
     if (this.currentState == PlayerState.POWER_UP) {
       const blink = 0.1;
-      console.log("Power up animation", this.world.timer.getElapsed(), this.powerUpStartTimer, blink);
-      if (Global.timer.getElapsed() % blink < blink / this.bigScale) {
+      if (this.world.timer.unscaledElapsed % blink < blink / this.bigScale) {
         this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
         this.mesh.position.y = this.modelOffsetY + (0.15);
       }
@@ -523,10 +525,10 @@ export class Player extends GameObject {
 
   private _powerupUpdate(fixedDeltaTime: number): void {
     
-    this.powerUpStartTimer -= fixedDeltaTime;
+    this.powerUpStartTimer -= this.world.timer.unscaledDelta;
     if (this.powerUpStartTimer <= 0)
     {
-      // this.world.timer.setTimescale(1.0);
+      this.world.timer.timescale = 1.0;
       this.powerUp = this.nextPowerUp;
       this.setCurrentState(PlayerState.NORMAL);
       this.mesh.position.y = this.modelOffsetY + (0.15);

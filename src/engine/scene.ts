@@ -38,6 +38,8 @@ export abstract class Scene {
 
   private initialized = false;
   private contentLoaded = false;
+  /** True while loadContent() is still in flight. The game loop checks this to skip updates. */
+  public isLoading = false;
 
   protected constructor(name: string) {
     this.name = name;
@@ -47,9 +49,9 @@ export abstract class Scene {
 
   protected initialize(): void {}
 
-  protected loadContent(): void {}
+  protected async loadContent(): Promise<void> {}
 
-  protected unloadContent(): void {
+  protected async unloadContent(): Promise<void> {
     this.world.dispose();
     this.content.clear();
   }
@@ -91,29 +93,35 @@ export abstract class Scene {
 
   // ─── SceneManager interface ───────────────────────────────────────────────
 
-  activate(): void {
+  async activate(): Promise<void> {
     if (!this.initialized) {
       this.initialize();
       this.initialized = true;
     }
 
     if (!this.contentLoaded) {
-      this.loadContent();
+      this.isLoading = true;
+      try {
+        await this.loadContent();
+      } finally {
+        this.isLoading = false;
+      }
       this.contentLoaded = true;
     }
   }
 
-  deactivate(): void {
+  async deactivate(): Promise<void> {
     if (!this.contentLoaded) {
       return;
     }
 
-    this.unloadContent();
+    await this.unloadContent();
     this.contentLoaded = false;
   }
 
   // Use World timer
   update(): void {
+    if (this.isLoading) return;
     this.world.update();
   }
 

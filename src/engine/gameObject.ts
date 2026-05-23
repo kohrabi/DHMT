@@ -12,7 +12,10 @@ export abstract class GameObject {
    *   this.gameObject.world.physics  → PhysicsWorld
    */
   readonly world: World;
+  /** True once the object has been added to the world (used by onDestroy guard). */
   public started = false;
+  /** True once the async start() promise has resolved and the object is fully initialised. */
+  public isReady = false;
   protected isActive = true;
 
   constructor(
@@ -26,9 +29,7 @@ export abstract class GameObject {
     this.transform.name = name;
   }
 
-
-  // async loadContent(): Promise<void> { return Promise.resolve(); }
-  start(): void {
+  async start(): Promise<void> {
     if (this.started) {
       return;
     }

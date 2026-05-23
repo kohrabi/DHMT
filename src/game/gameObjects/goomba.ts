@@ -55,7 +55,7 @@ export class Goomba extends GameObject {
   }
 
   public async start(): Promise<void> {
-    super.start();
+    await super.start();
     const { controller, collider } = this.world.physics.createCharacterController(
       this,
       new THREE.BoxGeometry(0.5, this.shapeHeight, 0.5)

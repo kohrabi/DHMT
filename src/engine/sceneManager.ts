@@ -8,32 +8,32 @@ export class SceneManager {
     return this.active;
   }
 
-  setScene(nextScene: Scene): void {
+  async setScene(nextScene: Scene): Promise<void> {
     if (this.active === nextScene) {
       return;
     }
 
     if (this.active) {
-      this.active.deactivate();
+      await this.active.deactivate();
     }
 
     this.active = nextScene;
-    this.active.activate();
+    await this.active.activate();
   }
 
   /**
    * Tear down the current scene and create a fresh instance of the same type.
    * This gives a completely clean reset (new World, PhysicsWorld, GameObjects).
    */
-  resetScene(): void {
+  async resetScene(): Promise<void> {
     if (!this.active) return;
 
     const SceneClass = this.active.constructor as new () => Scene;
-    this.setScene(new SceneClass());
+    await this.setScene(new SceneClass());
   }
 
   update(): void {
-    // Use Scene own timer.
+    // Use Scene's own timer.
     this.active?.update();
   }
 

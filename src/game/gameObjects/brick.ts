@@ -16,7 +16,7 @@ export class Brick extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     this.transform.translateY(0.5);
     const model = await this.world.gameScene.content.loadGLTF(
       "assets/platformer/brick.glb",

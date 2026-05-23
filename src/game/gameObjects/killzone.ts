@@ -16,8 +16,8 @@ export class KillZone extends GameObject {
     );
   }
 
-  public start(): void {
-    super.start();
+  public async start(): Promise<void> {
+    await super.start();
     this.collider = this.world.physics.world.createCollider(
       PhysicsWorld.getBoxShape(
         this.transform,

@@ -81,7 +81,7 @@ export class Koopa extends GameObject {
   }
 
   public async start(): Promise<void> {
-    super.start();
+    await super.start();
     const { controller, collider } = this.world.physics.createCharacterController(
       this,
       this.shape
@@ -378,6 +378,7 @@ export class Koopa extends GameObject {
     else if (go instanceof Brick) {
       if (Math.abs(collision.normal1.x) > 0.5) {
         go.onHit();
+        this.dir *= -1;
       }
     }
     else if (go instanceof QuestionBlock) {

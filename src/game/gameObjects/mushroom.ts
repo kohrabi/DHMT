@@ -11,7 +11,7 @@ import { Player } from './player';
 
 
 const MUSHROOM_X_SPEED = 0x01000 * SUBSUBSUBPIXEL_DELTA_TIME
-const MUSHROOM_INTRO_Y_VELOCITY = 0.25  ;
+const MUSHROOM_INTRO_Y_VELOCITY = 1.5;
 
 enum State {
   NORMAL,
@@ -55,10 +55,10 @@ export class Mushroom extends GameObject {
   }
 
   async start() : Promise<void> {
-    super.start();
+    await super.start();
     
     console.log("Starting mushroom at", this.transform.position);
-    this.maxYPos = this.transform.position.y + 1.1;
+    this.maxYPos = this.transform.position.y + 0.9;
     const { controller, collider } = this.world.physics.createCharacterController(
       this,
       new THREE.BoxGeometry(0.25 * this.transform.scale.x, this.shapeHeight * this.transform.scale.y, 0.25 * this.transform.scale.z)
@@ -82,9 +82,6 @@ export class Mushroom extends GameObject {
   }
 
   fixedUpdate(fixedDeltaTime: number): void {
-    if (this.started === false) {
-      return;
-    }
     if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
       return;
     }

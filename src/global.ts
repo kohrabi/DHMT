@@ -5,7 +5,6 @@ import { SceneManager } from "./engine/sceneManager";
 import { Coin } from "./game/gameObjects/coin";
 import { InspectorPanel } from "./engine/inspector";
 
-export const timer = new THREE.Timer();
 export const input = new InputManager();
 export const sceneManager = new SceneManager();
 export const contentManager = ContentManager.global;

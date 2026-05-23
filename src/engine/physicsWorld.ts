@@ -15,14 +15,11 @@ export class PhysicsWorld {
   readonly _vector = new THREE.Vector3();
   readonly _quaternion = new THREE.Quaternion();
   readonly _matrix = new THREE.Matrix4();
-  readonly timer = new THREE.Timer();
   readonly eventQueue: RAPIER.EventQueue = new RAPIER.EventQueue(true);
   readonly containPairs : Map<number, number> = new Map();
   readonly pendingRemovals: Set<RAPIER.Collider> = new Set();
   private readonly controllers: Set<RAPIER.KinematicCharacterController> = new Set();
   private deferedCalls: (() => void)[] = [];
-
-  private intervalId: ReturnType<typeof setInterval> | null = null;
 
   public onFixedStep?: (fdt: number) => void;
   /** Fired when two NON-sensor colliders start/stop touching. */
@@ -30,16 +27,7 @@ export class PhysicsWorld {
   /** Fired when a SENSOR collider overlaps with any other collider. */
   public onIntersection?: (go1: GameObject, go2: GameObject, intersecting: boolean) => void;
 
-  constructor() {
-    this.intervalId = setInterval(() => this.step(), 1000 / frameRate);
-  }
-
   public dispose() {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
-
     // clear tracked meshes
     // this.meshes.length = 0;
 
@@ -47,28 +35,19 @@ export class PhysicsWorld {
     this.world.free?.();
   }
 
-  step() {
+  step(fdt: number) {
     for (const fn of this.deferedCalls) {
       fn();
     }
     this.deferedCalls.length = 0;
-    this.timer.update();
     
-    this.world.timestep = this.timer.getDelta();
+    this.world.timestep = fdt;
     this.world.step();
     
     this.containPairs.clear();
     
-    // Solid vs solid contacts
-    // this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-    //   this.containPairs.set(handle1, handle2);
-    //   console.log("Collision event:", handle1, handle2, started);
-    // });
-      
-      
     try {
-      // console.log("Colliders", this.world.colliders.len());
-      this.onFixedStep?.(frameRate / 1000);
+      this.onFixedStep?.(fdt);
     } catch (error) {
       console.error("Error during physics step:", error);
     }
@@ -81,6 +60,15 @@ export class PhysicsWorld {
       this.pendingRemovals.clear();
     } catch (error) {
       console.error("Error during collider removal:", error);
+    }
+  }
+
+  /** Called when timescale = 0 to fire unscaled updates without advancing physics */
+  fixedStep(fdt: number) {
+    try {
+      this.onFixedStep?.(fdt);
+    } catch (error) {
+      console.error("Error during fixed step:", error);
     }
   }
 

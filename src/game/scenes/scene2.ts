@@ -14,6 +14,7 @@ import { Koopa } from "../gameObjects/koopa";
 import { QuestionBlock, QuestionBlockSpawnType } from "../gameObjects/questionBlock";
 import { KillZone } from "../gameObjects/killzone";
 import { PlayZone } from "../gameObjects/playzone";
+import { LevelEnd } from "../gameObjects/levelEnd";
 
 type LevelObject = {
   model_path: string;
@@ -213,6 +214,10 @@ export class Scene2 extends Scene {
           go = this.addGameObject(new Brick(this.world));
           break;
         }
+        case "LevelEnd": {
+          go = this.addGameObject(new LevelEnd(this.world));
+          break;
+        }
         case "KillZone": {
           go = this.addGameObject(new KillZone(this.world));
           break;
@@ -268,8 +273,8 @@ export class Scene2 extends Scene {
       // But somehow the rotation is correct
       go.transform.rotation.set(
         objectData.rotation[0],
-        objectData.rotation[1],
         objectData.rotation[2],
+        -objectData.rotation[1],
       );
       go.transform.scale.set(
         objectData.scale[0],

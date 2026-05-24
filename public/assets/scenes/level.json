@@ -539,7 +539,7 @@
     "body-mesh.003": {
       "name": "body-mesh.003",
       "position": [
-        5.0,
+        2.0,
         0.0,
         0.0
       ],
@@ -3454,6 +3454,48 @@
       ],
       "model_path": "null",
       "object_type": "PlayZone",
+      "properties": {}
+    },
+    "star": {
+      "name": "star",
+      "position": [
+        170.0,
+        0.0,
+        3.0
+      ],
+      "scale": [
+        4.0,
+        4.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/star.glb",
+      "object_type": "LevelEnd",
+      "properties": {}
+    },
+    "rocks.007": {
+      "name": "rocks.007",
+      "position": [
+        207.0,
+        53.0,
+        -18.0
+      ],
+      "scale": [
+        200.0,
+        200.0,
+        200.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        2.6179938316345215
+      ],
+      "model_path": "assets/platformer/rocks.glb",
+      "object_type": "",
       "properties": {}
     }
   }

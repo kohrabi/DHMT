@@ -2,17 +2,14 @@ import { clampf, GameObject, lerp, moveTowards, PhysicsWorld, World } from "@/en
 import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
-import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { Coin } from "./coin";
 import { Brick } from "./brick";
 import { GroundOneWay } from "./oneway";
 import { MAX_DELTA_TIME, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
-import { instance } from "three/tsl";
 import { Goomba } from "./goomba";
 import { Animator } from "@/engine/animator";
 import { Koopa } from "./koopa";
 import { QuestionBlock } from "./questionBlock";
-import { Mushroom } from "./mushroom";
 import { spawnJumpingParticles, spawnLandingParticles, spawnRunningParticles, spawnWalkingParticles } from "./playerParticles";
 import { Camera } from "./camera";
 
@@ -150,8 +147,15 @@ export class Player extends GameObject {
 
   private animator : Animator = new Animator();
 
+  public endLevel(): void {
+    this.setCurrentState(PlayerState.OUTRO);
+  }
+
   public kill(): void {
-    if (this.currentState == PlayerState.DEAD || this.currentState == PlayerState.POWER_UP || this.currentState == PlayerState.TELEPORT)  
+    if (this.currentState == PlayerState.DEAD || 
+      this.currentState == PlayerState.POWER_UP || 
+      this.currentState == PlayerState.TELEPORT ||
+      this.currentState == PlayerState.OUTRO) 
       return;
     this.powerUp = PowerUpState.SMALL;
     this.mesh.position.y = this.modelOffsetY;
@@ -281,6 +285,10 @@ export class Player extends GameObject {
   }
 
   public update(deltaTime: number): void {
+    if (this.currentState == PlayerState.DEAD || this.currentState == PlayerState.OUTRO) {
+      this.animator.update(deltaTime);
+      return;
+    }
     this.inputVector.set(0, 0, 0);
     if (Global.input.isKeyDown(this.keyLeft)) {
       this.inputVector.x += -1;
@@ -369,7 +377,7 @@ export class Player extends GameObject {
         if (this.outroStayTimer > 0.0)
         {
             this.outroStayTimer -= fixedDeltaTime;
-            this.velocity.y = Math.min(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
+            this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
             
             this.move();
 
@@ -383,7 +391,7 @@ export class Player extends GameObject {
               Global.sceneManager.resetScene();
             }
             this.velocity = new THREE.Vector3(MAXIMUM_WALK_SPEED, 0.0, 0.0);
-            this.transform.position.x += this.velocity.x * fixedDeltaTime;
+            this.move();
         }
         break;
       }

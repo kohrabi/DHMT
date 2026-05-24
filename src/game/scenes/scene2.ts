@@ -30,9 +30,7 @@ type LevelData = {
 };
 
 export class Scene2 extends Scene {
-  private controls?: OrbitControls;
-  private physicsHelper?: RapierHelper;
-  private controlsEnabled = false;
+  // private physicsHelper?: RapierHelper;
   private skyTexture?: THREE.Texture;
 
   public constructor() {
@@ -54,11 +52,11 @@ export class Scene2 extends Scene {
     this.world.scene.add(skyLight);
 
     // Ignore this warning.
-    this.physicsHelper = new RapierHelper(this.world.physics.world);
-    this.world.scene.add(this.physicsHelper);
+    // this.physicsHelper = new RapierHelper(this.world.physics.world);
+    // this.world.scene.add(this.physicsHelper);
 
-    this.scene3D.add(new THREE.AxesHelper(1));
-    this.scene3D.add(new THREE.GridHelper(10, 10));
+    // this.scene3D.add(new THREE.AxesHelper(1));
+    // this.scene3D.add(new THREE.GridHelper(10, 10));
 
     try {
       const levelData = await this.contentManager.loadJSON<LevelData>(
@@ -72,7 +70,7 @@ export class Scene2 extends Scene {
 
   public update(): void {
     super.update();
-    this.physicsHelper?.update();
+    // this.physicsHelper?.update();
   }
 
   protected async unloadContent(): Promise<void> {
@@ -82,7 +80,7 @@ export class Scene2 extends Scene {
       this.world.scene.background = null;
     }
 
-    this.physicsHelper = undefined;
+    // this.physicsHelper = undefined;
 
     await super.unloadContent();
   }

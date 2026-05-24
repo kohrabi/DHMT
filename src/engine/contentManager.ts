@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Font, FontLoader } from 'three/addons/loaders/FontLoader.js';
+
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -17,11 +19,13 @@ export class ContentManager {
   private readonly loadingManager = new THREE.LoadingManager();
   private readonly gltfLoader = new GLTFLoader(this.loadingManager);
   private readonly textureLoader = new THREE.TextureLoader(this.loadingManager);
+  private readonly fontLoader = new FontLoader(this.loadingManager);
 
   private readonly textureCache = new Map<string, THREE.Texture>();
   private readonly gltfCache = new Map<string, GLTF>();
   private readonly jsonCache = new Map<string, unknown>();
   private readonly textCache = new Map<string, string>();
+  private readonly fontCache = new Map<string, Font>();
 
   constructor(callbacks?: LoadingCallbacks) {
     this.setLoadingCallbacks(callbacks);
@@ -73,6 +77,19 @@ export class ContentManager {
     }
 
     return pending as Promise<T>;
+  }
+
+  async loadFont(path: string): Promise<Font> {
+    const normalizedPath = this.normalizePath(path);
+    const key = `FONT:${normalizedPath}`;
+
+    let pending = this.fontCache.get(key);
+    if (!pending) {
+      pending = await this.fontLoader.loadAsync(normalizedPath);
+      this.fontCache.set(key, pending);
+    }
+
+    return pending;
   }
 
   async loadText(path: string, method: HttpMethod = "GET"): Promise<string> {

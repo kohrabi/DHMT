@@ -413,9 +413,9 @@
     "hedge": {
       "name": "hedge",
       "position": [
-        2.0569474697113037,
-        -7.440706253051758,
-        0.7821891903877258
+        84.0,
+        1.0,
+        0.0
       ],
       "scale": [
         1.0,
@@ -434,9 +434,9 @@
     "hedge.001": {
       "name": "hedge.001",
       "position": [
-        3.0569474697113037,
-        -7.440706253051758,
-        0.7821891903877258
+        85.0,
+        1.0,
+        0.0
       ],
       "scale": [
         1.0,
@@ -455,9 +455,9 @@
     "flowers-tall.001": {
       "name": "flowers-tall.001",
       "position": [
-        2.193854570388794,
-        -7.533906936645508,
-        0.9774227142333984
+        84.0,
+        0.0,
+        0.0
       ],
       "scale": [
         1.0,
@@ -476,9 +476,9 @@
     "grass": {
       "name": "grass",
       "position": [
-        3.4516823291778564,
-        -7.255410194396973,
-        1.0960607528686523
+        86.0,
+        -2.0,
+        0.0
       ],
       "scale": [
         1.0,
@@ -497,9 +497,9 @@
     "tree-pine.003": {
       "name": "tree-pine.003",
       "position": [
-        5.0,
-        -7.0,
-        1.0
+        86.0,
+        1.0,
+        0.0
       ],
       "scale": [
         1.0,
@@ -2331,7 +2331,7 @@
     "platform-overhang.008": {
       "name": "platform-overhang.008",
       "position": [
-        138.0,
+        139.0,
         0.0,
         1.5
       ],
@@ -2358,9 +2358,9 @@
     "platform-overhang.010": {
       "name": "platform-overhang.010",
       "position": [
-        140.0,
+        141.0,
         0.0,
-        6.5
+        5.5
       ],
       "scale": [
         4.0,
@@ -3145,8 +3145,8 @@
       "name": "block-grass-curve-low",
       "position": [
         -15.103482246398926,
-        88.0,
-        -18.213115692138672
+        56.0,
+        -16.213115692138672
       ],
       "scale": [
         50.0,
@@ -3166,13 +3166,13 @@
       "name": "block-grass-curve-low.001",
       "position": [
         72.71366882324219,
-        88.0,
-        -13.341699600219727
+        56.0,
+        -20.341699600219727
       ],
       "scale": [
         50.0,
         50.0,
-        50.0
+        70.0
       ],
       "rotation": [
         0.0,
@@ -3187,8 +3187,8 @@
       "name": "block-grass-curve-low.002",
       "position": [
         130.70098876953125,
-        88.0,
-        -19.23871612548828
+        56.0,
+        -17.23871612548828
       ],
       "scale": [
         50.0,
@@ -3249,7 +3249,7 @@
     "tree-pine.012": {
       "name": "tree-pine.012",
       "position": [
-        92.0,
+        98.0,
         1.0,
         0.0
       ],
@@ -3333,7 +3333,7 @@
     "rocks.003": {
       "name": "rocks.003",
       "position": [
-        93.0,
+        92.0,
         2.0,
         0.0
       ],
@@ -3354,9 +3354,9 @@
     "rocks.004": {
       "name": "rocks.004",
       "position": [
-        -83.0,
-        228.0,
-        -17.0
+        -90.0,
+        191.0,
+        -31.0
       ],
       "scale": [
         200.0,
@@ -3375,9 +3375,9 @@
     "rocks.005": {
       "name": "rocks.005",
       "position": [
-        47.0,
-        221.0,
-        -16.0
+        25.0,
+        184.0,
+        -25.0
       ],
       "scale": [
         200.0,
@@ -3396,9 +3396,9 @@
     "rocks.006": {
       "name": "rocks.006",
       "position": [
-        155.0,
-        264.0,
-        -53.0
+        124.0,
+        187.0,
+        -31.0
       ],
       "scale": [
         200.0,
@@ -3482,7 +3482,7 @@
       "position": [
         207.0,
         53.0,
-        -18.0
+        -23.0
       ],
       "scale": [
         200.0,
@@ -3495,6 +3495,2259 @@
         2.6179938316345215
       ],
       "model_path": "assets/platformer/rocks.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.006": {
+      "name": "flowers.006",
+      "position": [
+        83.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.004": {
+      "name": "flowers-tall.004",
+      "position": [
+        77.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.007": {
+      "name": "flowers.007",
+      "position": [
+        91.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.001": {
+      "name": "grass.001",
+      "position": [
+        79.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.002": {
+      "name": "grass.002",
+      "position": [
+        90.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.003": {
+      "name": "grass.003",
+      "position": [
+        81.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.004": {
+      "name": "grass.004",
+      "position": [
+        76.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.002": {
+      "name": "hedge.002",
+      "position": [
+        98.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.003": {
+      "name": "hedge.003",
+      "position": [
+        118.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.004": {
+      "name": "hedge.004",
+      "position": [
+        119.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.005": {
+      "name": "flowers-tall.005",
+      "position": [
+        119.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.005": {
+      "name": "grass.005",
+      "position": [
+        120.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.014": {
+      "name": "tree-pine.014",
+      "position": [
+        120.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.015": {
+      "name": "tree-pine.015",
+      "position": [
+        110.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.016": {
+      "name": "tree-pine.016",
+      "position": [
+        112.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.017": {
+      "name": "tree-pine.017",
+      "position": [
+        116.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.008": {
+      "name": "tree.008",
+      "position": [
+        121.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.009": {
+      "name": "tree.009",
+      "position": [
+        108.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.008": {
+      "name": "flowers.008",
+      "position": [
+        115.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.006": {
+      "name": "flowers-tall.006",
+      "position": [
+        111.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.009": {
+      "name": "flowers.009",
+      "position": [
+        125.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.006": {
+      "name": "grass.006",
+      "position": [
+        109.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.007": {
+      "name": "grass.007",
+      "position": [
+        124.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.008": {
+      "name": "grass.008",
+      "position": [
+        115.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.009": {
+      "name": "grass.009",
+      "position": [
+        110.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.005": {
+      "name": "hedge.005",
+      "position": [
+        159.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.006": {
+      "name": "hedge.006",
+      "position": [
+        160.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.007": {
+      "name": "flowers-tall.007",
+      "position": [
+        159.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.010": {
+      "name": "grass.010",
+      "position": [
+        161.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.018": {
+      "name": "tree-pine.018",
+      "position": [
+        161.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "platform-overhang.011": {
+      "name": "platform-overhang.011",
+      "position": [
+        157.0,
+        0.0,
+        1.5
+      ],
+      "scale": [
+        7.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/platform-overhang.glb",
+      "object_type": "OneWay",
+      "properties": {
+        "collider_offset": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "tree-pine.019": {
+      "name": "tree-pine.019",
+      "position": [
+        153.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.020": {
+      "name": "tree-pine.020",
+      "position": [
+        157.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.010": {
+      "name": "tree.010",
+      "position": [
+        165.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.011": {
+      "name": "tree.011",
+      "position": [
+        149.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.010": {
+      "name": "flowers.010",
+      "position": [
+        156.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.008": {
+      "name": "flowers-tall.008",
+      "position": [
+        152.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.011": {
+      "name": "flowers.011",
+      "position": [
+        166.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.011": {
+      "name": "grass.011",
+      "position": [
+        154.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.012": {
+      "name": "grass.012",
+      "position": [
+        165.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.013": {
+      "name": "grass.013",
+      "position": [
+        156.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.014": {
+      "name": "grass.014",
+      "position": [
+        151.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.021": {
+      "name": "tree-pine.021",
+      "position": [
+        138.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.008": {
+      "name": "fence-straight.008",
+      "position": [
+        137.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.009": {
+      "name": "fence-straight.009",
+      "position": [
+        138.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.010": {
+      "name": "fence-straight.010",
+      "position": [
+        139.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.011": {
+      "name": "fence-straight.011",
+      "position": [
+        140.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.007": {
+      "name": "hedge.007",
+      "position": [
+        134.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.008": {
+      "name": "hedge.008",
+      "position": [
+        135.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.012": {
+      "name": "flowers.012",
+      "position": [
+        136.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.009": {
+      "name": "flowers-tall.009",
+      "position": [
+        131.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.015": {
+      "name": "grass.015",
+      "position": [
+        137.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.016": {
+      "name": "grass.016",
+      "position": [
+        139.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.017": {
+      "name": "grass.017",
+      "position": [
+        134.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.009": {
+      "name": "hedge.009",
+      "position": [
+        120.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.010": {
+      "name": "hedge.010",
+      "position": [
+        121.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "arrow": {
+      "name": "arrow",
+      "position": [
+        66.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/arrow.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.010": {
+      "name": "flowers-tall.010",
+      "position": [
+        54.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.018": {
+      "name": "grass.018",
+      "position": [
+        56.0,
+        -2.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.013": {
+      "name": "flowers.013",
+      "position": [
+        51.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.011": {
+      "name": "flowers-tall.011",
+      "position": [
+        47.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.014": {
+      "name": "flowers.014",
+      "position": [
+        61.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.019": {
+      "name": "grass.019",
+      "position": [
+        49.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.020": {
+      "name": "grass.020",
+      "position": [
+        60.0,
+        -2.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.021": {
+      "name": "grass.021",
+      "position": [
+        51.0,
+        -2.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.022": {
+      "name": "grass.022",
+      "position": [
+        46.0,
+        -2.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.012": {
+      "name": "flowers-tall.012",
+      "position": [
+        56.0,
+        -2.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.023": {
+      "name": "grass.023",
+      "position": [
+        59.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.024": {
+      "name": "grass.024",
+      "position": [
+        63.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant.007": {
+      "name": "plant.007",
+      "position": [
+        21.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "plant.008": {
+      "name": "plant.008",
+      "position": [
+        11.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/plant.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.025": {
+      "name": "grass.025",
+      "position": [
+        10.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.026": {
+      "name": "grass.026",
+      "position": [
+        21.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.027": {
+      "name": "grass.027",
+      "position": [
+        12.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.028": {
+      "name": "grass.028",
+      "position": [
+        7.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.029": {
+      "name": "grass.029",
+      "position": [
+        20.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "grass.030": {
+      "name": "grass.030",
+      "position": [
+        24.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/grass.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers.015": {
+      "name": "flowers.015",
+      "position": [
+        18.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.013": {
+      "name": "flowers-tall.013",
+      "position": [
+        26.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.014": {
+      "name": "flowers-tall.014",
+      "position": [
+        29.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "flowers-tall.015": {
+      "name": "flowers-tall.015",
+      "position": [
+        22.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/flowers-tall.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.012": {
+      "name": "fence-straight.012",
+      "position": [
+        43.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.013": {
+      "name": "fence-straight.013",
+      "position": [
+        44.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.014": {
+      "name": "fence-straight.014",
+      "position": [
+        45.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "fence-straight.015": {
+      "name": "fence-straight.015",
+      "position": [
+        46.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/fence-straight.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.011": {
+      "name": "hedge.011",
+      "position": [
+        78.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.012": {
+      "name": "hedge.012",
+      "position": [
+        79.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.013": {
+      "name": "hedge.013",
+      "position": [
+        59.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.014": {
+      "name": "hedge.014",
+      "position": [
+        60.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.015": {
+      "name": "hedge.015",
+      "position": [
+        61.0,
+        -1.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.016": {
+      "name": "hedge.016",
+      "position": [
+        107.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.017": {
+      "name": "hedge.017",
+      "position": [
+        108.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "hedge.018": {
+      "name": "hedge.018",
+      "position": [
+        109.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/hedge.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.012": {
+      "name": "tree.012",
+      "position": [
+        100.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.013": {
+      "name": "tree.013",
+      "position": [
+        101.0,
+        -1.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.022": {
+      "name": "tree-pine.022",
+      "position": [
+        163.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree-pine.023": {
+      "name": "tree-pine.023",
+      "position": [
+        167.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree-pine.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "tree.014": {
+      "name": "tree.014",
+      "position": [
+        159.0,
+        -2.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/tree.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones": {
+      "name": "stones",
+      "position": [
+        37.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.001": {
+      "name": "stones.001",
+      "position": [
+        36.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.002": {
+      "name": "stones.002",
+      "position": [
+        65.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.003": {
+      "name": "stones.003",
+      "position": [
+        64.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.004": {
+      "name": "stones.004",
+      "position": [
+        89.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.005": {
+      "name": "stones.005",
+      "position": [
+        81.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.006": {
+      "name": "stones.006",
+      "position": [
+        97.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.007": {
+      "name": "stones.007",
+      "position": [
+        108.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
+      "object_type": "",
+      "properties": {}
+    },
+    "stones.008": {
+      "name": "stones.008",
+      "position": [
+        132.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_path": "assets/platformer/stones.glb",
       "object_type": "",
       "properties": {}
     }

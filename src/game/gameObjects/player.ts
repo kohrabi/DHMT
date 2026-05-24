@@ -12,6 +12,7 @@ import { Koopa } from "./koopa";
 import { QuestionBlock } from "./questionBlock";
 import { spawnJumpingParticles, spawnLandingParticles, spawnRunningParticles, spawnWalkingParticles } from "./playerParticles";
 import { Camera } from "./camera";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
 
 const MULTIPLIER = 1;
@@ -49,7 +50,7 @@ const MAX_POWER_COUNT = 7;
 const FLY_P_TIMER = 0x80 / 60.0;
 
 const POWER_UP_ANIMATION_TIME = 0.7;
-const KICK_ANIMATION_TIME = 0.3;
+const KICK_ANIMATION_TIME = 0.5;
 
 const DEAD_STAY_TIME = 1;
 const DEAD_RESET_TIME = 1;
@@ -78,7 +79,8 @@ enum AnimationState {
   WALK,
   RUN,
   JUMP,
-  FALL
+  FALL,
+  KICK
 }
 
 enum PowerUpState {
@@ -263,12 +265,14 @@ export class Player extends GameObject {
     this.mesh = model.scene;
     this.transform.add(model.scene);
     this.animator.initialize(this.mesh);
+    console.log("Loaded player model and animations", model.animations);
     this.animator.setAnimations({
       [AnimationState.IDLE]: model.animations[1],
       [AnimationState.WALK]: model.animations[2],
       [AnimationState.RUN]: model.animations[3],
       [AnimationState.JUMP]: model.animations[4],
       [AnimationState.FALL]: model.animations[5],
+      [AnimationState.KICK]: model.animations[21]
     });
   }
 
@@ -418,7 +422,7 @@ export class Player extends GameObject {
       }
     }
     else if (this.currentState == PlayerState.DEAD) {
-      
+      this.animator.playAnimation(AnimationState.IDLE, 0.3);
     }
     else {
       if (!this.isGrounded) {
@@ -430,7 +434,10 @@ export class Player extends GameObject {
         }
       }
       else {
-        if (this.inputVector.x === 0) {
+        if (this.kickTimer > 0) {
+          this.animator.playAnimation(AnimationState.KICK, 0);
+        }
+        else if (this.inputVector.x === 0) {
           this.animator.playAnimation(AnimationState.IDLE, 0.3);
         }
         else if (this.running) {
@@ -620,24 +627,33 @@ export class Player extends GameObject {
       }
     }
     else if (other instanceof Goomba) {
-      if (!other.isDead) {
-        if (collision.normal1.y > 0.5) {
-          this.velocity.y = ENEMY_BOUNCE;
-          other.onHit();
-          console.log("Hit goomba with bounce");
-        }
-        else {
-          this.setCurrentState(PlayerState.DEAD);
-        }
+      if (other.isDead) {
+        return;
+      }
+      if (collision.normal1.y > 0.5) {
+        this.velocity.y = ENEMY_BOUNCE;
+        other.onHit();
+      }
+      else {
+        this.setCurrentState(PlayerState.DEAD);
       }
     }
     else if (other instanceof Koopa) {
+      if (other.isDead) {
+        return;
+      }
       if (collision.normal1.y > 0.5) {
+        this.world.addGameObject(new ScorePopup(ScoreType.Score100, this.world))
+          .transform.position.copy(this.transform.position);
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
       else {
         if (other.IsInShell && Math.abs(other.Velocity.x) < 0.05) {
+          this.kickTimer = KICK_ANIMATION_TIME;
+
+          this.world.addGameObject(new ScorePopup(ScoreType.Score100, this.world))
+            .transform.position.copy(this.transform.position);
           other.setDir(Math.sign(collision.collider.translation().x - this.collider.translation().x));
         }
         else {

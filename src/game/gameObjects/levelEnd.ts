@@ -2,6 +2,7 @@ import { GameObject, PhysicsWorld, World } from "@/engine";
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 import { Player } from "./player";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
 export class LevelEnd extends GameObject {
   private collider!: RAPIER.Collider;
@@ -34,8 +35,9 @@ export class LevelEnd extends GameObject {
 
   onDestroy(): void {
     super.onDestroy();
+    this.world.addGameObject(new ScorePopup(ScoreType.Score1000, this.world))
+      .transform.position.copy(this.transform.position);
     try {
-
       this.world.physics.removeCollider(this.collider);
       this.mesh.traverse((child) => {
         if (child instanceof THREE.Mesh) {

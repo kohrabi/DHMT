@@ -4,6 +4,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import { MESH_BOX_EXPAND, OBJECT_DEAD_BOUNCE, OBJECT_DEAD_X_VEL, OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
 import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import { Animator } from "@/engine/animator";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
 const GOOMBA_X_SPEED =  0x00A00 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GOOMBA_KILL_TIME = 2;
@@ -126,6 +127,9 @@ export class Goomba extends GameObject {
 
   public fixedUpdate(fixedDeltaTime: number): void {
     if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
+      if (this._currentState === GoombaState.DEAD_BOUNCE) {
+        this.destroy();
+      }
       return;
     }
     if (!this.controller) return;
@@ -183,7 +187,10 @@ export class Goomba extends GameObject {
     {
       case GoombaState.DEAD: {
         if (this.ignoreDamageTimer > 0) return;
-        // game->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
+        
+        const scorePopup = new ScorePopup(ScoreType.Score100, this.world);
+        scorePopup.transform.position.copy(this.transform.position);
+        this.world.addGameObject(scorePopup);
         this.killTimer = GOOMBA_KILL_TIME;
         this.world.physics.addDeferedCall(() => {
           this.collider.setEnabled(false);
@@ -196,8 +203,10 @@ export class Goomba extends GameObject {
         if (this.ignoreDamageTimer > 0) return;
         if (this._currentState == GoombaState.DEAD)
             return;
-        // game->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
-        // layer = SortingLayer::CORPSE;
+        
+        const scorePopup = new ScorePopup(ScoreType.Score100, this.world);
+        scorePopup.transform.position.copy(this.transform.position);
+        this.world.addGameObject(scorePopup);
         this.velocity.y = OBJECT_DEAD_BOUNCE;
         this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
         this.world.physics.addDeferedCall(() => {

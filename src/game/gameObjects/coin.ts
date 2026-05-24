@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL, SUBSUBSUBPIXEL_DELTA_TIME } from '@/engine/constants';
 import { Player } from './player';
 import { thickness } from 'three/tsl';
+import { ScorePopup, ScoreType } from './scorePopup';
 
 
 const COIN_KILL_TIME = 0.5
@@ -116,6 +117,10 @@ export class Coin extends GameObject {
 
   onDestroy(): void {
     super.onDestroy();
+    const scorePopup = new ScorePopup(ScoreType.Score100, this.world);
+    scorePopup.transform.position.copy(this.transform.position);
+    this.world.addGameObject(scorePopup);
+
     try {
 
       this.world.physics.removeCollider(this.collider);

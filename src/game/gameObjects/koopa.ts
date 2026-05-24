@@ -9,6 +9,7 @@ import { Animator } from "@/engine/animator";
 import { Goomba, GoombaState } from "./goomba";
 import { Brick } from "./brick";
 import { QuestionBlock } from "./questionBlock";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
 const GREEN_KOOPA_X_SPEED = 0x00800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const GREEN_KOOPA_SHELL_X_SPEED = 0x02700 * SUBSUBSUBPIXEL_DELTA_TIME;
@@ -60,6 +61,10 @@ export class Koopa extends GameObject {
   private respawnTimer = 0;
   private meshBox?: THREE.Box3;
   private meshSphere: THREE.Sphere = new THREE.Sphere();
+
+  get isDead() {
+    return this.currentState === KoopaState.DEAD_BOUNCE;
+  }
 
   get IsInShell() {
     return this.currentState === KoopaState.IN_SHELL;
@@ -174,6 +179,9 @@ export class Koopa extends GameObject {
 
   public fixedUpdate(fixedDeltaTime: number): void {
     if (this.meshBox && !this.world.isCameraVisible(this.transform, this.meshSphere)) {
+      if (this.currentState === KoopaState.DEAD_BOUNCE) {
+        this.destroy();
+      }
       return;
     }
     if (!this.controller) return;
@@ -265,7 +273,6 @@ export class Koopa extends GameObject {
     //     }
     // }
     // break;
-    case KoopaState.DEAD_BOUNCE: break;
     }
 
     if (this.currentState !== KoopaState.DEAD_BOUNCE) {
@@ -304,13 +311,15 @@ export class Koopa extends GameObject {
     case KoopaState.DEAD_BOUNCE:
     {
       if (this.ignoreDamageTimer > 0) return;
-      // CGame::GetInstance()->GetCurrentScene()->AddObject(new CScorePopup(position.x, position.y, ScoreCombo));
-      // layer = SortingLayer::CORPSE;
       this.velocity.y = OBJECT_DEAD_BOUNCE;
       this.velocity.x = OBJECT_DEAD_X_VEL * this.dir;
       this.world.physics.addDeferedCall(() => {
         this.collider.setEnabled(false);
       });
+      
+      const scorePopup = new ScorePopup(ScoreType.Score100, this.world);
+      scorePopup.transform.position.copy(this.transform.position);
+      this.world.addGameObject(scorePopup);
       break;
     }
     case KoopaState.IN_SHELL:

@@ -3,6 +3,7 @@ import * as Global from '@/global';
 import { sceneManager } from '../../global';
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
+import { ScorePopup, ScoreType } from './scorePopup';
 
 export class Brick extends GameObject {
   private mesh!: THREE.Object3D;
@@ -36,6 +37,7 @@ export class Brick extends GameObject {
   
   onDestroy(): void {
     super.onDestroy();
+    this.world.addGameObject(new ScorePopup(ScoreType.Score100, this.world));
     try {
       this.world.physics.removeCollider(this.collider);
       this.mesh.traverse((child) => {

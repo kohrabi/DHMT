@@ -4,7 +4,6 @@ import * as Global from "@/global";
 import { eventBus } from "@/engine/eventBus";
 import { ScreenShake } from "@/engine/screenShake";
 import { HudManager } from "@/game/ui/hudManager";
-import { ParallaxSystem } from "./mainMenu/parallaxSystem";
 import { Camera } from "@/game/gameObjects/camera";
 import { PlayZone } from "@/game/gameObjects/playzone";
 import { LevelFactory, type LevelObjectData } from "./gameplay/levelFactory";
@@ -17,7 +16,6 @@ export class GameplayScene extends Scene {
   private skyTexture?: THREE.Texture;
   private shake?: ScreenShake;
   private hud?: HudManager;
-  private parallax?: ParallaxSystem;
   private levelFactory = LevelFactory.createDefault();
 
   private onCoinCollected = (): void => {
@@ -58,11 +56,6 @@ export class GameplayScene extends Scene {
     eventBus.on("hud:combo", this.onCombo);
     eventBus.on("screen:shake", this.onScreenShake);
 
-    this.parallax = new ParallaxSystem(this.world.scene, this.content);
-    this.parallax.scrollSpeed = 0.5;
-    await this.parallax.loadAssets();
-    this.parallax.seedTiles();
-
     try {
       const levelData = await this.contentManager.loadJSON<LevelData>(
         "/assets/scenes/level.json",
@@ -81,8 +74,6 @@ export class GameplayScene extends Scene {
     if (this.shake) {
       this.shake.update(this.world.timer.delta, this.camera);
     }
-
-    this.parallax?.update(this.world.timer.delta);
   }
 
   protected async unloadContent(): Promise<void> {
@@ -95,8 +86,6 @@ export class GameplayScene extends Scene {
     this.hud?.dispose();
     this.hud = undefined;
     this.shake = undefined;
-    this.parallax?.dispose();
-    this.parallax = undefined;
 
     if (this.skyTexture) {
       this.skyTexture.dispose();

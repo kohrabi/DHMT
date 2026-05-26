@@ -90,8 +90,8 @@ async function createGround(
     | undefined;
   const colliderSize = new THREE.Vector3(
     colliderSizeData?.[0] ?? 1,
-    colliderSizeData?.[1] ?? 1,
     colliderSizeData?.[2] ?? 1,
+    colliderSizeData?.[1] ?? 1,
   );
 
   const colliderOffsetData = data.properties?.["collider_offset"] as
@@ -99,8 +99,8 @@ async function createGround(
     | undefined;
   const colliderOffset = new THREE.Vector3(
     colliderOffsetData?.[0] ?? 0,
-    colliderOffsetData?.[1] ?? 0.5,
-    colliderOffsetData?.[2] ?? 0,
+    colliderOffsetData?.[2] ?? 0.5,
+    colliderOffsetData?.[1] ?? 0,
   );
 
   const go = new Ground(world, modelMesh, colliderSize, colliderOffset);

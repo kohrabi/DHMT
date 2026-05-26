@@ -85,7 +85,7 @@ export class Goomba extends CharacterEnemy {
     switch (this._currentState) {
       case GoombaState.NORMAL: {
         this.velocity.x = GOOMBA_X_SPEED * this.dir;
-        this.applyGravity();
+        this.applyGravity(fixedDeltaTime);
         this.moveAndCheckWalls();
         break;
       }

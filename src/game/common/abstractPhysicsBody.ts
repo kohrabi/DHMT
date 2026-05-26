@@ -1,6 +1,7 @@
 import { GameObject, PhysicsWorld, World } from "../../engine";
 import * as THREE from "three";
 import RAPIER from "@dimforge/rapier3d-compat";
+import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import { MESH_BOX_EXPAND } from "../../engine/constants";
 import { disposeMesh } from "../../engine/utils/disposeUtils";
 
@@ -16,7 +17,7 @@ export abstract class AbstractPhysicsBody extends GameObject {
 
   protected async loadModel(path: string, offsetY = -0.5): Promise<THREE.Object3D> {
     const gltf = await this.world.gameScene.content.loadGLTF(path);
-    const model = gltf.scene.clone(true);
+    const model = SkeletonUtils.clone(gltf.scene);
     model.position.set(0, offsetY, 0);
     this.mesh = model;
     this.transform.add(model);

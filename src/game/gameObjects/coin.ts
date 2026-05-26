@@ -43,6 +43,10 @@ export class Coin extends AbstractPhysicsBody {
     );
 
     await this.loadModel("assets/platformer/coin-gold.glb", -0.25);
+
+    if (this.currentState === CoinState.INTRO) {
+      this.collider?.setEnabled(false);
+    }
   }
 
   fixedUpdate(fixedDeltaTime: number): void {
@@ -89,9 +93,9 @@ export class Coin extends AbstractPhysicsBody {
       case CoinState.INTRO: {
         this.velocity.y = COIN_INIT_Y_VEL * 10;
         this.killTimer = COIN_KILL_TIME;
-        this.world.physics.addDeferedCall(() => {
-          this.collider?.setEnabled(false);
-        });
+        if (this.collider) {
+          this.collider.setEnabled(false);
+        }
         break;
       }
     }

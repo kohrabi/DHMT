@@ -87,7 +87,7 @@ export class Mushroom extends AbstractPhysicsBody {
         this.collider,
         this.transform,
         this.velocity,
-        1,
+        this.world.timer.timescale === 0 ? 0 : 1,
         (cl) => {
           const go = this.world.physics.getGameObjectFromCollider(cl);
           if (!go) return false;

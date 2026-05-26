@@ -39,6 +39,17 @@ export class PlayerParticle extends GameObject {
       this.world.removeGameObject(this);
     }
   }
+
+  override onDestroy(): void {
+    super.onDestroy();
+    if (this.mesh && this.mesh.material) {
+      if (Array.isArray(this.mesh.material)) {
+        this.mesh.material.forEach((mat) => mat.dispose());
+      } else {
+        this.mesh.material.dispose();
+      }
+    }
+  }
 }
 
 export function spawnRunningParticles(world: World, position: THREE.Vector3, direction: number) {

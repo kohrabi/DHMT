@@ -1,4 +1,4 @@
-import { World } from "@/engine";
+import { PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import { AbstractPhysicsBody } from "@/game/common/abstractPhysicsBody";
 
@@ -24,14 +24,19 @@ export class GroundOneWay extends AbstractPhysicsBody {
     await super.start();
     this.mesh = this.transform.children[0] as THREE.Object3D;
 
-    this.createBoxCollider(
+    const t = this.transform.clone();
+    t.translateY(0.5);
+
+    const shape = PhysicsWorld.getBoxShape(
+      t,
       new THREE.Vector3(
         this.transform.scale.x * this.shapeSize.x,
         this.transform.scale.y * this.shapeSize.y,
         this.transform.scale.z * this.shapeSize.z,
       ),
-      new THREE.Vector3(0, 0.5, 0),
     );
+    this.collider = this.world.physics.world.createCollider(shape);
+    this.world.physics.registerCollider(this.collider, this);
   }
 
   fixedUpdate(): void {}

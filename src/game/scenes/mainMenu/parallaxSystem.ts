@@ -170,8 +170,37 @@ export class ParallaxSystem {
   }
 
   dispose(): void {
+    for (const tile of this.groundTiles) {
+      this.scene.remove(tile);
+      tile.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach((m) => m.dispose());
+          } else {
+            child.material?.dispose();
+          }
+        }
+      });
+    }
     this.groundTiles.length = 0;
-    this.layers.forEach((l) => (l.tiles.length = 0));
+
+    for (const layer of this.layers) {
+      for (const tile of layer.tiles) {
+        this.scene.remove(tile);
+        tile.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry?.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach((m) => m.dispose());
+            } else {
+              child.material?.dispose();
+            }
+          }
+        });
+      }
+      layer.tiles.length = 0;
+    }
   }
 
   private spawnGroundColumn(col: number): void {

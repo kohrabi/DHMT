@@ -224,8 +224,9 @@ async function createQuestionBlock(
   world: World,
   _content: ContentManager,
 ): Promise<LevelObjectResult> {
+  const props = data.properties ?? {};
   let coinType = QuestionBlockSpawnType.COIN;
-  switch (data.properties["spawn_type"]) {
+  switch (props["spawn_type"]) {
     case "COIN":
       coinType = QuestionBlockSpawnType.COIN;
       break;
@@ -233,12 +234,11 @@ async function createQuestionBlock(
       coinType = QuestionBlockSpawnType.LEAF;
       break;
     default:
-      console.warn(
-        "Unknown spawn type for Question Block:",
-        data.properties["spawn_type"],
-      );
+      if (props["spawn_type"]) {
+        console.warn("Unknown spawn type for Question Block:", props["spawn_type"]);
+      }
   }
-  const spawnCount = data.properties["spawn_count"] as number | undefined ?? 1;
+  const spawnCount = props["spawn_count"] as number | undefined ?? 1;
   const go = new QuestionBlock(world, spawnCount, coinType);
   return { gameObject: go, applyGenericTransform: true };
 }

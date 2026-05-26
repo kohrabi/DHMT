@@ -74,7 +74,7 @@ export class Koopa extends CharacterEnemy {
     );
 
     this.flipCollider = this.world.physics.world.createCollider(
-      RAPIER.ColliderDesc.cuboid(0.25, 0.25, 0.25)
+      RAPIER.ColliderDesc.cuboid(0.125, 0.125, 0.125)
         .setTranslation(
           this.transform.position.x + 0.5 * this.dir,
           this.transform.position.y - 0.5,
@@ -137,7 +137,7 @@ export class Koopa extends CharacterEnemy {
       this.ignoreDamageTimer -= fixedDeltaTime;
     }
 
-    this.applyGravity();
+    this.applyGravity(fixedDeltaTime);
     if (this.currentState === KoopaState.IN_SHELL) {
       this.velocity.y *= 0.85;
     }
@@ -181,7 +181,7 @@ export class Koopa extends CharacterEnemy {
       }
       case KoopaState.DEAD_BOUNCE: {
         if (this.collider) this.collider.setEnabled(false);
-        this.velocity.y -= OBJECT_FALL;
+        this.velocity.y -= OBJECT_FALL * fixedDeltaTime;
         this.velocity.y = Math.max(this.velocity.y, -OBJECT_MAX_FALL);
         this.transform.position.x += this.velocity.x;
         this.transform.position.y += this.velocity.y;
@@ -191,12 +191,13 @@ export class Koopa extends CharacterEnemy {
 
     if (this.currentState !== KoopaState.DEAD_BOUNCE) {
       this.velocity.z = 0;
+      const moveDt = this.world.timer.timescale === 0 ? 0 : 1;
       PhysicsWorld.moveAndSlide(
         this.controller,
         this.collider!,
         this.transform,
         this.velocity,
-        1,
+        moveDt,
       );
       for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
         const collision = this.controller.computedCollision(i);

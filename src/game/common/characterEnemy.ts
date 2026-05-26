@@ -27,15 +27,16 @@ export abstract class CharacterEnemy extends AbstractPhysicsBody {
     await this.loadModel(modelPath);
   }
 
-  protected applyGravity(): void {
+  protected applyGravity(fixedDeltaTime: number): void {
     if (!this.controller.computedGrounded()) {
-      this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL, -OBJECT_MAX_FALL);
+      this.velocity.y = Math.max(this.velocity.y - OBJECT_FALL * fixedDeltaTime, -OBJECT_MAX_FALL);
     }
   }
 
   protected moveAndCheckWalls(): void {
     this.velocity.z = 0;
-    PhysicsWorld.moveAndSlide(this.controller, this.collider, this.transform, this.velocity, 1);
+    const dt = this.world.timer.timescale === 0 ? 0 : 1;
+    PhysicsWorld.moveAndSlide(this.controller, this.collider, this.transform, this.velocity, dt);
 
     for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
       const collision = this.controller.computedCollision(i);

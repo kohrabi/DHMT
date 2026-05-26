@@ -1,5 +1,6 @@
 import * as Global from "@/global";
 import { GameplayScene } from "../gameplayScene";
+import { AudioManager } from "@/game/audio/audioManager";
 
 function showSettingsMessage(): void {
   const msg = document.createElement("div");
@@ -39,6 +40,10 @@ export function showMenuUI(): void {
   const startBtn = document.getElementById("start-btn");
   if (startBtn) {
     startBtn.addEventListener("click", () => {
+      const audioCtx = (AudioManager.getInstance() as any).audioContext as AudioContext | undefined;
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
       cleanupUI();
       Global.sceneManager.setScene(new GameplayScene());
     });

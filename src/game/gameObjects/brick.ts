@@ -1,61 +1,41 @@
-import { PhysicsWorld, GameObject, World } from '@/engine';
-import * as Global from '@/global';
-import { sceneManager } from '../../global';
-import RAPIER from '@dimforge/rapier3d-compat';
-import * as THREE from 'three';
-import { ScorePopup, ScoreType } from './scorePopup';
+import { World } from "@/engine";
+import * as THREE from "three";
+import { AbstractPhysicsBody } from "@/game/common/abstractPhysicsBody";
+import { eventBus } from "@/engine/eventBus";
+import { AudioManager } from "@/game/audio/audioManager";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
-export class Brick extends GameObject {
-  private mesh!: THREE.Object3D;
-  private collider! : RAPIER.Collider;
-
-  constructor(world : World) {
+export class Brick extends AbstractPhysicsBody {
+  constructor(world: World) {
     super(
       `Brick_${world.gameObjects.size}`,
       world,
     );
   }
 
-  async start() : Promise<void> {
+  async start(): Promise<void> {
     await super.start();
     this.transform.translateY(0.5);
-    const model = await this.world.gameScene.content.loadGLTF(
-      "assets/platformer/brick.glb",
+    await this.loadModel("assets/platformer/brick.glb", -0.25);
+    this.createBoxCollider(
+      this.transform.scale.clone().multiplyScalar(0.5),
+      new THREE.Vector3(0, 0, 0),
     );
-    const modelMesh = model.scene.clone();
-    modelMesh.translateY(-0.25);
-    this.mesh = modelMesh;
-    this.transform.add(this.mesh);
-    const shape = 
-      PhysicsWorld.getBoxShape(this.transform, 
-        this.transform.scale.clone().multiplyScalar(0.5))!;
-    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    const collider = this.world.physics.world.createCollider(shape);
-    this.collider = collider;
-    this.world.physics.registerCollider(collider, this);
-  }
-  
-  onDestroy(): void {
-    super.onDestroy();
-    this.world.addGameObject(new ScorePopup(ScoreType.Score100, this.world));
-    try {
-      this.world.physics.removeCollider(this.collider);
-      this.mesh.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach((mat) => mat.dispose());
-          } else {
-            child.material.dispose();
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error during brick destruction:", error);
-    }
   }
 
   public onHit(): void {
+    eventBus.emit("screen:shake", 0.1, 0.15);
+    AudioManager.getInstance().playBump();
+    eventBus.emit("brick:broken", this.transform.position);
     this.destroy();
   }
+
+  override onDestroy(): void {
+    const popup = new ScorePopup(ScoreType.Score100, this.world);
+    popup.transform.position.copy(this.transform.position);
+    this.world.addGameObject(popup);
+    super.onDestroy();
+  }
+
+  fixedUpdate(): void {}
 }

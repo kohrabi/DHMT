@@ -30,6 +30,8 @@
  * Call  Global.input.dispose()  to remove all event listeners (e.g. on teardown).
  */
 export class InputManager {
+  private disposed = false;
+
   // ─── Keyboard ─────────────────────────────────────────────────────────────
 
   /** Keys currently held down (KeyboardEvent.code values). */
@@ -78,6 +80,7 @@ export class InputManager {
 
   constructor(target: EventTarget = window) {
     this._onKeyDown = (e) => {
+      if (this.disposed) return;
       if (!this._keysDown.has(e.code)) {
         this._keysPressed.add(e.code);
       }
@@ -85,11 +88,13 @@ export class InputManager {
     };
 
     this._onKeyUp = (e) => {
+      if (this.disposed) return;
       this._keysDown.delete(e.code);
       this._keysReleased.add(e.code);
     };
 
     this._onMouseDown = (e) => {
+      if (this.disposed) return;
       if (!this._mouseDown.has(e.button)) {
         this._mousePressed.add(e.button);
       }
@@ -97,11 +102,13 @@ export class InputManager {
     };
 
     this._onMouseUp = (e) => {
+      if (this.disposed) return;
       this._mouseDown.delete(e.button);
       this._mouseReleased.add(e.button);
     };
 
     this._onMouseMove = (e) => {
+      if (this.disposed) return;
       this._mouseX = e.clientX;
       this._mouseY = e.clientY;
       this._rawDeltaX += e.movementX;
@@ -109,6 +116,7 @@ export class InputManager {
     };
 
     this._onWheel = (e) => {
+      if (this.disposed) return;
       this._rawScrollX += e.deltaX;
       this._rawScrollY += e.deltaY;
     };
@@ -213,6 +221,7 @@ export class InputManager {
 
   /** Remove all event listeners. Call when the game is torn down. */
   dispose(): void {
+    this.disposed = true;
     this._target.removeEventListener("keydown", this._onKeyDown as EventListener);
     this._target.removeEventListener("keyup", this._onKeyUp as EventListener);
     this._target.removeEventListener("mousedown", this._onMouseDown as EventListener);

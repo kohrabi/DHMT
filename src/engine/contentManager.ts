@@ -138,6 +138,7 @@ export class ContentManager {
     this.gltfCache.clear();
     this.jsonCache.clear();
     this.textCache.clear();
+    this.fontCache.clear();
   }
 
   private normalizePath(path: string): string {

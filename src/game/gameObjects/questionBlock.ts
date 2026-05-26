@@ -1,15 +1,16 @@
-import { PhysicsWorld, GameObject, World } from '@/engine';
-import * as Global from '@/global';
-import { sceneManager } from '../../global';
-import RAPIER from '@dimforge/rapier3d-compat';
-import * as THREE from 'three';
-import { Goomba } from './goomba';
-import { Koopa } from './koopa';
-import { Coin, CoinState } from './coin';
-import { Mushroom } from './mushroom';
+import { World } from "@/engine";
+import * as THREE from "three";
+import RAPIER from "@dimforge/rapier3d-compat";
+import { AbstractPhysicsBody } from "@/game/common/abstractPhysicsBody";
+import { AudioManager } from "@/game/audio/audioManager";
+import { Goomba } from "./goomba";
+import { Koopa } from "./koopa";
+import { Coin, CoinState } from "./coin";
+import { Mushroom } from "./mushroom";
 
 const QUESTION_BLOCK_ANIMATION_TIME = 0.2;
 const QUESTION_BLOCK_ANIMATION_Y_VEL = 2;
+
 export enum QuestionBlockSpawnType {
   COIN,
   LEAF,
@@ -17,18 +18,15 @@ export enum QuestionBlockSpawnType {
   P_BUTTON
 }
 
-export class QuestionBlock extends GameObject {
-  private mesh!: THREE.Object3D;
-  private collider! : RAPIER.Collider;
-
+export class QuestionBlock extends AbstractPhysicsBody {
+  private hitSensor: RAPIER.Collider | null = null;
   private animationTimer: number = -1;
-  private yOffset: number = 0
+  private yOffset: number = 0;
   private isHit = false;
-  private hitCollider !: RAPIER.Collider;
   private spawnCount = 1;
-  private spawnType = QuestionBlockSpawnType.COIN; 
+  private spawnType = QuestionBlockSpawnType.COIN;
 
-  constructor(world : World, spawnCount : number, spawnType : QuestionBlockSpawnType) {
+  constructor(world: World, spawnCount: number, spawnType: QuestionBlockSpawnType) {
     super(
       `QuestionBlock_${world.gameObjects.size}`,
       world,
@@ -37,141 +35,112 @@ export class QuestionBlock extends GameObject {
     this.spawnType = spawnType;
   }
 
-  async start() : Promise<void> {
+  async start(): Promise<void> {
     await super.start();
     this.transform.position.y += 0.5;
 
-    const shape = 
-      PhysicsWorld.getBoxShape(this.transform, 
-        this.transform.scale.clone().multiplyScalar(0.5))!;
-    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    const collider = this.world.physics.world.createCollider(shape);
-    this.collider = collider;
-    this.world.physics.registerCollider(collider, this);
-    
-    this.hitCollider = this.world.physics.world.createCollider(
-      PhysicsWorld.getBoxShape(
-          this.transform, 
-          this.transform.scale.clone().multiplyScalar(0.5)
+    await this.loadModel("assets/platformer/crate-item.glb", -0.25);
+
+    this.createBoxCollider(
+      this.transform.scale.clone().multiplyScalar(0.5),
+      new THREE.Vector3(0, 0, 0),
+    );
+
+    this.hitSensor = this.world.physics.world.createCollider(
+      RAPIER.ColliderDesc.cuboid(
+        this.transform.scale.x * 0.25,
+        this.transform.scale.y * 0.25,
+        this.transform.scale.z * 0.25,
+      )
+        .setTranslation(
+          this.transform.position.x,
+          this.transform.position.y + 0.5,
+          this.transform.position.z,
         )
-        .setSensor(true)
+        .setSensor(true),
     );
-    this.hitCollider.setTranslation({
-      x: this.transform.position.x,
-      y: this.transform.position.y + 0.5,
-      z: this.transform.position.z
-    });
-    this.world.physics.registerCollider(this.hitCollider, this);
-
-    const model = await this.world.gameScene.content.loadGLTF(
-      "assets/platformer/crate-item.glb",
-    );
-    const modelMesh = model.scene.clone();
-    modelMesh.translateY(-0.25);
-    this.mesh = modelMesh;
-    this.transform.add(this.mesh);
-  }
-  
-  onDestroy(): void {
-    super.onDestroy();
-    try {
-      this.world.physics.removeCollider(this.collider);
-      this.world.physics.removeCollider(this.hitCollider);
-      this.mesh.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach((mat) => mat.dispose());
-          } else {
-            child.material.dispose();
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error during brick destruction:", error);
-    }
+    this.world.physics.registerCollider(this.hitSensor, this);
   }
 
-  public fixedUpdate(fixedDeltaTime: number): void {
-    
-    if (this.animationTimer >= 0) 
-    {
-        this.animationTimer -= fixedDeltaTime;
-        if (this.animationTimer >= QUESTION_BLOCK_ANIMATION_TIME / 2)
-            this.yOffset += QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
-        else
-            this.yOffset -= QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
-        this.yOffset = Math.max(this.yOffset, 0);
-        this.mesh.position.y = -0.25 + this.yOffset;
+  fixedUpdate(fixedDeltaTime: number): void {
+    if (this.animationTimer >= 0) {
+      this.animationTimer -= fixedDeltaTime;
+      if (this.animationTimer >= QUESTION_BLOCK_ANIMATION_TIME / 2)
+        this.yOffset += QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
+      else
+        this.yOffset -= QUESTION_BLOCK_ANIMATION_Y_VEL * fixedDeltaTime;
+      this.yOffset = Math.max(this.yOffset, 0);
+      if (this.mesh) this.mesh.position.y = -0.25 + this.yOffset;
     }
 
-    if (this.isHit)
-    {
+    if (this.isHit && this.hitSensor) {
       this.world.physics.world.intersectionsWithShape(
-        this.hitCollider.translation(),
-        this.hitCollider.rotation(),
-        this.hitCollider.shape,
+        this.hitSensor.translation(),
+        this.hitSensor.rotation(),
+        this.hitSensor.shape,
         (otherCollider) => {
           const go = this.world.physics.getGameObjectFromCollider(otherCollider);
           if (go instanceof Goomba) {
             go.deadBounce(1);
-          }
-          else if (go instanceof Koopa) {
+          } else if (go instanceof Koopa) {
             go.deadBounce(1);
           }
           return true;
-        }
+        },
       );
       this.isHit = false;
     }
   }
 
-  public Hit(dx : number) : void {
+  public onHit(dx: number): void {
     if (this.spawnCount <= 0)
       return;
-    switch (this.spawnType)
-    {
-    case QuestionBlockSpawnType.COIN:
-      {
-        console.log("Spawning coin from question block");
+
+    AudioManager.getInstance().playBump();
+
+    switch (this.spawnType) {
+      case QuestionBlockSpawnType.COIN: {
         const coin = new Coin(this.world);
         const go = this.world.addGameObject(coin);
-        coin.setState(CoinState.INTRO); 
-        go.transform.position.set(this.transform.position.x, this.transform.position.y + 0.5, this.transform.position.z);
+        coin.setState(CoinState.INTRO);
+        go.transform.position.set(
+          this.transform.position.x,
+          this.transform.position.y + 0.5,
+          this.transform.position.z,
+        );
         break;
       }
-    case QuestionBlockSpawnType.LEAF:
-      {
+      case QuestionBlockSpawnType.LEAF: {
         const mushroom = new Mushroom(this.world);
         this.world.addGameObject(mushroom);
         mushroom.transform.position.set(
           this.transform.position.x,
           this.transform.position.y,
-          this.transform.position.z
+          this.transform.position.z,
         );
         mushroom.setDir(dx);
         break;
       }
-    case QuestionBlockSpawnType.ONE_UP:
-      {
-        // CMario* player = dynamic_cast<CMario*>(game->GetCurrentScene()->GetPlayer());
-        // LPGAMEOBJECT powerUp = NULL;
-        // powerUp = new COneUp(position.x, position.y);
-        // powerUp->SetNx(dx);
-        // game->GetCurrentScene()->AddObject(powerUp);
-
-      }
-    break;
-    case QuestionBlockSpawnType.P_BUTTON:
-      {
-        // CPButton* button = new CPButton(position.x, position.y - 16.0f);
-        // game->GetCurrentScene()->AddObject(button);
-      }
-    break;
+      case QuestionBlockSpawnType.ONE_UP:
+      case QuestionBlockSpawnType.P_BUTTON:
+        break;
     }
+
     this.isHit = true;
     this.isActive = false;
     this.spawnCount--;
     this.animationTimer = QUESTION_BLOCK_ANIMATION_TIME;
+  }
+
+  override onDestroy(): void {
+    try {
+      if (this.hitSensor) {
+        this.world.physics.removeCollider(this.hitSensor);
+        this.hitSensor = null;
+      }
+    } catch (e) {
+      console.error("Error during question block destruction:", e);
+    }
+    super.onDestroy();
   }
 }

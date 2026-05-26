@@ -55,7 +55,6 @@ export class PhysicsWorld {
     try {
       for (const collider of this.pendingRemovals) {
         this.world.removeCollider(collider, true);
-        console.log("Removed collider:", collider.handle);
       }
       this.pendingRemovals.clear();
     } catch (error) {
@@ -93,7 +92,6 @@ export class PhysicsWorld {
     collider.setEnabled(false);
     this.pendingRemovals.add(collider);
     this.colliderGameObjectMap.delete(collider);
-    console.log("Scheduled collider for removal:", collider.handle);
   }
 
   /**
@@ -413,8 +411,6 @@ export class PhysicsWorld {
 
       return RAPIER.ColliderDesc.trimesh(vertices, indices);
     }
-
-    console.error("RapierPhysics: Unsupported geometry type:", typeof geometry);
 
     return null;
   }

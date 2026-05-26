@@ -1,7 +1,7 @@
 import { clampf, GameObject, lerp, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
-import RAPIER from '@dimforge/rapier3d-compat';
+import RAPIER from "@dimforge/rapier3d-compat";
 import { Coin } from "./coin";
 import { Brick } from "./brick";
 import { GroundOneWay } from "./oneway";
@@ -13,6 +13,8 @@ import { QuestionBlock } from "./questionBlock";
 import { spawnJumpingParticles, spawnLandingParticles, spawnRunningParticles, spawnWalkingParticles } from "./playerParticles";
 import { Camera } from "./camera";
 import { ScorePopup, ScoreType } from "./scorePopup";
+import { eventBus } from "@/engine/eventBus";
+import { AudioManager } from "@/game/audio/audioManager";
 
 
 const MULTIPLIER = 1;
@@ -37,7 +39,7 @@ const JUMP_GRAVITY = 0x00500 * SUBSUBSUBPIXEL_DELTA_TIME;
 const JUMP_HANG = 0x02000 * SUBSUBSUBPIXEL_DELTA_TIME;
 
 const MAX_FALL_SPEED = 0x04000 * SUBSUBSUBPIXEL_DELTA_TIME;
-const MAX_TAILWAG_FALL_SPDED = 0x01000 * SUBSUBSUBPIXEL_DELTA_TIME;
+const MAX_TAILWAG_FALL_SPEED = 0x01000 * SUBSUBSUBPIXEL_DELTA_TIME;
 
 const FLY_Y_VELOCITY = -0x01800 * SUBSUBSUBPIXEL_DELTA_TIME;
 const TELEPORT_Y_VELOCITY = 0x00b00 * SUBSUBSUBPIXEL_DELTA_TIME;
@@ -71,7 +73,7 @@ enum PlayerState {
   DEAD,
   TELEPORT,
   OUTRO,
-  SIT
+  SITTING
 }
 
 enum AnimationState {
@@ -86,12 +88,11 @@ enum AnimationState {
 enum PowerUpState {
   SMALL,
   BIG,
-  RACOON
+  RACCOON
 }
 
 export class Player extends GameObject {
 
-  
   // Constants
   readonly DEBUG_INVINCIBLE = false;
   readonly keyLeft = "KeyA";
@@ -106,9 +107,9 @@ export class Player extends GameObject {
   readonly shapeHeight = 1.0;
 
   // Components
-  private controller!: RAPIER.KinematicCharacterController;
-  private collider!: RAPIER.Collider;
-  private camera!: Camera;
+  private controller: RAPIER.KinematicCharacterController | null = null;
+  private collider: RAPIER.Collider | null = null;
+  private camera: Camera | null = null;
 
   private velocity = new THREE.Vector3();
   private mesh: THREE.Object3D = new THREE.Object3D();
@@ -122,8 +123,8 @@ export class Player extends GameObject {
 
   private powerUpStartTimer = 0.0;
   private invincibleTimer = 0.0;
-  private powerUp = 0;
-  private nextPowerUp = 0;
+  private currentPowerUp = PowerUpState.SMALL;
+  private nextPowerUp = PowerUpState.SMALL;
   private deadTimer = 0.0;
 
   private enterPipe = false;
@@ -147,19 +148,19 @@ export class Player extends GameObject {
   private outroStayTimer = 0.0;
   private switchLevelTimer = 0.0;
 
-  private animator : Animator = new Animator();
+  private animator: Animator = new Animator();
 
   public endLevel(): void {
     this.setCurrentState(PlayerState.OUTRO);
   }
 
   public kill(): void {
-    if (this.currentState == PlayerState.DEAD || 
-      this.currentState == PlayerState.POWER_UP || 
+    if (this.currentState == PlayerState.DEAD ||
+      this.currentState == PlayerState.POWER_UP ||
       this.currentState == PlayerState.TELEPORT ||
-      this.currentState == PlayerState.OUTRO) 
+      this.currentState == PlayerState.OUTRO)
       return;
-    this.powerUp = PowerUpState.SMALL;
+    this.currentPowerUp = PowerUpState.SMALL;
     this.mesh.position.y = this.modelOffsetY;
     this.transform.scale.set(1.0, 1.0, 1.0);
     this.setCurrentState(PlayerState.DEAD);
@@ -170,58 +171,48 @@ export class Player extends GameObject {
   }
 
   setCurrentState(state: PlayerState) {
-    console.log("PLAYER: Transitioning to state", PlayerState[state]);
     switch (state) {
-      case PlayerState.POWER_UP:
-      {
+      case PlayerState.POWER_UP: {
+        AudioManager.getInstance().playPowerUp();
+        eventBus.emit("player:powerup");
         this.world.timer.timescale = 0.0;
-        this.powerUpStartTimer = POWER_UP_ANIMATION_TIME
+        this.powerUpStartTimer = POWER_UP_ANIMATION_TIME;
         break;
       }
-      case PlayerState.DEAD:
-      {
+      case PlayerState.DEAD: {
         if (this.DEBUG_INVINCIBLE)
-            return;
+          return;
         if (this.invincibleTimer > 0)
-            return;
-        if (this.powerUp != PowerUpState.SMALL)
-        {
+          return;
+        if (this.currentPowerUp != PowerUpState.SMALL) {
           state = (PlayerState.POWER_UP);
           this.nextPowerUp = PowerUpState.SMALL;
-          // this.transform.position.y += 8.0;
           this.powerUpStartTimer = POWER_UP_ANIMATION_TIME;
           this.world.timer.timescale = 0.0;
-        }
-        else 
-        {
-          this.camera.isFollowingTarget = false;
+        } else {
+          AudioManager.getInstance().playDeath();
+          eventBus.emit("player:death");
+          if (this.camera) this.camera.isFollowingTarget = false;
           this.deadTimer = DEAD_STAY_TIME;
-          this.velocity = new THREE.Vector3(0, 0, 0);
+          this.velocity.set(0, 0, 0);
         }
         break;
       }
-      case PlayerState.TELEPORT:
-      {
+      case PlayerState.TELEPORT: {
         this.enterPipe = false;
         this.beforeTeleportY = this.transform.position.y;
         this.velocity.x = 0.0;
         break;
       }
-      case PlayerState.OUTRO: 
-      {
-          // CGame* const game = CGame::GetInstance();
-          // LPPLAYSCENE scene = dynamic_cast<LPPLAYSCENE>(game->GetCurrentScene());
-          // ASSERT(scene != NULL, "HEY");
-          // scene->SetStopTimer(true);
-          this.velocity.x = 0.0; 
-          this.velocity.y /= 2.0;
-          this.outroStayTimer = STAY_OUTRO_TIME;
-          // this.powerCounter = 0;
-          this.skidding = false;
-          this.kickTimer = 0.0;
-          this.dir = 1;
-          break;
-      }   
+      case PlayerState.OUTRO: {
+        this.velocity.x = 0.0;
+        this.velocity.y /= 2.0;
+        this.outroStayTimer = STAY_OUTRO_TIME;
+        this.skidding = false;
+        this.kickTimer = 0.0;
+        this.dir = 1;
+        break;
+      }
     }
     this._currentState = state;
   }
@@ -231,16 +222,15 @@ export class Player extends GameObject {
   }
 
   get isGrounded(): boolean {
-    return this.controller.computedGrounded();
+    return this.controller ? this.controller.computedGrounded() : false;
   }
 
-  public PowerUp() : void {
+  public powerUp(): void {
     this.nextPowerUp = PowerUpState.BIG;
     this.setCurrentState(PlayerState.POWER_UP);
-    console.log("Power up!");
   }
 
-  constructor(world : World) {
+  constructor(world: World) {
     super(
       "Player",
       world
@@ -265,7 +255,6 @@ export class Player extends GameObject {
     this.mesh = model.scene;
     this.transform.add(model.scene);
     this.animator.initialize(this.mesh);
-    console.log("Loaded player model and animations", model.animations);
     this.animator.setAnimations({
       [AnimationState.IDLE]: model.animations[1],
       [AnimationState.WALK]: model.animations[2],
@@ -279,11 +268,9 @@ export class Player extends GameObject {
   public onDestroy(): void {
     super.onDestroy();
     try {
-      this.world.physics.removeCharacterController(this.controller);
-      this.world.physics.removeCollider(this.collider);
-      // Mesh will be cleaned by the scene's cleanup.
-    }
-    catch (error) {
+      if (this.controller) this.world.physics.removeCharacterController(this.controller);
+      if (this.collider) this.world.physics.removeCollider(this.collider);
+    } catch (error) {
       console.error("Error during player destruction:", error);
     }
   }
@@ -317,8 +304,6 @@ export class Player extends GameObject {
   }
 
   public fixedUpdate(fixedDeltaTime: number): void {
-
-    
     if (this.kickTimer > 0) this.kickTimer -= fixedDeltaTime;
     if (this.invincibleTimer > 0) this.invincibleTimer -= fixedDeltaTime;
     if (this.spinTimer > 0) this.spinTimer -= fixedDeltaTime;
@@ -329,73 +314,59 @@ export class Player extends GameObject {
     else this.comboCounter = 0;
 
     switch (this.currentState) {
-      case PlayerState.NORMAL: this._normalState(fixedDeltaTime); break; 
+      case PlayerState.NORMAL: this._normalState(fixedDeltaTime); break;
       case PlayerState.POWER_UP: this._powerupUpdate(fixedDeltaTime); break;
-      case PlayerState.DEAD: 
-      {
+      case PlayerState.DEAD: {
         const unscaledDt = this.world.timer.unscaledDelta;
         if (this.deadTimer > 0) this.deadTimer -= unscaledDt;
-        else
-        {
-            if (!this.deadJump)
-            {
-                this.velocity.y = 30 * unscaledDt;
-                this.deadJump = true;
-            }
-            this.transform.rotation.x += 0.1;
-            this.velocity.y = this.velocity.y - JUMP_GRAVITY * 30 * unscaledDt;
-            this.transform.position.y += this.velocity.y;
+        else {
+          if (!this.deadJump) {
+            this.velocity.y = 30 * unscaledDt;
+            this.deadJump = true;
+          }
+          this.transform.rotation.x += 0.1;
+          this.velocity.y = this.velocity.y - JUMP_GRAVITY * 30 * unscaledDt;
+          this.transform.position.y += this.velocity.y;
         }
 
-        // Camera visible
-        if (this.transform.position.y <= -3.0)
-        {
-            if (!this.isResetting)
-            {
-                this.isResetting = true;
-                this.levelResetTimer = DEAD_RESET_TIME;
-            }
+        if (this.transform.position.y <= -3.0) {
+          if (!this.isResetting) {
+            this.isResetting = true;
+            this.levelResetTimer = DEAD_RESET_TIME;
+          }
 
-            if (this.levelResetTimer > 0) this.levelResetTimer -= unscaledDt;
-            else
-            {
-              console.log("Resetting level");
-              this.world.timer.timescale = 1.0;
-              Global.sceneManager.resetScene();
-            }
+          if (this.levelResetTimer > 0) this.levelResetTimer -= unscaledDt;
+          else {
+            this.world.timer.timescale = 1.0;
+            Global.sceneManager.resetScene();
+          }
         }
         break;
       }
-      case PlayerState.SIT:
-      {
+      case PlayerState.SITTING: {
         if (!Global.input.isKeyDown(this.keyDown))
-            this.setCurrentState(PlayerState.NORMAL);
+          this.setCurrentState(PlayerState.NORMAL);
         this.velocity.x = moveTowards(this.velocity.x, 0, RELEASE_DECELERATION);
         this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
 
         this.move();
         break;
       }
-      case PlayerState.OUTRO:
-      {
-        if (this.outroStayTimer > 0.0)
-        {
-            this.outroStayTimer -= fixedDeltaTime;
-            this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
-            
-            this.move();
+      case PlayerState.OUTRO: {
+        if (this.outroStayTimer > 0.0) {
+          this.outroStayTimer -= fixedDeltaTime;
+          this.velocity.y = Math.max(this.velocity.y - JUMP_GRAVITY, -MAX_FALL_SPEED);
 
-            this.switchLevelTimer = SWITCH_LEVEL_TIME;
-        }
-        else
-        {
-            if (this.switchLevelTimer > 0) this.switchLevelTimer -= fixedDeltaTime;
-            else
-            {
-              Global.sceneManager.resetScene();
-            }
-            this.velocity = new THREE.Vector3(MAXIMUM_WALK_SPEED, 0.0, 0.0);
-            this.move();
+          this.move();
+
+          this.switchLevelTimer = SWITCH_LEVEL_TIME;
+        } else {
+          if (this.switchLevelTimer > 0) this.switchLevelTimer -= fixedDeltaTime;
+          else {
+            Global.sceneManager.resetScene();
+          }
+          this.velocity.set(MAXIMUM_WALK_SPEED, 0, 0);
+          this.move();
         }
         break;
       }
@@ -415,47 +386,38 @@ export class Player extends GameObject {
       if (this.world.timer.unscaledElapsed % blink < blink / this.bigScale) {
         this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
         this.mesh.position.y = this.modelOffsetY + (0.15);
-      }
-      else {
+      } else {
         this.transform.scale.set(1.0, 1.0, 1.0);
         this.mesh.position.y = this.modelOffsetY;
       }
-    }
-    else if (this.currentState == PlayerState.DEAD) {
+    } else if (this.currentState == PlayerState.DEAD) {
       this.animator.playAnimation(AnimationState.IDLE, 0.3);
-    }
-    else {
+    } else {
       if (!this.isGrounded) {
         if (this.velocity.y > 0) {
           this.animator.playAnimation(AnimationState.JUMP, 0.1);
-        }
-        else {
+        } else {
           this.animator.playAnimation(AnimationState.FALL, 0.1);
         }
-      }
-      else {
+      } else {
         if (this.kickTimer > 0) {
           this.animator.playAnimation(AnimationState.KICK, 0);
-        }
-        else if (this.inputVector.x === 0) {
+        } else if (this.inputVector.x === 0) {
           this.animator.playAnimation(AnimationState.IDLE, 0.3);
-        }
-        else if (this.running) {
+        } else if (this.running) {
           this.animator.playAnimation(AnimationState.RUN, 0.3);
-        }
-        else {
+        } else {
           this.animator.playAnimation(AnimationState.WALK, 0.3);
         }
       }
-      
-      const scaleX = this.powerUp == PowerUpState.BIG ? this.bigScale : 1.0;
-      
-      let scale = this.transform.scale;
-      let velSign =  Math.sign(this.dir);
-      
-      
-      scale.x = lerp(Math.abs(scale.x), scaleX, 0.2);
-      scale.y = lerp(Math.abs(scale.y), scaleX, 0.2);
+
+      const scaleX = this.currentPowerUp == PowerUpState.BIG ? this.bigScale : 1.0;
+
+      const scale = this.transform.scale;
+      const velSign = Math.sign(this.dir);
+
+      scale.x = lerp(Math.abs(scale.x), scaleX, 0.35);
+      scale.y = lerp(Math.abs(scale.y), scaleX, 0.35);
       if (!this.isGrounded && Math.abs(this.velocity.y) > MAX_FALL_SPEED * 0.75) {
         scale.x = lerp(Math.abs(scale.x), scaleX * 0.7, Math.abs(this.velocity.x) / (MAXIMUM_RUNNING_SPEED));
         scale.y = lerp(Math.abs(scale.y), scaleX * 1.5, Math.abs(this.velocity.y) / (MAX_FALL_SPEED));
@@ -466,19 +428,20 @@ export class Player extends GameObject {
   }
 
   private move() {
+    if (!this.controller || !this.collider) return;
 
     PhysicsWorld.moveAndSlide(
-      this.controller, 
-      this.collider, 
-      this.transform, 
-      this.velocity, 
-      1, 
+      this.controller,
+      this.collider,
+      this.transform,
+      this.velocity,
+      1,
       (collider) => this.canCollideWith(collider)
     );
 
     this.world.physics.world.intersectionsWithShape(
-      this.collider.translation(), 
-      this.collider.rotation(), 
+      this.collider.translation(),
+      this.collider.rotation(),
       this.collider.shape,
       (handle) => {
         const other = this.world.physics.getGameObjectFromCollider(handle);
@@ -494,11 +457,9 @@ export class Player extends GameObject {
       if (!collision.collider) continue;
       this.onControllerEnter(collision);
     }
-
   }
 
   private _normalState(fixedDeltaTime: number): void {
-    
     this.accel.x = 0.0;
     this.accel.x =
       this.inputVector.x *
@@ -511,32 +472,30 @@ export class Player extends GameObject {
 
     this.skidding = false;
     if (this.accel.x === 0.0) {
-      this.velocity.x = 
+      this.velocity.x =
         moveTowards(this.velocity.x, 0, RELEASE_DECELERATION);
-    } 
-    else if (
+    } else if (
       Math.sign(this.accel.x) !== Math.sign(this.velocity.x) &&
       this.velocity.x !== 0
     ) {
-      if (this.isGrounded) 
+      if (this.isGrounded)
         this.skidding = true;
-      
-      this.velocity.x = 
+
+      this.velocity.x =
         moveTowards(this.velocity.x, 0, SKIDDING_DECELERATION);
     }
 
-    if (this.runBeforeWalkTimer > 0) 
+    if (this.runBeforeWalkTimer > 0)
       this.runBeforeWalkTimer -= fixedDeltaTime;
 
     if (
       this.running ||
       (Math.abs(this.velocity.x) > MAXIMUM_WALK_SPEED + WALKING_ACCELERATION && this.runBeforeWalkTimer > 0)
     ) {
-      this.velocity.x = 
+      this.velocity.x =
         clampf(this.velocity.x, -MAXIMUM_RUNNING_SPEED, MAXIMUM_RUNNING_SPEED);
-    } 
-    else {
-      this.velocity.x = 
+    } else {
+      this.velocity.x =
         clampf(this.velocity.x, -MAXIMUM_WALK_SPEED, MAXIMUM_WALK_SPEED);
     }
 
@@ -555,7 +514,7 @@ export class Player extends GameObject {
     // Y Movement
     let gravity = 0.0;
     if (!this.isGrounded) {
-      if (Global.input.isKeyDown(this.keyJump) && this.velocity.y <= JUMP_HANG) 
+      if (Global.input.isKeyDown(this.keyJump) && this.velocity.y <= JUMP_HANG)
         gravity = -JUMP_HELD_GRAVITY;
       else
         gravity = -JUMP_GRAVITY;
@@ -564,7 +523,7 @@ export class Player extends GameObject {
 
     if (this.jumped && this.isGrounded) {
       let initVel = JUMP_INIT_VEL;
-      let absVelX = Math.abs(this.velocity.x);
+      const absVelX = Math.abs(this.velocity.x);
       if (absVelX < MAXIMUM_WALK_SPEED)
         initVel += 0x00200 * SUBSUBSUBPIXEL_DELTA_TIME;
       else if (absVelX < MAXIMUM_RUNNING_SPEED)
@@ -575,6 +534,7 @@ export class Player extends GameObject {
       this.accel.y = 0;
       this.velocity.y = initVel;
       this.jumped = false;
+      AudioManager.getInstance().playJump();
       spawnJumpingParticles(this.world, this.transform.position);
     }
 
@@ -589,56 +549,55 @@ export class Player extends GameObject {
   }
 
   private _powerupUpdate(fixedDeltaTime: number): void {
-    
     this.powerUpStartTimer -= this.world.timer.unscaledDelta;
-    if (this.powerUpStartTimer <= 0)
-    {
+    if (this.powerUpStartTimer <= 0) {
       this.world.timer.timescale = 1.0;
-      this.powerUp = this.nextPowerUp;
+      this.currentPowerUp = this.nextPowerUp;
       this.setCurrentState(PlayerState.NORMAL);
-      if (this.powerUp == PowerUpState.BIG) {
+      if (this.currentPowerUp == PowerUpState.BIG) {
         this.mesh.position.y = this.modelOffsetY + (0.15);
         this.transform.scale.set(this.bigScale, this.bigScale, this.bigScale);
-      }
-      else {
+      } else {
         this.mesh.position.y = this.modelOffsetY;
         this.transform.scale.set(1.0, 1.0, 1.0);
       }
-      // if (this.nextPowerUp != PowerUpState.SMALL) {
-      //   this.transform.position.y += 1.0;
-      // }
       this.invincibleTimer = INVINCIBLE_TIME;
     }
   }
 
   private onIntersection(other: GameObject): void {
     if (other instanceof Coin) {
-      this.world.removeGameObject(other);
+      other.destroy();
     }
   }
 
-  private onControllerEnter(collision : RAPIER.CharacterCollision): void {
-    if (!collision.collider) return;
+  private onControllerEnter(collision: RAPIER.CharacterCollision): void {
+    if (!collision.collider || !this.collider) return;
     const other = this.world.physics.getGameObjectFromCollider(collision.collider);
+    if (!other) return;
+
     if (other instanceof Brick) {
       if (collision.normal1.y < -0.5) {
         this.velocity.y = 0;
         other.onHit();
       }
-    }
-    else if (other instanceof Goomba) {
+    } else if (other instanceof Goomba) {
       if (other.isDead) {
         return;
       }
       if (collision.normal1.y > 0.5) {
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit();
-      }
-      else {
+        this.comboCounter++;
+        this.comboTimer = COMBO_TIME;
+        if (this.comboCounter > 1) {
+          eventBus.emit("hud:combo", this.comboCounter);
+        }
+        eventBus.emit("screen:shake", 0.15, 0.2);
+      } else {
         this.setCurrentState(PlayerState.DEAD);
       }
-    }
-    else if (other instanceof Koopa) {
+    } else if (other instanceof Koopa) {
       if (other.isDead) {
         return;
       }
@@ -647,27 +606,29 @@ export class Player extends GameObject {
           .transform.position.copy(this.transform.position);
         this.velocity.y = ENEMY_BOUNCE;
         other.onHit(-Math.sign(collision.collider.translation().x - this.collider.translation().x));
-      }
-      else {
-        if (other.IsInShell && Math.abs(other.Velocity.x) < 0.05) {
+        this.comboCounter++;
+        this.comboTimer = COMBO_TIME;
+        if (this.comboCounter > 1) {
+          eventBus.emit("hud:combo", this.comboCounter);
+        }
+        eventBus.emit("screen:shake", 0.15, 0.2);
+      } else {
+        if (other.isInShell && Math.abs(other.vel.x) < 0.05) {
           this.kickTimer = KICK_ANIMATION_TIME;
 
           this.world.addGameObject(new ScorePopup(ScoreType.Score100, this.world))
             .transform.position.copy(this.transform.position);
           other.setDir(Math.sign(collision.collider.translation().x - this.collider.translation().x));
-        }
-        else {
+        } else {
           this.setCurrentState(PlayerState.DEAD);
         }
       }
-    }
-    else if (other instanceof QuestionBlock) {
+    } else if (other instanceof QuestionBlock) {
       if (collision.normal1.y < -0.5) {
         this.velocity.y = 0;
-        other.Hit(Math.sign(collision.collider.translation().x - this.collider.translation().x));
+        other.onHit(Math.sign(collision.collider.translation().x - this.collider.translation().x));
       }
-    }
-    else if (other instanceof Coin) {
+    } else if (other instanceof Coin) {
       other.destroy();
     }
   }

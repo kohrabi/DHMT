@@ -12,4 +12,11 @@ function lerp(start: number, end: number, t: number): number {
   return start + (end - start) * t;
 }
 
-export { clampf, moveTowards, lerp };
+import * as THREE from "three";
+
+function clampfV2(value: THREE.Vector2, min: number, max: number): void {
+  value.x = clampf(value.x, min, max);
+  value.y = clampf(value.y, min, max);
+}
+
+export { clampf, moveTowards, lerp, clampfV2 };

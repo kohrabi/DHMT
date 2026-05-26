@@ -21,6 +21,7 @@ export class World {
   readonly frustum = new THREE.Frustum();
   readonly projView = new THREE.Matrix4();
   public readonly timer : GameTimer = new GameTimer();
+  public frustumCulling = true;
   private physicsAccumulator = 0;
 
   constructor(readonly gameScene : Scene) {
@@ -119,8 +120,9 @@ export class World {
     this.frustum.setFromProjectionMatrix(this.projView);
   }
 
-  public isCameraVisible(transform : THREE.Object3D, boundingSphere : THREE.Sphere): boolean {
-    boundingSphere.center = transform.position;
+  public isCameraVisible(transform: THREE.Object3D, boundingSphere: THREE.Sphere): boolean {
+    if (!this.frustumCulling) return true;
+    boundingSphere.center.copy(transform.position);
     return this.frustum.intersectsSphere(boundingSphere);
   }
 

@@ -1,65 +1,48 @@
-import { PhysicsWorld, GameObject, World } from '@/engine';
-import * as Global from '@/global';
-import { sceneManager } from '../../global';
-import RAPIER from '@dimforge/rapier3d-compat';
-import * as THREE from 'three';
-import { OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL, SUBSUBSUBPIXEL_DELTA_TIME } from '@/engine/constants';
-import { Player } from './player';
-import { thickness } from 'three/tsl';
-import { ScorePopup, ScoreType } from './scorePopup';
+import { World } from "@/engine";
+import * as THREE from "three";
+import { AbstractPhysicsBody } from "@/game/common/abstractPhysicsBody";
+import { eventBus } from "@/engine/eventBus";
+import { AudioManager } from "@/game/audio/audioManager";
+import { OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
+import { Player } from "./player";
+import { ScorePopup, ScoreType } from "./scorePopup";
 
-
-const COIN_KILL_TIME = 0.5
+const COIN_KILL_TIME = 0.5;
 const COIN_INIT_Y_VEL = 0x07A00 * SUBSUBSUBPIXEL_DELTA_TIME;
-const COIN_Y_DESTROY = 0x02000 * SUBSUBSUBPIXEL;
+const COIN_FALL_MULTIPLIER = 20.0;
 
 export enum CoinState {
-  INTRO, 
-  BRICK, 
+  INTRO,
+  BRICK,
   NORMAL
 }
 
-export class Coin extends GameObject {
-  private mesh!: THREE.Object3D;
-  private collider! : RAPIER.Collider;
-
-  private originalY = 0;
+export class Coin extends AbstractPhysicsBody {
   private velocity = new THREE.Vector3();
+  private originalY = 0;
   private killTimer = COIN_KILL_TIME;
-  private meshBox?: THREE.Box3;
-  private meshSphere: THREE.Sphere = new THREE.Sphere();
 
   private currentState = CoinState.NORMAL;
 
-  constructor(world : World) {
+  constructor(world: World) {
     super(
       `Coin_${world.gameObjects.size}`,
       world,
     );
   }
 
-  async start() : Promise<void> {
+  async start(): Promise<void> {
     await super.start();
-    
+
     this.originalY = this.transform.position.y;
 
-    const shape = PhysicsWorld.getSphereShape(this.transform, 0.25)!;
-    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    const collider = this.world.physics.world.createCollider(shape);
-    collider.setSensor(true);
-    this.collider = collider;
-    this.world.physics.registerCollider(collider, this);
-    const model = await this.world.gameScene.content.loadGLTF(
-      "assets/platformer/coin-gold.glb",
+    this.createBoxCollider(
+      new THREE.Vector3(0.5, 0.5, 0.5),
+      new THREE.Vector3(0, 0, 0),
+      true,
     );
-    const modelMesh = model.scene.clone();
-    modelMesh.translateY(-0.25);
-    this.mesh = modelMesh;
-    this.transform.add(modelMesh);
 
-    this.meshBox = new THREE.Box3().setFromObject(this.mesh);
-    this.meshBox.expandByScalar(1);
-    this.meshBox.getBoundingSphere(this.meshSphere);
+    await this.loadModel("assets/platformer/coin-gold.glb", -0.25);
   }
 
   fixedUpdate(fixedDeltaTime: number): void {
@@ -68,28 +51,29 @@ export class Coin extends GameObject {
         return;
       }
       this.transform.rotateY(0.1);
-      this.transform.position.y = this.originalY + 
+      this.transform.position.y = this.originalY +
         Math.sin(this.world.timer.elapsed * 5 + this.transform.position.x) * 0.1;
-      
-      this.world.physics.world.intersectionsWithShape(
-        this.collider.translation(), 
-        this.collider.rotation(), 
-        this.collider.shape,
-        (handle) => {
-          const other = this.world.physics.getGameObjectFromCollider(handle);
-          if (other instanceof Player) {
-            this.destroy();
-          }
-          return false;
-        }
-      );
-    }
-    else {
+
+      if (this.collider) {
+        this.world.physics.world.intersectionsWithShape(
+          this.collider.translation(),
+          this.collider.rotation(),
+          this.collider.shape,
+          (handle) => {
+            const other = this.world.physics.getGameObjectFromCollider(handle);
+            if (other instanceof Player) {
+              this.collect();
+            }
+            return false;
+          },
+        );
+      }
+    } else {
       this.transform.rotateY(0.25);
-      console.log("Coin velocity:", this.velocity.y);
-      const something = 20.0;
-      this.velocity.y = 
-        Math.max(this.velocity.y - OBJECT_FALL * something, -OBJECT_MAX_FALL * something);
+      this.velocity.y = Math.max(
+        this.velocity.y - OBJECT_FALL * COIN_FALL_MULTIPLIER,
+        -OBJECT_MAX_FALL * COIN_FALL_MULTIPLIER,
+      );
       this.transform.position.y += this.velocity.y * fixedDeltaTime;
 
       if (this.killTimer > 0) this.killTimer -= fixedDeltaTime;
@@ -97,45 +81,32 @@ export class Coin extends GameObject {
         this.destroy();
       }
     }
-    
   }
-  
+
   public setState(state: CoinState) {
     this.currentState = state;
     switch (state) {
-      case CoinState.INTRO:
-      {
+      case CoinState.INTRO: {
         this.velocity.y = COIN_INIT_Y_VEL * 10;
         this.killTimer = COIN_KILL_TIME;
         this.world.physics.addDeferedCall(() => {
-          this.collider.setEnabled(false);
+          this.collider?.setEnabled(false);
         });
         break;
       }
     }
   }
 
-  onDestroy(): void {
-    super.onDestroy();
+  private collect(): void {
+    eventBus.emit("coin:collected");
+    AudioManager.getInstance().playCoin();
+    this.destroy();
+  }
+
+  override onDestroy(): void {
     const scorePopup = new ScorePopup(ScoreType.Score100, this.world);
     scorePopup.transform.position.copy(this.transform.position);
     this.world.addGameObject(scorePopup);
-
-    try {
-
-      this.world.physics.removeCollider(this.collider);
-      this.mesh.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach((mat) => mat.dispose());
-          } else {
-            child.material.dispose();
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error during coin destruction:", error);
-    }
+    super.onDestroy();
   }
 }

@@ -1,4 +1,4 @@
-import { clampf, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
+import { clampf, enableShadows, GameObject, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import RAPIER from '@dimforge/rapier3d-compat';
 import { MESH_BOX_EXPAND, OBJECT_DEAD_BOUNCE, OBJECT_DEAD_X_VEL, OBJECT_FALL, OBJECT_MAX_FALL, SUBSUBSUBPIXEL_DELTA_TIME } from "@/engine/constants";
@@ -114,6 +114,7 @@ export class Koopa extends GameObject {
     mesh.position.set(0, -0.5, 0);
     mesh.rotation.y = Math.PI / 4;
     this.mesh = mesh;
+    enableShadows(this.mesh);
     this.transform.add(this.mesh);
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);
     this.meshBox.expandByScalar(MESH_BOX_EXPAND);

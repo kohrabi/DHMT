@@ -1,4 +1,5 @@
 import * as Global from "./global";
+import * as THREE from "three";
 import { Scene2 } from "./game/scenes/scene2";
 import RAPIER from "@dimforge/rapier3d-compat";
 import { MainMenu } from "./game/scenes/mainMenu";
@@ -7,6 +8,8 @@ await RAPIER.init();
 
 Global.renderer.setSize(window.innerWidth, window.innerHeight);
 Global.renderer.setClearColor(0x202020);
+Global.renderer.shadowMap.enabled = true;
+Global.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.getElementById("webgl")!.appendChild(Global.renderer.domElement);
 
 await Global.sceneManager.setScene(new MainMenu());

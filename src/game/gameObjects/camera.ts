@@ -10,6 +10,10 @@ export class Camera extends GameObject {
   private controls?: OrbitControls;
   public isFollowingTarget = true;
   private zone?: PlayZone;
+  private sunLight?: THREE.DirectionalLight;
+
+  /** The offset from camera position to sun light position. */
+  private readonly sunOffset = new THREE.Vector3(6, 10, 4);
 
   constructor(
     private readonly camera : THREE.Camera, 
@@ -94,10 +98,35 @@ export class Camera extends GameObject {
     
     // Update to get the correct view-projection matrix for frustum culling.
     this.world.updateFrustum(this.camera);
+
+    // Move the sun light so its shadow frustum always covers the visible area.
+    if (this.sunLight) {
+      this.sunLight.position.set(
+        this.camera.position.x + this.sunOffset.x,
+        this.sunOffset.y,
+        this.camera.position.z + this.sunOffset.z,
+      );
+      this.sunLight.target.position.set(
+        this.camera.position.x,
+        0,
+        this.camera.position.z,
+      );
+      this.sunLight.target.updateMatrixWorld();
+    }
   }
 
   public setTarget(target: GameObject) {
     this.target = target;
+  }
+
+  /**
+   * Attach a DirectionalLight to the camera so its shadow frustum
+   * tracks the camera position and never falls off-screen.
+   */
+  public setSunLight(light: THREE.DirectionalLight): void {
+    this.sunLight = light;
+    // Ensure the target object is in the scene so updateMatrixWorld works.
+    this.world.scene.add(light.target);
   }
 
   /**

@@ -1,4 +1,5 @@
 import { Scene } from "@/engine";
+import { enableShadows } from "@/engine/utils";
 import * as Global from "@/global";
 import * as THREE from "three";
 import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
@@ -188,6 +189,7 @@ export class MainMenu extends Scene {
   private skyTexture?   : THREE.Texture;
   private animTime      = 0;
   private scrollOffset  = 0;
+  private sunLight?     : THREE.DirectionalLight;
 
   constructor() {
     super("mainMenu");
@@ -202,7 +204,19 @@ export class MainMenu extends Scene {
     // Lighting
     const sun = new THREE.DirectionalLight(0xfff5d6, 2.5);
     sun.position.set(5, 12, 4);
+    sun.castShadow = true;
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = 200;
+    sun.shadow.camera.left = -30;
+    sun.shadow.camera.right = 30;
+    sun.shadow.camera.top = 20;
+    sun.shadow.camera.bottom = -20;
+    sun.shadow.bias = -0.001;
     this.world.scene.add(sun);
+    this.world.scene.add(sun.target);
+    this.sunLight = sun;
     this.world.scene.add(new THREE.HemisphereLight(0x9fd8ff, 0x6bbf5a, 1.8));
 
     // Camera
@@ -254,6 +268,21 @@ export class MainMenu extends Scene {
       this.titleGroup.position.y = titleY + Math.sin(this.animTime * bobFreq) * bobAmp;
       this.titleGroup.rotation.y = Math.sin(this.animTime * rockFreq) * rockAmp;
     }
+
+    // Keep sun shadow frustum centred on the camera so it never falls off-screen.
+    if (this.sunLight) {
+      this.sunLight.position.set(
+        this.camera.position.x + 5,
+        12,
+        this.camera.position.z + 4,
+      );
+      this.sunLight.target.position.set(
+        this.camera.position.x,
+        0,
+        this.camera.position.z,
+      );
+      this.sunLight.target.updateMatrixWorld();
+    }
   }
 
   public async deactivate(): Promise<void> {
@@ -298,6 +327,7 @@ export class MainMenu extends Scene {
         0,
       );
       mesh.scale.setScalar(tileSize);
+      enableShadows(mesh);
       this.world.scene.add(mesh);
       this.groundTiles.push(mesh);
     }
@@ -352,6 +382,7 @@ export class MainMenu extends Scene {
       def.posZ + (Math.random() - 0.5) * def.posZJitter,
     );
     mesh.rotation.y = Math.random() * (def.rotationYJitter ?? 0);
+    enableShadows(mesh);
 
     this.world.scene.add(mesh);
     layer.tiles.push(mesh);

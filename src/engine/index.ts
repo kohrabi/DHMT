@@ -10,3 +10,4 @@ export * from "@/engine/scene";
 export * from "@/engine/sceneManager";
 
 export * from "@/engine/math";
+export * from "@/engine/utils";

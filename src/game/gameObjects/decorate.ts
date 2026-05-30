@@ -1,4 +1,5 @@
 import { GameObject, World } from "@/engine";
+import { enableShadows } from "@/engine/utils";
 import * as THREE from "three";
 
 export class Decorate extends GameObject {
@@ -8,5 +9,6 @@ export class Decorate extends GameObject {
       world,
       model
     );
+    enableShadows(model);
   }
-}
+}

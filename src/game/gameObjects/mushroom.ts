@@ -1,4 +1,4 @@
-import { PhysicsWorld, GameObject, World } from '@/engine';
+import { enableShadows, PhysicsWorld, GameObject, World } from '@/engine';
 import * as Global from '@/global';
 import { sceneManager } from '../../global';
 import RAPIER from '@dimforge/rapier3d-compat';
@@ -74,6 +74,7 @@ export class Mushroom extends GameObject {
     const modelMesh = model.scene.clone();
     modelMesh.translateY(-0.1);
     this.mesh = modelMesh;
+    enableShadows(this.mesh);
     this.transform.add(this.mesh);
 
     this.meshBox = new THREE.Box3().setFromObject(this.mesh);

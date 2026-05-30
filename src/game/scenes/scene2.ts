@@ -32,6 +32,7 @@ type LevelData = {
 export class Scene2 extends Scene {
   // private physicsHelper?: RapierHelper;
   private skyTexture?: THREE.Texture;
+  private sunLight?: THREE.DirectionalLight;
 
   public constructor() {
     super("scene2");
@@ -39,14 +40,25 @@ export class Scene2 extends Scene {
 
   protected async loadContent(): Promise<void> {
     console.log("Loading content for Scene2...");
-    Global.renderer.shadowMap.enabled = true;
 
     this.skyTexture = this.buildSkyTexture();
     this.world.scene.background = this.skyTexture;
 
     const sunLight = new THREE.DirectionalLight(0xfff2cc, 2);
     sunLight.position.set(6, 10, 4);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 200;
+    sunLight.shadow.camera.left = -40;
+    sunLight.shadow.camera.right = 40;
+    sunLight.shadow.camera.top = 20;
+    sunLight.shadow.camera.bottom = -20;
+    sunLight.shadow.bias = -0.001;
     this.world.scene.add(sunLight);
+    this.sunLight = sunLight;
+
 
     const skyLight = new THREE.HemisphereLight(0x8ad7ff, 0x6bbf5a, 2);
     this.world.scene.add(skyLight);
@@ -113,6 +125,9 @@ export class Scene2 extends Scene {
   public async loadLevel(levelData: LevelData): Promise<void> {
     const camera = new Camera(this.camera, this.world, null);
     const cameraObject = this.addGameObject(camera);
+    if (this.sunLight) {
+      camera.setSunLight(this.sunLight);
+    }
 
     for (const objectData of Object.values(levelData.objects)) {
       let go: GameObject | null = null;

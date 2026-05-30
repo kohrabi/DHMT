@@ -1,4 +1,4 @@
-import { clampf, GameObject, lerp, moveTowards, PhysicsWorld, World } from "@/engine";
+import { clampf, enableShadows, GameObject, lerp, moveTowards, PhysicsWorld, World } from "@/engine";
 import * as THREE from "three";
 import * as Global from "@/global";
 import RAPIER from '@dimforge/rapier3d-compat';
@@ -263,7 +263,9 @@ export class Player extends GameObject {
     model.scene.position.set(0, this.modelOffsetY, 0);
     model.scene.rotation.y = Math.PI / 4;
     this.mesh = model.scene;
+    enableShadows(this.mesh);
     this.transform.add(model.scene);
+
     this.animator.initialize(this.mesh);
     console.log("Loaded player model and animations", model.animations);
     this.animator.setAnimations({

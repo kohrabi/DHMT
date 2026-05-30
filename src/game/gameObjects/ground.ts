@@ -1,9 +1,12 @@
 
+
 import { GameObject } from "@/engine/gameObject";
 import { PhysicsWorld } from "@/engine/physicsWorld";
 import { World } from "@/engine/world";
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
+import { enableShadows } from "@/engine/utils";
+
 
 export class Ground extends GameObject {
   private mesh!: THREE.Mesh;
@@ -21,6 +24,7 @@ export class Ground extends GameObject {
 
   async start() : Promise<void> {
     await super.start();
+    enableShadows(this.transform);
     const t = this.transform.clone();
     t.position.add(this.colliderOffset.multiply(this.transform.scale));
     const shape = PhysicsWorld.getBoxShape(

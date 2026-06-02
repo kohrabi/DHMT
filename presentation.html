@@ -120,8 +120,30 @@
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 12px;
         min-height: 0;
+      }
+      .slide-content > .grid2,
+      .slide-content > .grid3 {
+        flex: 1;
+        min-height: 0;
+      }
+      .slide-content > .card {
+        flex-shrink: 0;
+      }
+      .grid2 > .card,
+      .grid3 > .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: flex-start;
+      }
+      .card > ul {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding-left: 14px;
       }
       .slide-content > .grid2,
       .slide-content > .grid3,
@@ -455,46 +477,52 @@
 `,
       });
 
-      // ═══ SLIDE 3: Ý TƯỞNG ═══
+      // ═══ SLIDE 3: Ý TƯỞNG (Đã sửa lỗi hiển thị cân bằng cả hai bên) ═══
       slides.push({
-        title: "Ý tưởng chương trình",
+        title: "Ý tưởng chương trình & Công nghệ",
         content: `
-<div class="grid2" style="flex:1; min-height:0;">
-  <div style="display:flex;flex-direction:column;gap:12px;justify-content:center;">
+<div style="display: grid; grid-template-columns: 55% 45%; gap: 24px; flex: 1; min-height: 0; align-items: center; width: 100%; height: 100%;">
+  
+  <!-- CỘT BÊN TRÁI: THÔNG TIN CHI TIẾT (CỠ CHỮ TO, RÕ RÀNG) -->
+  <div style="display: flex; flex-direction: column; gap: 16px; justify-content: center; height: 100%;">
     <div>
-      <h2>Tổng quan</h2>
-      <p>Game platformer 3D lấy cảm hứng từ <strong>Super Mario Bros</strong> — người chơi điều khiển nhân vật vượt chướng ngại vật, thu thập xu, tiêu diệt kẻ địch. Xây dựng trên <strong>WebGL</strong> qua Three.js, kết hợp vật lý <strong>Rapier3D</strong>.</p>
+      <h2 style="font-size: 15px; color: var(--yellow); margin-bottom: 6px; border-left: 3px solid var(--accent); padding-left: 8px;">Tổng quan đề tài</h2>
+      <p style="font-size: 12.5px; line-height: 1.5; color: var(--text);">
+        Xây dựng game platformer 3D lấy cảm hứng từ <strong>Super Mario Bros</strong> — người chơi điều khiển nhân vật vượt chướng ngại vật, thu thập xu, tiêu diệt kẻ địch. Dự án xây dựng trên nền tảng <strong>WebGL 2.0</strong> thông qua thư viện Three.js, kết hợp mô phỏng vật lý thời gian thực từ Engine <strong>Rapier3D</strong>.
+      </p>
     </div>
 
     <div>
-      <h2>Tương tác người dùng</h2>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;font-size:11px">
-        <span class="tag yellow">A/D</span> Di chuyển ·
-        <span class="tag yellow">Space</span> Nhảy (giữ = cao hơn) ·
-        <span class="tag yellow">J</span> Chạy ·
-        <span class="tag yellow">S</span> Ngồi ·
-        <span class="tag yellow">C</span> Orbit Cam debug ·
-        <span class="tag">I</span> Slow-mo
+      <h2 style="font-size: 15px; color: var(--yellow); margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 8px;">Tương tác người dùng</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; line-height: 1.6;">
+        <span class="tag yellow" style="font-size: 10.5px; padding: 2px 6px;">A / D</span> Di chuyển tiến lùi &nbsp;·&nbsp;
+        <span class="tag yellow" style="font-size: 10.5px; padding: 2px 6px;">Space</span> Nhảy (giữ lâu để nhảy cao hơn) &nbsp;·&nbsp;
+        <span class="tag yellow" style="font-size: 10.5px; padding: 2px 6px;">J</span> Chạy nhanh &nbsp;·&nbsp;
+        <span class="tag yellow" style="font-size: 10.5px; padding: 2px 6px;">S</span> Ngồi tránh chướng ngại &nbsp;·&nbsp;
+        <span class="tag yellow" style="font-size: 10.5px; padding: 2px 6px;">C</span> Kích hoạt Orbit Camera Debug &nbsp;·&nbsp;
+        <span class="tag" style="font-size: 10.5px; padding: 2px 6px;">I</span> Hiệu ứng Slow-motion (giảm tốc)
       </div>
     </div>
 
     <div>
-      <h2>Công nghệ</h2>
-      <div style="display:flex;flex-wrap:wrap;gap:4px">
-        <span class="tag">Three.js v0.184</span>
-        <span class="tag">Rapier3D v0.19</span>
-        <span class="tag green">WebGL 2.0</span>
-        <span class="tag green">TypeScript</span>
-        <span class="tag yellow">Vite</span>
-        <span class="tag yellow">Bun</span>
-        <span class="tag">Tween.js</span>
-        <span class="tag">dat.gui</span>
-        <span class="tag green">Canvas API</span>
+      <h2 style="font-size: 15px; color: var(--yellow); margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 8px;">Công nghệ tích hợp</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <span class="tag" style="font-size: 10.5px; padding: 3px 6px;">Three.js v0.184</span>
+        <span class="tag" style="font-size: 10.5px; padding: 3px 6px;">Rapier3D v0.19</span>
+        <span class="tag green" style="font-size: 10.5px; padding: 3px 6px;">WebGL 2.0</span>
+        <span class="tag green" style="font-size: 10.5px; padding: 3px 6px;">TypeScript</span>
+        <span class="tag yellow" style="font-size: 10.5px; padding: 3px 6px;">Vite Bundler</span>
+        <span class="tag yellow" style="font-size: 10.5px; padding: 3px 6px;">Bun Runtime</span>
+        <span class="tag" style="font-size: 10.5px; padding: 3px 6px;">Tween.js</span>
+        <span class="tag" style="font-size: 10.5px; padding: 3px 6px;">dat.gui</span>
+        <span class="tag green" style="font-size: 10.5px; padding: 3px 6px;">HTML5 Canvas API</span>
       </div>
     </div>
   </div>
-  <div style="display:flex; justify-content:center; align-items:stretch; min-height:0;">
-    <svg class="diagram" viewBox="0 0 280 350" style="height:100%; width:auto;">
+  
+  <!-- CỘT BÊN PHẢI: SƠ ĐỒ GAME LOOP (ĐÃ ĐƯỢC PHÓNG TO, RÕ RÀNG) -->
+  <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; min-height: 0;">
+    <svg class="diagram" viewBox="0 0 280 350" style="width: 100%; height: 100%; max-height: 380px; max-width: 310px; display: block; object-fit: contain;">
       <text x="140" y="12" text-anchor="middle" class="title">Game Loop (mỗi frame)</text>
       <rect x="30" y="20" width="220" height="22" class="box"/><text x="140" y="35" text-anchor="middle">1. Input (keyboard/mouse)</text>
       <line x1="140" y1="42" x2="140" y2="52" class="arrow"/>
@@ -524,6 +552,7 @@
       <text x="140" y="295" text-anchor="middle" fill="var(--muted)" font-size="9">Lặp ≈ 60 lần/giây, physics step 60Hz</text>
     </svg>
   </div>
+
 </div>
 `,
       });
@@ -532,7 +561,7 @@
       slides.push({
         title: "Các chức năng chính",
         content: `
-<div class="grid3">
+<div class="grid3" style="flex: 1.1;">
   <div class="card">
     <h3>Vẽ khối 3D & Load Model</h3>
     <ul>
@@ -541,7 +570,7 @@
       <li>17+ model: Mario, Goomba, Koopa, Coin, Brick, Star, Nấm...</li>
       <li>Level load từ JSON động</li>
     </ul>
-    <span class="tag">GLTFLoader</span> <span class="tag">SkeletonUtils</span>
+    <div style="margin-top:auto;"><span class="tag">GLTFLoader</span> <span class="tag">SkeletonUtils</span></div>
   </div>
   <div class="card">
     <h3>Camera & Phép chiếu</h3>
@@ -552,7 +581,7 @@
       <li>OrbitControls debug (C)</li>
       <li>Frustum culling CPU-side</li>
     </ul>
-    <span class="tag green">Phối cảnh</span> <span class="tag">Frustum</span>
+    <div style="margin-top:auto;"><span class="tag green">Phối cảnh</span> <span class="tag">Frustum</span></div>
   </div>
   <div class="card">
     <h3>Phép biến đổi Affine</h3>
@@ -562,8 +591,11 @@
       <li><strong>Tỉ lệ</strong>: Power-up BIG 1.5x, squash & stretch</li>
       <li>Đồng bộ transform Three.js ↔ Rapier collider</li>
     </ul>
-    <span class="tag yellow">T·R·S</span> <span class="tag">matrix</span>
+    <div style="margin-top:auto;"><span class="tag yellow">T·R·S</span> <span class="tag">matrix</span></div>
   </div>
+</div>
+
+<div class="grid3" style="flex: 1.1;">
   <div class="card">
     <h3>Chiếu sáng & Bóng đổ</h3>
     <ul>
@@ -573,7 +605,7 @@
       <li>Shadow frustum động theo camera</li>
       <li>Bias -0.001 chống shadow acne</li>
     </ul>
-    <span class="tag">PCFSoft</span> <span class="tag green">2048px</span>
+    <div style="margin-top:auto;"><span class="tag">PCFSoft</span> <span class="tag green">2048px</span></div>
   </div>
   <div class="card">
     <h3>Texture & Font 3D</h3>
@@ -583,7 +615,7 @@
       <li>TextGeometry + font Mario tùy chỉnh</li>
       <li>ContentManager: cache + dedup + dispose</li>
     </ul>
-    <span class="tag green">Canvas</span> <span class="tag">TextGeometry</span>
+    <div style="margin-top:auto;"><span class="tag green">Canvas</span> <span class="tag">TextGeometry</span></div>
   </div>
   <div class="card">
     <h3>Animation & Hiệu ứng</h3>
@@ -594,13 +626,14 @@
       <li>Parallax scrolling menu nền 6 lớp</li>
       <li>Procedural: coin bob, star rotate, block bounce</li>
     </ul>
-    <span class="tag yellow">keyframe</span> <span class="tag">procedural</span>
+    <div style="margin-top:auto;"><span class="tag yellow">keyframe</span> <span class="tag">procedural</span></div>
   </div>
 </div>
 
-<h2>Hệ thống Gameplay</h2>
-<div class="grid3">
-  <div class="card" style="display:flex; flex-direction:column;">
+<h2 style="margin: 0; font-size: 13px;">Hệ thống Gameplay</h2>
+
+<div class="grid3" style="flex: 1;">
+  <div class="card" style="display:flex; flex-direction:column; height: 100%;">
     <h3>Player State Machine</h3>
     <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:0;">
       <svg class="diagram" viewBox="0 0 200 100" style="width:100%; height:auto; max-height:85px;">
@@ -643,19 +676,19 @@
       slides.push({
         title: "Giới thiệu các kỹ thuật đồ họa sử dụng",
         content: `
-<div class="grid2">
-  <div style="display:flex;flex-direction:column;gap:6px">
-    <div class="card">
+<div class="grid2" style="flex: 1;">
+  <div style="display:flex; flex-direction:column; gap:12px; height: 100%; justify-content: space-between;">
+    <div class="card" style="flex: 1;">
       <h3>1. Phép chiếu phối cảnh</h3>
       <div class="kv"><span class="key">Camera</span><span class="val">PerspectiveCamera</span></div>
       <div class="kv"><span class="key">FOV</span><span class="val">45° (góc nhìn dọc)</span></div>
       <div class="kv"><span class="key">Near / Far</span><span class="val">1 / 500</span></div>
       <div class="kv"><span class="key">Aspect</span><span class="val">dynamic (innerW/innerH)</span></div>
-      <p style="font-size:11px;margin-top:2px">Camera theo Player, clamp viewport trong PlayZone. OrbitControls debug.</p>
+      <p style="font-size:11px; margin-top:4px">Camera theo Player, clamp viewport trong PlayZone. OrbitControls debug.</p>
     </div>
-    <div class="card">
+    <div class="card" style="flex: 1.2;">
       <h3>2. Phép biến đổi Affine</h3>
-      <table>
+      <table style="width:100%; height:100%;">
         <tr><td>Phép</td><td>Ma trận</td><td>Ứng dụng trong game</td></tr>
         <tr><td>Tịnh tiến</td><td>T(dx,dy,dz)</td><td>Di chuyển nhân vật, enemy; score bay</td></tr>
         <tr><td>Xoay</td><td>R(θ, axis)</td><td>Coin rotateY, death spin rotateX, shell roll</td></tr>
@@ -663,9 +696,9 @@
         <tr><td>Kết hợp</td><td>M=T·R·S</td><td>transform.position + .rotation + .scale</td></tr>
       </table>
     </div>
-    <div class="card">
+    <div class="card" style="flex: 1.1; display: flex; flex-direction: column; justify-content: center;">
       <h3>3. Hệ thống chiếu sáng</h3>
-      <svg class="diagram" viewBox="0 0 300 110" style="width:100%; height:auto; max-height:90px;">
+      <svg class="diagram" viewBox="0 0 300 110" style="width:100%; height:auto; max-height:90px; margin-top:2px;">
         <rect x="5" y="6" width="140" height="35" class="box"/>
         <text x="75" y="21" text-anchor="middle" fill="var(--yellow)" font-size="10">DirectionalLight</text>
         <text x="75" y="33" text-anchor="middle" font-size="8">0xfff2cc · intensity 2.0</text>
@@ -679,8 +712,9 @@
       </svg>
     </div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:6px">
-    <div class="card">
+  
+  <div style="display:flex; flex-direction:column; gap:12px; height: 100%; justify-content: space-between;">
+    <div class="card" style="flex: 1;">
       <h3>4. Shadow Mapping</h3>
       <ul>
         <li><strong>PCFSoftShadowMap</strong> — nội suy nhiều mẫu → viền bóng mềm</li>
@@ -691,7 +725,7 @@
         <li>Mọi mesh castShadow + receiveShadow (enableShadows)</li>
       </ul>
     </div>
-    <div class="card">
+    <div class="card" style="flex: 0.9;">
       <h3>5. Texture & Procedural Geometry</h3>
       <ul>
         <li>PBR materials từ GLTF (color, roughness, metalness)</li>
@@ -700,9 +734,9 @@
         <li>Score popup: 2 lớp TextGeometry (outline đen + fill trắng)</li>
       </ul>
     </div>
-    <div class="card">
+    <div class="card" style="flex: 1.1; display: flex; flex-direction: column; justify-content: center;">
       <h3>6. Animation Pipeline</h3>
-      <svg class="diagram" viewBox="0 0 300 110" style="width:100%; height:auto; max-height:90px;">
+      <svg class="diagram" viewBox="0 0 300 110" style="width:100%; height:auto; max-height:90px; margin-top:2px;">
         <text x="150" y="10" text-anchor="middle" class="title">Từ GLTF Model tới Frame Render</text>
         <rect x="5" y="18" width="140" height="20" class="box"/><text x="75" y="32" text-anchor="middle">GLTF model.skeleton</text>
         <line x1="145" y1="28" x2="155" y2="28" class="arrow"/>
@@ -719,9 +753,10 @@
     </div>
   </div>
 </div>
-<div class="card" style="margin-top:2px">
+
+<div class="card" style="margin-top:2px; flex-shrink: 0;">
   <h3>7. Kỹ thuật bổ trợ</h3>
-  <div style="display:flex;gap:3px;flex-wrap:wrap">
+  <div style="display:flex; gap:3px; flex-wrap:wrap">
     <span class="tag">Frustum Culling (CPU)</span>
     <span class="tag green">Parallax Scrolling (6 lớp)</span>
     <span class="tag yellow">Particle System (4 loại)</span>
@@ -777,8 +812,8 @@
       slides.push({
         title: "Kết quả, hạn chế và hướng phát triển",
         content: `
-<h2>Kết quả đạt được</h2>
-<div class="grid3">
+<h2 style="margin: 0; font-size: 13px;">Kết quả đạt được</h2>
+<div class="grid3" style="flex: 1.1;">
   <div class="card">
     <h3>Đồ họa 3D</h3>
     <ul>
@@ -812,8 +847,8 @@
   </div>
 </div>
 
-<h2>Hạn chế hiện tại</h2>
-<div class="grid2">
+<h2 style="margin: 0; font-size: 13px;">Hạn chế hiện tại</h2>
+<div class="grid2" style="flex: 1;">
   <div class="card">
     <ul>
       <li>Góc camera cố định 2.5D, chưa xoay tự do khi chơi</li>
@@ -832,8 +867,8 @@
   </div>
 </div>
 
-<h2>Hướng phát triển</h2>
-<div class="grid3">
+<h2 style="margin: 0; font-size: 13px;">Hướng phát triển</h2>
+<div class="grid3" style="flex: 1.1;">
   <div class="card">
     <h3>Ngắn hạn</h3>
     <ul>
@@ -862,9 +897,9 @@
   </div>
 </div>
 
-<div style="text-align:center;margin-top:6px;padding:8px;background:#1a1b2e;border-radius:4px">
-  <p style="font-size:12px;color:var(--accent)"><strong>Tổng kết:</strong> Dự án đã áp dụng toàn bộ kiến thức đồ họa 3D CS105 vào sản phẩm game hoàn chỉnh, kiến trúc rõ ràng, khả năng mở rộng tốt.</p>
-  <p style="font-size:10px;color:var(--muted);margin-top:2px">
+<div style="text-align:center; padding:10px; background:#1a1b2e; border-radius:4px; flex-shrink: 0; margin-top: 4px;">
+  <p style="font-size:12px; color:var(--accent); margin: 0;"><strong>Tổng kết:</strong> Dự án đã áp dụng toàn bộ kiến thức đồ họa 3D CS105 vào sản phẩm game hoàn chỉnh, kiến trúc rõ ràng, khả năng mở rộng tốt.</p>
+  <p style="font-size:10px; color:var(--muted); margin-top:2px; margin-bottom: 0;">
     Source: &lt;&lt; LINK REPO &gt;&gt; &nbsp;·&nbsp; Demo: &lt;&lt; LINK DEMO &gt;&gt;
   </p>
 </div>

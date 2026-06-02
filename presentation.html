@@ -211,36 +211,36 @@ S.push({t:"Các chức năng chính của chương trình",c:`
 
 // ═══ 5: KỸ THUẬT ĐỒ HỌA ═══
 S.push({t:"Giới thiệu các kỹ thuật đồ họa sử dụng",c:`
-<div class="grid2" style="flex:1;min-height:0">
-  <div style="display:flex;flex-direction:column;gap:8px;height:100%">
+<div class="grid2" style="min-height:0;overflow:hidden">
+  <div style="display:flex;flex-direction:column;gap:5px">
     <div class="card" style="flex:1"><h3>1. Phép chiếu phối cảnh</h3>
       <div class="kv"><span class="key">Camera</span><span class="val">PerspectiveCamera</span></div>
-      <div class="kv"><span class="key">FOV</span><span class="val">45° (góc nhìn dọc)</span></div>
+      <div class="kv"><span class="key">FOV</span><span class="val">45°</span></div>
       <div class="kv"><span class="key">Near / Far</span><span class="val">1 / 500</span></div>
-      <div class="kv"><span class="key">Aspect</span><span class="val">dynamic (innerW / innerH)</span></div>
-      <p style="font-size:10px;margin-top:3px">Camera theo Player, clamp trong PlayZone, hỗ trợ OrbitControls debug.</p>
+      <div class="kv"><span class="key">Aspect</span><span class="val">dynamic (W/H)</span></div>
+      <p style="font-size:10px;margin-top:2px">Bám Player, clamp PlayZone, OrbitControls debug.</p>
     </div>
-    <div class="card" style="flex:1.3"><h3>2. Phép biến đổi Affine</h3>
-      <table><tr><td>Phép</td><td>Ứng dụng trong game</td></tr><tr><td>Tịnh tiến T(dx,dy,dz)</td><td>Di chuyển player, enemy; score bay lên</td></tr><tr><td>Xoay R(θ,axis)</td><td>Coin rotateY, death spin rotateX, shell roll</td></tr><tr><td>Tỉ lệ S(sx,sy,sz)</td><td>Power-up BIG 1.5x, squash & stretch</td></tr><tr><td>Kết hợp M=T·R·S</td><td>Đồng bộ transform Three.js ↔ Rapier</td></tr></table>
+    <div class="card" style="flex:1.4"><h3>2. Phép biến đổi Affine</h3>
+      <table><tr><td>Phép</td><td>Ma trận</td><td>Ứng dụng</td></tr><tr><td>Tịnh tiến</td><td>T(dx,dy,dz)</td><td>Player, enemy, score</td></tr><tr><td>Xoay</td><td>R(θ,axis)</td><td>Coin rotateY, death spin, shell</td></tr><tr><td>Tỉ lệ</td><td>S(sx,sy,sz)</td><td>Power-up 1.5x, squash & stretch</td></tr><tr><td>Kết hợp</td><td>M=T·R·S</td><td>Đồng bộ Three.js ↔ Rapier</td></tr></table>
     </div>
-    <div class="card" style="flex:1;padding-bottom:4px"><h3>3. Hệ thống chiếu sáng & Shadow</h3>
-      <div style="flex:1;min-height:0"><svg class="diagram" viewBox="0 0 300 95" style="border:none;background:transparent">
-        <rect x="5" y="3" width="140" height="30" class="box"/><text x="75" y="16" text-anchor="middle" fill="var(--yellow)" font-size="9">DirectionalLight</text><text x="75" y="28" text-anchor="middle" font-size="7">0xfff2cc · i=2.0</text>
-        <rect x="155" y="3" width="140" height="30" class="box"/><text x="225" y="16" text-anchor="middle" fill="var(--cyan)" font-size="9">HemisphereLight</text><text x="225" y="28" text-anchor="middle" font-size="7">sky/ground · i=2.0</text>
-        <rect x="5" y="40" width="290" height="48" style="fill:#1a1b2e;stroke:var(--green);rx:3;stroke-width:1.2"/>
-        <text x="150" y="54" text-anchor="middle" fill="var(--green)" font-size="9" font-weight="bold">Shadow Mapping: PCFSoft 2048×2048</text>
-        <text x="150" y="67" text-anchor="middle" font-size="7">frustum [-40,40]×[-20,20] · bias -0.001</text>
-        <text x="150" y="80" text-anchor="middle" font-size="7">Dynamic tracking: sunLight = camera.pos + (6,10,4)</text>
+    <div class="card" style="flex:1"><h3>3. Chiếu sáng & Shadow</h3>
+      <div style="flex:1;min-height:0"><svg class="diagram" viewBox="0 0 300 90" style="border:none;background:transparent">
+        <rect x="5" y="3" width="140" height="26" class="box"/><text x="75" y="14" text-anchor="middle" fill="var(--yellow)" font-size="9">DirectionalLight</text><text x="75" y="24" text-anchor="middle" font-size="7">0xfff2cc · i=2.0</text>
+        <rect x="155" y="3" width="140" height="26" class="box"/><text x="225" y="14" text-anchor="middle" fill="var(--cyan)" font-size="9">HemisphereLight</text><text x="225" y="24" text-anchor="middle" font-size="7">sky/ground · i=2.0</text>
+        <rect x="5" y="35" width="290" height="46" style="fill:#1a1b2e;stroke:var(--green);rx:3;stroke-width:1.2"/>
+        <text x="150" y="50" text-anchor="middle" fill="var(--green)" font-size="9" font-weight="bold">Shadow Mapping: PCFSoft 2048×2048</text>
+        <text x="150" y="63" text-anchor="middle" font-size="7">frustum [-40,40]×[-20,20] · bias -0.001</text>
+        <text x="150" y="75" text-anchor="middle" font-size="7">Dynamic: sunLight = camera.pos + sunOffset(6,10,4)</text>
       </svg></div>
     </div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:8px;height:100%">
-    <div class="card" style="flex:1"><h3>4. Shadow Mapping chi tiết</h3><ul><li><strong>PCFSoftShadowMap</strong>: nội suy nhiều mẫu → viền bóng mềm</li><li>Độ phân giải <span class="tag green">2048×2048</span> pixels</li><li>Bias = -0.001 chống shadow acne</li><li><strong>Dynamic tracking</strong>: sunLight luôn theo camera, shadow frustum không bao giờ rơi ngoài màn hình</li><li>Mọi mesh castShadow + receiveShadow</li></ul></div>
-    <div class="card" style="flex:0.8"><h3>5. Texture Mapping & Font 3D</h3><ul><li>PBR materials từ GLTF (color, roughness, metalness)</li><li>Canvas API sky gradient: Scene2 256², Menu 4×256</li><li>TextGeometry + font Mario cho chữ 3D nổi</li><li>Score popup: 2 lớp TextGeometry (outline + fill)</li></ul></div>
+  <div style="display:flex;flex-direction:column;gap:5px">
+    <div class="card" style="flex:1"><h3>4. Shadow Mapping</h3><ul><li><strong>PCFSoft</strong>: nội suy đa mẫu → bóng mềm</li><li>Độ phân giải <span class="tag green">2048×2048</span></li><li>Bias -0.001 chống shadow acne</li><li><strong>Dynamic tracking</strong>: sunLight bám camera</li><li>Mọi mesh castShadow + receiveShadow</li></ul></div>
+    <div class="card" style="flex:0.8"><h3>5. Texture Mapping</h3><ul><li>PBR materials từ GLTF model</li><li>Canvas sky gradient: 256² / 4×256</li><li>TextGeometry + font Mario cho chữ 3D</li><li>Score: outline + fill TextGeometry</li></ul></div>
     <div class="card" style="flex:1"><h3>6. Animation Pipeline</h3>
       <div style="flex:1;min-height:0"><svg class="diagram" viewBox="0 0 300 100" style="border:none;background:transparent">
         <text x="150" y="10" text-anchor="middle" class="title">Từ GLTF Model tới Frame Render</text>
-        <rect x="3" y="18" width="142" height="18" class="box"/><text x="74" y="30" text-anchor="middle">GLTF model.skeleton</text>
+        <rect x="3" y="18" width="142" height="18" class="box"/><text x="74" y="30" text-anchor="middle">GLTF skeleton</text>
         <line x1="145" y1="27" x2="155" y2="27" class="arrow"/>
         <rect x="155" y="18" width="142" height="18" class="box"/><text x="226" y="30" text-anchor="middle">AnimationMixer</text>
         <line x1="74" y1="36" x2="74" y2="46" class="arrow"/>
@@ -255,8 +255,8 @@ S.push({t:"Giới thiệu các kỹ thuật đồ họa sử dụng",c:`
     </div>
   </div>
 </div>
-<div class="card" style="flex-shrink:0"><h3>7. Kỹ thuật bổ trợ</h3>
-  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px">
+<div class="card" style="flex-shrink:0;padding:5px 10px"><h3>7. Kỹ thuật bổ trợ</h3>
+  <div style="display:flex;gap:4px;flex-wrap:wrap">
     <span class="tag">Frustum Culling</span><span class="tag green">Parallax Scrolling</span><span class="tag yellow">Particle System</span><span class="tag">One-way Platform</span><span class="tag green">Deferred Collision</span><span class="tag yellow">Physics 60Hz</span><span class="tag">Timescale Control</span>
   </div>
 </div>

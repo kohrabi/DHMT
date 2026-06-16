@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Báo cáo đồ án - Mô phỏng Game Super Mario 3D</title>
+  <style>
+    @page { size: A4; margin: 2cm; }
+    body { font-family: "Times New Roman", serif; font-size: 13pt; line-height: 1.45; color: #111; }
+    h1, h2, h3 { font-family: "Times New Roman", serif; color: #000; }
+    h1 { text-align: center; font-size: 20pt; margin: 8px 0; text-transform: uppercase; }
+    h2 { font-size: 16pt; margin-top: 20px; border-bottom: 1px solid #999; padding-bottom: 4px; }
+    h3 { font-size: 14pt; margin: 14px 0 6px; }
+    p { margin: 6px 0; text-align: justify; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+    th, td { border: 1px solid #333; padding: 7px; vertical-align: top; }
+    th { text-align: center; background: #e9eef7; }
+    ul { margin-top: 6px; }
+    li { margin-bottom: 4px; }
+    .cover { text-align: center; margin-top: 40px; }
+    .subtitle { text-align: center; font-size: 14pt; margin: 10px 0; }
+    .meta { width: 80%; margin: 26px auto; }
+    .meta td:first-child { width: 34%; font-weight: bold; background: #f5f5f5; }
+    .center { text-align: center; }
+    .figure { margin: 14px 0 20px; text-align: center; page-break-inside: avoid; }
+    .figure img { max-width: 100%; border: 1px solid #555; }
+    .caption { font-style: italic; font-size: 12pt; text-align: center; margin-top: 5px; }
+    .page-break { page-break-before: always; }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <p class="center"><strong>ĐẠI HỌC QUỐC GIA TP. HỒ CHÍ MINH</strong></p>
+    <p class="center"><strong>TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN</strong></p>
+    <br>
+    <p class="center"><strong>MÔN HỌC: ĐỒ HỌA MÁY TÍNH - CS105</strong></p>
+    <br>
+    <h1>BÁO CÁO ĐỒ ÁN</h1>
+    <h1>MÔ PHỎNG GAME SUPER MARIO 3D</h1>
+    <p class="subtitle">Sử dụng Three.js và Rapier Physics</p>
+    <table class="meta">
+      <tr><td>Giảng viên hướng dẫn</td><td>Cáp Phạm Đình Thăng</td></tr>
+      <tr><td>Lớp</td><td>CS105.Q22</td></tr>
+      <tr><td>Học kỳ</td><td>2025-2026</td></tr>
+    </table>
+    <br>
+    <p class="center">TP. Hồ Chí Minh, 2026</p>
+  </div>
+
+  <div class="page-break"></div>
+  <h2>1. Giới thiệu nhóm</h2>
+  <table>
+    <tr>
+      <th>STT</th>
+      <th>Họ và tên</th>
+      <th>MSSV</th>
+      <th>Vai trò / đóng góp</th>
+    </tr>
+    <tr>
+      <td class="center">1</td>
+      <td>Nguyễn Mỹ Thống</td>
+      <td class="center">23521527</td>
+      <td>Xây dựng scene, hệ thống đồ họa, ánh sáng, hiệu ứng, tài nguyên 3D và trình bày báo cáo.</td>
+    </tr>
+    <tr>
+      <td class="center">2</td>
+      <td>Đặng Trần Anh Hào</td>
+      <td class="center">23520444</td>
+      <td>Xây dựng gameplay, tích hợp engine, xử lý nhân vật, vật lý va chạm và hoàn thiện demo.</td>
+    </tr>
+  </table>
+
+  <h2>2. Giới thiệu đề tài</h2>
+  <p>Đồ án xây dựng một chương trình mô phỏng game platformer 3D lấy cảm hứng từ Super Mario. Người chơi điều khiển nhân vật di chuyển, nhảy qua chướng ngại vật, tương tác với các khối câu hỏi, thu thập vật phẩm và tiêu diệt kẻ địch trong môi trường 3D phong cách low-poly.</p>
+  <p>Dự án được phát triển trên nền WebGL thông qua thư viện Three.js, kết hợp Rapier3D để xử lý vật lý và va chạm. Mục tiêu chính là vận dụng các kiến thức đồ họa máy tính như phép chiếu phối cảnh, phép biến đổi affine, ánh sáng, bóng đổ, texture, mô hình 3D và animation vào một sản phẩm có tính tương tác thực tế.</p>
+
+  <h2>3. Công nghệ sử dụng</h2>
+  <table>
+    <tr><th>Công nghệ</th><th>Vai trò trong đồ án</th></tr>
+    <tr><td>Three.js</td><td>Dựng cảnh 3D, camera, ánh sáng, vật liệu, model GLTF, shadow mapping và render WebGL.</td></tr>
+    <tr><td>Rapier3D</td><td>Mô phỏng vật lý, rigid body, collider, va chạm nhân vật, enemy, block, platform và kill zone.</td></tr>
+    <tr><td>Vite / Bun</td><td>Môi trường phát triển và chạy demo cục bộ.</td></tr>
+    <tr><td>Tween.js</td><td>Hỗ trợ nội suy chuyển động, hiệu ứng UI, scale và animation phụ.</td></tr>
+    <tr><td>GLTF Assets</td><td>Nạp mô hình 3D cho nhân vật, map, enemy, coin, block và các vật thể trang trí.</td></tr>
+  </table>
+
+  <h2>4. Mô tả các chức năng trong đồ án</h2>
+  <h3>4.1. Các chức năng đã làm được</h3>
+  <ul>
+    <li><strong>Main Menu:</strong> Có màn hình menu chính với nền parallax, chữ 3D "SUPER MARIO", nút Start Game và Settings.</li>
+    <li><strong>Điều khiển nhân vật:</strong> Người chơi có thể di chuyển trái/phải, nhảy, chạy, ngồi và tương tác với môi trường.</li>
+    <li><strong>Camera 2.5D:</strong> Camera phối cảnh bám theo nhân vật, giới hạn trong vùng chơi và hỗ trợ OrbitControls để debug.</li>
+    <li><strong>Môi trường màn chơi:</strong> Có nền đồi xanh, cây, hoa, hàng rào, đá, ống nước, nền trời gradient và các platform.</li>
+    <li><strong>Question Block và Brick:</strong> Người chơi có thể tương tác với block để tạo hiệu ứng bật, score popup hoặc vật phẩm.</li>
+    <li><strong>Coin:</strong> Đồng xu có hiệu ứng xoay và dùng phép biến đổi trong không gian 3D.</li>
+    <li><strong>Enemy:</strong> Có Goomba/Koopa với logic di chuyển, va chạm và trạng thái bị tiêu diệt.</li>
+    <li><strong>Power-up:</strong> Có vật phẩm nấm và hiệu ứng phóng to nhân vật khi ăn power-up.</li>
+    <li><strong>Score Popup:</strong> Hiển thị điểm số dạng chữ 3D khi người chơi tiêu diệt enemy hoặc tương tác với object.</li>
+    <li><strong>Hiệu ứng hạt:</strong> Có hiệu ứng bụi khi nhân vật chạy/nhảy/chạm đất, giúp chuyển động sinh động hơn.</li>
+    <li><strong>Ánh sáng và bóng đổ:</strong> Sử dụng DirectionalLight, HemisphereLight và PCFSoft Shadow Map để tạo chiều sâu cho cảnh.</li>
+    <li><strong>Physics và collision:</strong> Tích hợp Rapier3D cho hệ thống collider, rigid body, one-way platform, kill zone và kiểm tra va chạm.</li>
+    <li><strong>Kiến trúc engine:</strong> Tách riêng engine và game logic gồm SceneManager, GameObject, ContentManager, InputManager, PhysicsWorld, Animator và GameTimer.</li>
+  </ul>
+
+  <h3>4.2. Các chức năng mới / điểm nổi bật</h3>
+  <ul>
+    <li><strong>3D Outline Text:</strong> Tạo chữ điểm số nổi bật bằng kỹ thuật double-mesh, giúp chữ có viền tương phản khi hiển thị trong cảnh 3D.</li>
+    <li><strong>Viewport Clamping:</strong> Camera được giới hạn động để không vượt ra ngoài PlayZone.</li>
+    <li><strong>Dynamic Shadow Tracking:</strong> Nguồn sáng và vùng đổ bóng bám theo camera để duy trì chất lượng bóng khi người chơi di chuyển.</li>
+    <li><strong>Z-up to Y-up Pipeline:</strong> Chuyển đổi hệ tọa độ model từ Blender sang Three.js để đồng bộ asset 3D.</li>
+    <li><strong>One-way Platform:</strong> Platform cho phép nhân vật nhảy xuyên từ dưới lên và đứng lại khi tiếp đất từ phía trên.</li>
+    <li><strong>Subpixel Movement Scale:</strong> Tối ưu cảm giác điều khiển và chuyển động của nhân vật theo phong cách platformer.</li>
+  </ul>
+
+  <h3>4.3. Các chức năng chưa làm được / hạn chế</h3>
+  <ul>
+    <li>Chưa có nhiều màn chơi, hiện mới tập trung vào một level demo.</li>
+    <li>Việc thiết kế bản đồ hiện được thực hiện bằng Blender và import vào dự án, chưa có công cụ chỉnh level trực tiếp ngay trong game.</li>
+    <li>Chưa hoàn thiện toàn bộ HUD như điểm, mạng, thời gian và trạng thái nhân vật.</li>
+    <li>Chưa tích hợp âm thanh nền và hiệu ứng âm thanh.</li>
+    <li>Một số power-up nâng cao như Racoon chưa được hoàn thiện đầy đủ.</li>
+    <li>Chưa tối ưu hoàn chỉnh cho thiết bị di động.</li>
+    <li>Chưa có hệ thống lưu điểm cao hoặc save/load tiến trình.</li>
+  </ul>
+
+  <h2>5. Show các chức năng đã làm</h2>
+  <p>Các hình bên dưới minh họa những chức năng chính đã hoàn thiện trong đồ án.</p>
+
+  <div class="figure">
+    <img src="../screenshoots/menu.png" alt="Main Menu">
+    <div class="caption">Hình 1. Màn hình Main Menu với chữ 3D, nền parallax, nút Start Game và Settings.</div>
+  </div>
+
+  <div class="figure">
+    <img src="../screenshoots/gameplay.png" alt="Gameplay">
+    <div class="caption">Hình 2. Màn chơi chính với nhân vật, Question Block, platform, pipe, nền đồi xanh và bóng đổ.</div>
+  </div>
+
+  <div class="figure">
+    <img src="../screenshoots/shadow_lightning.png" alt="Lighting and shadow">
+    <div class="caption">Hình 3. Hệ thống chiếu sáng và bóng đổ trong môi trường 3D.</div>
+  </div>
+
+  <div class="figure">
+    <img src="../screenshoots/score_popup.png" alt="Score popup">
+    <div class="caption">Hình 4. Hiệu ứng Score Popup khi nhân vật tương tác với block hoặc enemy.</div>
+  </div>
+
+  <div class="figure">
+    <img src="../screenshoots/death.png" alt="Death spin">
+    <div class="caption">Hình 5. Hiệu ứng nhân vật/enemy bị tiêu diệt và trạng thái death spin trong gameplay.</div>
+  </div>
+
+  <h2>6. Kết luận</h2>
+  <p>Đồ án đã hoàn thành một sản phẩm game platformer 3D có đầy đủ các thành phần cơ bản: menu, nhân vật điều khiển được, camera, môi trường 3D, enemy, vật phẩm, block tương tác, score popup, hiệu ứng hạt, ánh sáng, bóng đổ và hệ thống vật lý. Thông qua đồ án, nhóm đã áp dụng được nhiều kiến thức quan trọng của môn Đồ họa máy tính vào một chương trình có khả năng chạy và tương tác thực tế.</p>
+  <p>Trong tương lai, dự án có thể tiếp tục phát triển thêm nhiều level, âm thanh, HUD, công cụ chỉnh level trực tiếp trong game, lưu điểm cao, tối ưu mobile và các power-up nâng cao để hoàn thiện trải nghiệm giống một game platformer hoàn chỉnh hơn.</p>
+</body>
+</html>
